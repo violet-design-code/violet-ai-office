@@ -110,6 +110,21 @@ REQUIRED_TESTS.update({
      'tests.test_development.FinanceTests.test_missing_values_do_not_default_to_zero'})
 
 
+REQUIRED_TESTS.update({
+    'tests.test_sales.SalesTests.'+name for name in (
+        'test_tax_unknown_blocks_quote_send_and_contract_without_touching_old_prices',
+        'test_identity_link_requires_two_purpose_consents_and_unlink_preserves_businesses',
+        'test_actual_pipeline_invoice_partial_payment_final_payment_and_profit',
+        'test_mock_pipeline_does_not_enter_actual_financial_or_old_booking_counts',
+        'test_full_refund_credit_cancellation_reopen_and_revised_quote',
+        'test_web_acl_csrf_xss_and_manual_forgery_rejected',
+        'test_migration_from_actual_phase11_schema_preserves_all_old_rows',
+        'test_restore_rechecks_approvals_preserves_financial_history',
+        'test_opaque_shared_tasks_still_obey_emergency_stop_and_no_legacy_execution',
+    )
+} | {'tests.test_sales.SalesFinanceTests.test_unknown_tax_is_not_zero_and_not_approvable'})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -154,7 +169,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):
