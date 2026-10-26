@@ -304,6 +304,7 @@ class Portfolio:
         self.store._transaction(op)
 
     def run(self,p,business,task):
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='bd_tasks'").fetchone() and self.db.execute('SELECT 1 FROM bd_tasks WHERE task_id=?',(task,)).fetchone(): raise ValueError('Use approved development plan controls')
         self.writable(p,business)
         def op():
             row=self.db.execute('SELECT * FROM portfolio_tasks WHERE business_id=? AND task_id=?',(business,task)).fetchone()

@@ -1,0 +1,14 @@
+-- Independent development workspace. No legacy ownership or real business is created.
+CREATE TABLE IF NOT EXISTS bd_ideas(id TEXT PRIMARY KEY,business_id TEXT REFERENCES portfolio_businesses(id),title TEXT NOT NULL,brief TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1,status TEXT NOT NULL DEFAULT 'draft',created_by TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS bd_revisions(id INTEGER PRIMARY KEY,idea_id TEXT NOT NULL REFERENCES bd_ideas(id),revision INTEGER NOT NULL,snapshot TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS bd_sources(id TEXT PRIMARY KEY,idea_id TEXT NOT NULL REFERENCES bd_ideas(id),topic TEXT NOT NULL,claim TEXT NOT NULL,source_ref TEXT NOT NULL,research_day TEXT,confidence TEXT NOT NULL,state TEXT NOT NULL,unknowns TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS bd_scenarios(idea_id TEXT NOT NULL REFERENCES bd_ideas(id),name TEXT NOT NULL,parameters TEXT NOT NULL,basis TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1,PRIMARY KEY(idea_id,name));
+CREATE TABLE IF NOT EXISTS bd_proposals(id TEXT PRIMARY KEY,idea_id TEXT NOT NULL REFERENCES bd_ideas(id),input_digest TEXT NOT NULL,body TEXT NOT NULL,digest TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'approval_pending',created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS bd_draft_work(id TEXT PRIMARY KEY,proposal_id TEXT NOT NULL REFERENCES bd_proposals(id),agent TEXT NOT NULL,reason TEXT NOT NULL,input_refs TEXT NOT NULL,output TEXT NOT NULL,reviewer TEXT NOT NULL,state TEXT NOT NULL,created_at TEXT NOT NULL,UNIQUE(proposal_id,agent));
+CREATE TABLE IF NOT EXISTS bd_plans(id TEXT PRIMARY KEY,idea_id TEXT NOT NULL REFERENCES bd_ideas(id),proposal_id TEXT NOT NULL REFERENCES bd_proposals(id),horizon INTEGER NOT NULL,settings TEXT NOT NULL,status TEXT NOT NULL,created_at TEXT NOT NULL,UNIQUE(proposal_id,horizon));
+CREATE TABLE IF NOT EXISTS bd_tasks(task_id TEXT PRIMARY KEY REFERENCES tasks(id),plan_id TEXT NOT NULL REFERENCES bd_plans(id),stage TEXT NOT NULL,UNIQUE(plan_id,stage));
+CREATE TABLE IF NOT EXISTS bd_results(task_id TEXT PRIMARY KEY REFERENCES bd_tasks(task_id),body TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS bd_actuals(id TEXT PRIMARY KEY,idea_id TEXT NOT NULL REFERENCES bd_ideas(id),day TEXT NOT NULL,metric TEXT NOT NULL,value TEXT NOT NULL,mode TEXT NOT NULL,evidence TEXT NOT NULL,previous_id TEXT REFERENCES bd_actuals(id),created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS bd_events(id INTEGER PRIMARY KEY,idea_id TEXT REFERENCES bd_ideas(id),actor TEXT NOT NULL,event TEXT NOT NULL,ref TEXT NOT NULL,detail TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS bd_comparisons(id TEXT PRIMARY KEY,body TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS bd_validation_reviews(id TEXT PRIMARY KEY,idea_id TEXT NOT NULL REFERENCES bd_ideas(id),body TEXT NOT NULL,digest TEXT NOT NULL,status TEXT NOT NULL,created_at TEXT NOT NULL);

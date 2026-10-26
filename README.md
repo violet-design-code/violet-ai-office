@@ -63,3 +63,10 @@ python3 -m violet_office.growth_cli tick
 - [第10段階の実装範囲・6事業・権限・互換性・操作手順](docs/phase-10.md)
 
 `python3 -m violet_office.portfolio_demo` で一時DBだけの合成シナリオを確認できます。本番起動や既存データ移行は行いません。
+
+第11段階の「新規事業開発」では、既存事業と新規候補を複数登録し、出典/仮説・3シナリオの月次試算・提案・承認後の7/30/90日内部計画を管理できます。予算/希望値の初期値は未設定。実績は別記録で、試算を売上へ転記しません。実検索・実モデル・外部実行は未接続です。
+
+- [第11段階の正式要求・出典](docs/phase-11-requirements.md)
+- [第11段階の設計・計算式・検証・制限](docs/phase-11.md)
+
+`python3 -m violet_office.development_demo` は一時DBの合成仮定だけで再現します。mainへの統合や本番運用は代表の確認・承認後です。

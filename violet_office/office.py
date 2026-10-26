@@ -103,6 +103,9 @@ class Office:
         from .portfolio import Portfolio
         migrate_portfolio(store)
         self.portfolio=Portfolio(store)
+        from .development import migrate as migrate_development,Development
+        migrate_development(store)
+        self.development=Development(store,self.portfolio)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -248,7 +251,7 @@ class Office:
         return '/selection' if action.startswith('selection_') else '/seminar-admin'
 
     def portfolio_commands(self,session,nonce,action,data):
-        if not action.startswith('portfolio_') or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
+        if not action.startswith(('portfolio_','bd_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
         def op():
             current=self.session_by_snapshot(session)
             if not current or current['role']!='business_operator': raise PermissionError('Scoped session expired')
@@ -257,9 +260,10 @@ class Office:
             if old:
                 if old['actor']!=session['username'] or old['fingerprint']!=fingerprint: raise ValueError('Command conflict')
                 # Recheck access even for replay after a grant is revoked.
-                self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
+                if action.startswith('bd_'): self.development.access(Principal(session['role'],session['username']),data.get('idea'),True)
+                else: self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
                 return old['result']
-            result=self.portfolio_command(session,action,data)
+            result=self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
             self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,session['username'],fingerprint,result))
             return result
         return self.store._transaction(op)
@@ -312,7 +316,35 @@ class Office:
         else: raise ValueError('Unknown scoped action')
         return '/business?business='+business if business and action!='portfolio_create' else '/businesses'
 
+    def development_command(self,session,action,data):
+        from .development import BRIEF
+        from .development_finance import PARAMETERS
+        d=self.development; p=Principal(session['role'],session['username']); idea=data.get('idea')
+        if action=='bd_create':
+            idea=d.create(p,data['title'],{k:data.get(k) for k in BRIEF},data.get('business') or None)
+        elif action=='bd_edit': d.edit(p,idea,data['title'],{k:data.get(k) for k in BRIEF},int(data['revision']))
+        elif action=='bd_idea_decide': d.decide_idea(p,idea,data['decision'])
+        elif action=='bd_source': d.source(p,idea,data['topic'],data['claim'],data.get('source_ref',''),data.get('research_day') or None,data['confidence'],data['state'],data.get('unknowns',''))
+        elif action=='bd_source_withdraw': d.withdraw_source(p,idea,data['id'])
+        elif action=='bd_scenario': d.scenario(p,idea,data['name'],{k:data.get(k) for k in PARAMETERS},data.get('basis',''))
+        elif action=='bd_proposal': d.proposal(p,idea,data.get('with_content')=='1')
+        elif action=='bd_proposal_decide': d.decide_proposal(p,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='bd_plan': d.plan(p,data['id'],int(data['horizon']),{'budget_yen':data.get('budget_yen'),'api_budget_microusd':usd(data.get('api_budget_usd','0')),'start_day':data['start_day'],'kpi':data.get('kpi'),'withdrawal':data.get('withdrawal')})
+        elif action=='bd_run': d.run(p,data['id'])
+        elif action=='bd_resume': d.resume(p,data['id'])
+        elif action=='bd_pause': d.pause(p,data['id'])
+        elif action=='bd_actual': d.actual(p,idea,data['day'],data['metric'],data['value'],data['mode'],data['evidence'],data.get('previous') or None)
+        elif action=='bd_validation_review': d.validation_review(p,idea)
+        elif action=='bd_validation_decide': d.decide_validation_review(p,data['id'],data['decision'])
+        elif action=='bd_compare':
+            comparison,_=d.compare(p,[v.strip() for v in data['ideas'].split(',') if v.strip()],data['criterion'])
+            return '/development-compare?id='+comparison
+        else: raise ValueError('Unknown development action')
+        return '/development-idea?id='+idea if idea else '/development'
+
     def _command(self,session,action,data):
+        if action.startswith('bd_'):
+            return self.development_command(session,action,data)
         if action.startswith('portfolio_'):
             return self.portfolio_command(session,action,data)
         if action.startswith(('seminar_','selection_')):
@@ -413,6 +445,7 @@ class Office:
             campaign=self.content.generate(data['key'],data['instruction'],int(data['days']),data['platform'],data['start_date'])
             return '/approvals?campaign='+campaign
         if action in ('start','stop','retry'):
+            if self.db.execute('SELECT 1 FROM bd_tasks WHERE task_id=?',(ref,)).fetchone(): raise ValueError('Use development plan controls')
             if self.db.execute('SELECT 1 FROM portfolio_tasks WHERE task_id=?',(ref,)).fetchone(): raise ValueError('Use the scoped business task controls')
             if self.db.execute('SELECT 1 FROM growth_work WHERE task_id=?',(ref,)).fetchone():
                 raise ValueError('Use the local scheduler controls for generated work')
@@ -454,6 +487,7 @@ class Office:
             self.db.execute('UPDATE request_options SET priority=? WHERE request_id=?',(priority,ref))
             return '/requests?id='+ref
         if action=='result':
+            if self.db.execute('SELECT 1 FROM bd_tasks WHERE task_id=?',(ref,)).fetchone(): raise ValueError('Use development plan controls')
             if self.db.execute('SELECT 1 FROM portfolio_tasks WHERE task_id=?',(ref,)).fetchone(): raise ValueError('Business outputs must remain in scoped storage')
             safe_input(data['content'])
             run=self.db.execute("SELECT id FROM runs WHERE task_id=? AND status='running'",(ref,)).fetchone()

@@ -19,6 +19,7 @@ from . import growth_views
 from . import learning_views
 from . import phase9_views
 from . import portfolio_views
+from . import development_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -126,7 +127,7 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path!='/seminars':
                 return self.response(303,extra={'Location':'/seminars'})
-            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo'):
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea'):
                 return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
@@ -137,6 +138,9 @@ class OfficeApp:
                 mime,blob=office.portfolio.photo_bytes(Principal(session['role'],session['username']),params.get('business',[''])[0],ref)
                 return self.response(200,blob,{'Content-Disposition':'attachment; filename="photo.'+('png' if mime=='image/png' else 'jpg')+'"'},content_type=mime)
             pages={
+                '/development':('新規事業開発',lambda:development_views.home(office,session)),
+                '/development-idea':('事業アイデア・検証',lambda:development_views.detail(office,session,ref)),
+                '/development-compare':('事業候補の比較',lambda:development_views.comparison(office,session,ref)),
                 '/businesses':('統合経営ダッシュボード',lambda:portfolio_views.home(office,session,params)),
                 '/business':('事業別管理',lambda:portfolio_views.business(office,session,params)),
                 '/business-reports':('AI経営会議',lambda:portfolio_views.reports(office,session)),

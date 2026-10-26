@@ -1,0 +1,772 @@
+{
+  "mode": "synthetic_temporary_database_not_real_market_or_income",
+  "real_representative_approval": false,
+  "ideas": [
+    {
+      "id": "197b985116eb4f5cb690589200185931",
+      "title": "セルフホワイトニングの合成候補",
+      "business_id": null,
+      "brief": "{\"assets\": \"\", \"budget_yen\": null, \"desired_profit_yen\": null, \"desired_revenue_yen\": null, \"hours_month\": null, \"industry\": \"\", \"region\": \"\", \"target\": \"\"}",
+      "status": "draft"
+    },
+    {
+      "id": "9b86924dd8d044a392d20c681d7a35c1",
+      "title": "スマホ教室の合成候補",
+      "business_id": null,
+      "brief": "{\"assets\": \"\", \"budget_yen\": null, \"desired_profit_yen\": null, \"desired_revenue_yen\": null, \"hours_month\": null, \"industry\": \"\", \"region\": \"\", \"target\": \"\"}",
+      "status": "draft"
+    },
+    {
+      "id": "852402b2bd5040128d285fb0b442a24a",
+      "title": "鏡清掃の合成候補",
+      "business_id": null,
+      "brief": "{\"assets\": \"\", \"budget_yen\": null, \"desired_profit_yen\": null, \"desired_revenue_yen\": null, \"hours_month\": null, \"industry\": \"\", \"region\": \"\", \"target\": \"\"}",
+      "status": "draft"
+    },
+    {
+      "id": "45b02bc0161f4bceabbfe3d9f7955045",
+      "title": "独立新規事業の合成候補",
+      "business_id": null,
+      "brief": "{\"assets\": \"\", \"budget_yen\": null, \"desired_profit_yen\": null, \"desired_revenue_yen\": null, \"hours_month\": null, \"industry\": \"\", \"region\": \"\", \"target\": \"\"}",
+      "status": "draft"
+    }
+  ],
+  "forecast": {
+    "optimistic": {
+      "basis": "合成テストの明示的仮定。市場・実収益の根拠として使用不可。",
+      "calculation": {
+        "actual_revenue": null,
+        "assumptions": {
+          "conversion_percent": "50",
+          "fixed_cost_yen": "10000",
+          "hours_month": "20",
+          "hours_per_sale": "1",
+          "initial_cost_yen": "30000",
+          "leads_month": "20",
+          "price_yen": "6000",
+          "variable_cost_per_sale_yen": "1000"
+        },
+        "currency": "JPY",
+        "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+        "formulas": {
+          "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+          "gross_profit": "売上 − 変動費",
+          "hours": "期待成約件数 × 1件あたり作業時間",
+          "operating_profit": "粗利益 − 月間固定費",
+          "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+          "revenue": "期待成約件数 × 単価",
+          "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+          "variable_cost": "期待成約件数 × 1件あたり変動費"
+        },
+        "missing": [],
+        "mode": "prediction_from_assumptions",
+        "period": "month",
+        "results": {
+          "break_even_leads": "4",
+          "break_even_revenue_yen": "12000.00",
+          "break_even_units": "2",
+          "expected_sales": "10.00",
+          "gross_profit_yen": "50000.00",
+          "operating_profit_yen": "40000.00",
+          "payback_months": "0.75",
+          "required_hours": "10.00",
+          "revenue_yen": "60000.00",
+          "variable_cost_yen": "10000.00",
+          "within_hours": true
+        },
+        "status": "computed_prediction",
+        "warnings": []
+      }
+    },
+    "pessimistic": {
+      "basis": "合成テストの明示的仮定。市場・実収益の根拠として使用不可。",
+      "calculation": {
+        "actual_revenue": null,
+        "assumptions": {
+          "conversion_percent": "50",
+          "fixed_cost_yen": "10000",
+          "hours_month": "20",
+          "hours_per_sale": "1",
+          "initial_cost_yen": "30000",
+          "leads_month": "20",
+          "price_yen": "6000",
+          "variable_cost_per_sale_yen": "1000"
+        },
+        "currency": "JPY",
+        "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+        "formulas": {
+          "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+          "gross_profit": "売上 − 変動費",
+          "hours": "期待成約件数 × 1件あたり作業時間",
+          "operating_profit": "粗利益 − 月間固定費",
+          "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+          "revenue": "期待成約件数 × 単価",
+          "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+          "variable_cost": "期待成約件数 × 1件あたり変動費"
+        },
+        "missing": [],
+        "mode": "prediction_from_assumptions",
+        "period": "month",
+        "results": {
+          "break_even_leads": "4",
+          "break_even_revenue_yen": "12000.00",
+          "break_even_units": "2",
+          "expected_sales": "10.00",
+          "gross_profit_yen": "50000.00",
+          "operating_profit_yen": "40000.00",
+          "payback_months": "0.75",
+          "required_hours": "10.00",
+          "revenue_yen": "60000.00",
+          "variable_cost_yen": "10000.00",
+          "within_hours": true
+        },
+        "status": "computed_prediction",
+        "warnings": []
+      }
+    },
+    "standard": {
+      "basis": "合成テストの明示的仮定。市場・実収益の根拠として使用不可。",
+      "calculation": {
+        "actual_revenue": null,
+        "assumptions": {
+          "conversion_percent": "50",
+          "fixed_cost_yen": "10000",
+          "hours_month": "20",
+          "hours_per_sale": "1",
+          "initial_cost_yen": "30000",
+          "leads_month": "20",
+          "price_yen": "6000",
+          "variable_cost_per_sale_yen": "1000"
+        },
+        "currency": "JPY",
+        "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+        "formulas": {
+          "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+          "gross_profit": "売上 − 変動費",
+          "hours": "期待成約件数 × 1件あたり作業時間",
+          "operating_profit": "粗利益 − 月間固定費",
+          "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+          "revenue": "期待成約件数 × 単価",
+          "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+          "variable_cost": "期待成約件数 × 1件あたり変動費"
+        },
+        "missing": [],
+        "mode": "prediction_from_assumptions",
+        "period": "month",
+        "results": {
+          "break_even_leads": "4",
+          "break_even_revenue_yen": "12000.00",
+          "break_even_units": "2",
+          "expected_sales": "10.00",
+          "gross_profit_yen": "50000.00",
+          "operating_profit_yen": "40000.00",
+          "payback_months": "0.75",
+          "required_hours": "10.00",
+          "revenue_yen": "60000.00",
+          "variable_cost_yen": "10000.00",
+          "within_hours": true
+        },
+        "status": "computed_prediction",
+        "warnings": []
+      }
+    }
+  },
+  "before_proposal_approval_internal_tasks": 0,
+  "selected_draft_roles": [
+    "AI01",
+    "AI02",
+    "AI03",
+    "AI04",
+    "AI05",
+    "AI07",
+    "AI08",
+    "AI09",
+    "AI14",
+    "AI20",
+    "AI25",
+    "AI27",
+    "AI28"
+  ],
+  "completed_local_checks": 7,
+  "plan_state": "paused",
+  "comparison": {
+    "criterion": "evidence",
+    "rows": [
+      {
+        "idea_id": "197b985116eb4f5cb690589200185931",
+        "title": "セルフホワイトニングの合成候補",
+        "input_digest": "bfaed07217a7e12ab036809d1e98d8f221caba87a5d9f8f68f4dd1c24bf3466e",
+        "evidence_topics": 0,
+        "standard": {
+          "mode": "prediction_from_assumptions",
+          "currency": "JPY",
+          "period": "month",
+          "formulas": {
+            "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+            "revenue": "期待成約件数 × 単価",
+            "variable_cost": "期待成約件数 × 1件あたり変動費",
+            "gross_profit": "売上 − 変動費",
+            "operating_profit": "粗利益 − 月間固定費",
+            "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+            "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+            "hours": "期待成約件数 × 1件あたり作業時間"
+          },
+          "missing": [
+            "initial_cost_yen",
+            "fixed_cost_yen",
+            "variable_cost_per_sale_yen",
+            "price_yen",
+            "leads_month",
+            "conversion_percent",
+            "hours_per_sale",
+            "hours_month"
+          ],
+          "actual_revenue": null,
+          "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+          "status": "uncomputed",
+          "results": null
+        },
+        "scenarios": {
+          "optimistic": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          },
+          "pessimistic": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          },
+          "standard": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          }
+        },
+        "rankable": false,
+        "status": "要調査・条件確認",
+        "priority": null
+      },
+      {
+        "idea_id": "9b86924dd8d044a392d20c681d7a35c1",
+        "title": "スマホ教室の合成候補",
+        "input_digest": "7262e04c055677572e4cf92a44932728220661c4caab1b9631dd90f4cf9deeff",
+        "evidence_topics": 0,
+        "standard": {
+          "mode": "prediction_from_assumptions",
+          "currency": "JPY",
+          "period": "month",
+          "formulas": {
+            "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+            "revenue": "期待成約件数 × 単価",
+            "variable_cost": "期待成約件数 × 1件あたり変動費",
+            "gross_profit": "売上 − 変動費",
+            "operating_profit": "粗利益 − 月間固定費",
+            "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+            "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+            "hours": "期待成約件数 × 1件あたり作業時間"
+          },
+          "missing": [
+            "initial_cost_yen",
+            "fixed_cost_yen",
+            "variable_cost_per_sale_yen",
+            "price_yen",
+            "leads_month",
+            "conversion_percent",
+            "hours_per_sale",
+            "hours_month"
+          ],
+          "actual_revenue": null,
+          "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+          "status": "uncomputed",
+          "results": null
+        },
+        "scenarios": {
+          "optimistic": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          },
+          "pessimistic": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          },
+          "standard": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          }
+        },
+        "rankable": false,
+        "status": "要調査・条件確認",
+        "priority": null
+      },
+      {
+        "idea_id": "852402b2bd5040128d285fb0b442a24a",
+        "title": "鏡清掃の合成候補",
+        "input_digest": "59f03f682e9b9457e2e6856d9bb3a5b224c0dd79c395e8de385cea892cc883ba",
+        "evidence_topics": 0,
+        "standard": {
+          "mode": "prediction_from_assumptions",
+          "currency": "JPY",
+          "period": "month",
+          "formulas": {
+            "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+            "revenue": "期待成約件数 × 単価",
+            "variable_cost": "期待成約件数 × 1件あたり変動費",
+            "gross_profit": "売上 − 変動費",
+            "operating_profit": "粗利益 − 月間固定費",
+            "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+            "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+            "hours": "期待成約件数 × 1件あたり作業時間"
+          },
+          "missing": [],
+          "actual_revenue": null,
+          "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+          "status": "computed_prediction",
+          "assumptions": {
+            "conversion_percent": "50",
+            "fixed_cost_yen": "10000",
+            "hours_month": "20",
+            "hours_per_sale": "1",
+            "initial_cost_yen": "30000",
+            "leads_month": "20",
+            "price_yen": "6000",
+            "variable_cost_per_sale_yen": "1000"
+          },
+          "results": {
+            "expected_sales": "10.00",
+            "revenue_yen": "60000.00",
+            "variable_cost_yen": "10000.00",
+            "gross_profit_yen": "50000.00",
+            "operating_profit_yen": "40000.00",
+            "break_even_units": "2",
+            "break_even_revenue_yen": "12000.00",
+            "break_even_leads": "4",
+            "payback_months": "0.75",
+            "required_hours": "10.00",
+            "within_hours": true
+          },
+          "warnings": []
+        },
+        "scenarios": {
+          "optimistic": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "computed_prediction",
+            "assumptions": {
+              "conversion_percent": "50",
+              "fixed_cost_yen": "10000",
+              "hours_month": "20",
+              "hours_per_sale": "1",
+              "initial_cost_yen": "30000",
+              "leads_month": "20",
+              "price_yen": "6000",
+              "variable_cost_per_sale_yen": "1000"
+            },
+            "results": {
+              "expected_sales": "10.00",
+              "revenue_yen": "60000.00",
+              "variable_cost_yen": "10000.00",
+              "gross_profit_yen": "50000.00",
+              "operating_profit_yen": "40000.00",
+              "break_even_units": "2",
+              "break_even_revenue_yen": "12000.00",
+              "break_even_leads": "4",
+              "payback_months": "0.75",
+              "required_hours": "10.00",
+              "within_hours": true
+            },
+            "warnings": []
+          },
+          "pessimistic": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "computed_prediction",
+            "assumptions": {
+              "conversion_percent": "50",
+              "fixed_cost_yen": "10000",
+              "hours_month": "20",
+              "hours_per_sale": "1",
+              "initial_cost_yen": "30000",
+              "leads_month": "20",
+              "price_yen": "6000",
+              "variable_cost_per_sale_yen": "1000"
+            },
+            "results": {
+              "expected_sales": "10.00",
+              "revenue_yen": "60000.00",
+              "variable_cost_yen": "10000.00",
+              "gross_profit_yen": "50000.00",
+              "operating_profit_yen": "40000.00",
+              "break_even_units": "2",
+              "break_even_revenue_yen": "12000.00",
+              "break_even_leads": "4",
+              "payback_months": "0.75",
+              "required_hours": "10.00",
+              "within_hours": true
+            },
+            "warnings": []
+          },
+          "standard": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "computed_prediction",
+            "assumptions": {
+              "conversion_percent": "50",
+              "fixed_cost_yen": "10000",
+              "hours_month": "20",
+              "hours_per_sale": "1",
+              "initial_cost_yen": "30000",
+              "leads_month": "20",
+              "price_yen": "6000",
+              "variable_cost_per_sale_yen": "1000"
+            },
+            "results": {
+              "expected_sales": "10.00",
+              "revenue_yen": "60000.00",
+              "variable_cost_yen": "10000.00",
+              "gross_profit_yen": "50000.00",
+              "operating_profit_yen": "40000.00",
+              "break_even_units": "2",
+              "break_even_revenue_yen": "12000.00",
+              "break_even_leads": "4",
+              "payback_months": "0.75",
+              "required_hours": "10.00",
+              "within_hours": true
+            },
+            "warnings": []
+          }
+        },
+        "rankable": false,
+        "status": "要調査・条件確認",
+        "priority": null
+      },
+      {
+        "idea_id": "45b02bc0161f4bceabbfe3d9f7955045",
+        "title": "独立新規事業の合成候補",
+        "input_digest": "fdca7ec4f7f7a314bb3f1ea21549950b34417cfe0fbf223e36281b269392df73",
+        "evidence_topics": 0,
+        "standard": {
+          "mode": "prediction_from_assumptions",
+          "currency": "JPY",
+          "period": "month",
+          "formulas": {
+            "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+            "revenue": "期待成約件数 × 単価",
+            "variable_cost": "期待成約件数 × 1件あたり変動費",
+            "gross_profit": "売上 − 変動費",
+            "operating_profit": "粗利益 − 月間固定費",
+            "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+            "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+            "hours": "期待成約件数 × 1件あたり作業時間"
+          },
+          "missing": [
+            "initial_cost_yen",
+            "fixed_cost_yen",
+            "variable_cost_per_sale_yen",
+            "price_yen",
+            "leads_month",
+            "conversion_percent",
+            "hours_per_sale",
+            "hours_month"
+          ],
+          "actual_revenue": null,
+          "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+          "status": "uncomputed",
+          "results": null
+        },
+        "scenarios": {
+          "optimistic": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          },
+          "pessimistic": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          },
+          "standard": {
+            "mode": "prediction_from_assumptions",
+            "currency": "JPY",
+            "period": "month",
+            "formulas": {
+              "sales": "月間見込み客数 × 成約率 ÷ 100（期待件数、小数可）",
+              "revenue": "期待成約件数 × 単価",
+              "variable_cost": "期待成約件数 × 1件あたり変動費",
+              "gross_profit": "売上 − 変動費",
+              "operating_profit": "粗利益 − 月間固定費",
+              "break_even_sales": "ceil(月間固定費 ÷ (単価 − 1件あたり変動費))",
+              "payback": "初期費用 ÷ 月次営業利益（正の場合、一定継続の仮定）",
+              "hours": "期待成約件数 × 1件あたり作業時間"
+            },
+            "missing": [
+              "initial_cost_yen",
+              "fixed_cost_yen",
+              "variable_cost_per_sale_yen",
+              "price_yen",
+              "leads_month",
+              "conversion_percent",
+              "hours_per_sale",
+              "hours_month"
+            ],
+            "actual_revenue": null,
+            "exclusions": "税・借入・金利・減価償却・季節性・回収不能・運転資金の増減は未計算。単純回収期間はキャッシュフロー分析ではない。収益保証なし。",
+            "status": "uncomputed",
+            "results": null
+          }
+        },
+        "rankable": false,
+        "status": "要調査・条件確認",
+        "priority": null
+      }
+    ],
+    "unranked": "根拠・予算・時間条件不足は順位なし。数字を補完しない。",
+    "mode": "assumptions_comparison_not_recommendation_to_spend"
+  },
+  "validation_review_state": "approval_pending",
+  "actual_records": 0,
+  "portfolio_ledger_records": 0,
+  "registered_real_businesses": 0,
+  "real_external_services": [],
+  "new_paid_api_calls": 0,
+  "external_attempts": 0,
+  "foreign_key_violations": 0,
+  "production_started": false
+}
