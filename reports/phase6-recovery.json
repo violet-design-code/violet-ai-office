@@ -1,0 +1,35 @@
+{
+  "scenario": "temporary synthetic SQLite/WAL backup and new-file restore",
+  "source_unchanged": true,
+  "snapshot_health": {
+    "application_schema": true,
+    "integrity_ok": true,
+    "foreign_key_violations": 0,
+    "dependency_cycle": false,
+    "schema_tables": 45,
+    "healthy": true
+  },
+  "restore_result": {
+    "restored_to_new_file": true,
+    "health": {
+      "application_schema": true,
+      "integrity_ok": true,
+      "foreign_key_violations": 0,
+      "dependency_cycle": false,
+      "schema_tables": 45,
+      "healthy": true
+    },
+    "quarantine": {
+      "sessions_invalidated": 1,
+      "runs_quarantined": 1,
+      "tasks_paused": 1,
+      "operations_held": 2,
+      "steps_held": 7,
+      "contents_requiring_reapproval": 1
+    },
+    "automatic_resume": false,
+    "source_snapshot_id": "d02e284d9a9c45f4b1d57edf76cad07c"
+  },
+  "actual_customer_data": false,
+  "actual_external_calls": 0
+}

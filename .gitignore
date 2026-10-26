@@ -5,3 +5,11 @@ var/
 .env
 .env.*
 !.env.example
+
+# SQLite files and recovery manifests may contain private operational data.
+*.sqlite
+*.sqlite3
+*.db
+*.db-*
+*.sqlite3-*
+*.backup.json

@@ -53,6 +53,19 @@ def department(agent):
 
 def redact(value):
     text=str(value)
+    def mask(item):
+        if isinstance(item,dict):
+            hidden={'apikey','accesstoken','token','secret','password','channelsecret','authorization','email','phone','lineuserid','fullname'}
+            return {k:('[非表示]' if re.sub(r'[_-]','',str(k)).casefold() in hidden else mask(v)) for k,v in item.items()}
+        if isinstance(item,list):
+            return [mask(v) for v in item]
+        return item
+    try:
+        structured=json.loads(text)
+        if isinstance(structured,(dict,list)):
+            text=json.dumps(mask(structured),ensure_ascii=False,indent=2)
+    except (ValueError,RecursionError):
+        pass
     text=re.sub(r'[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}','[メール非表示]',text)
     text=re.sub(r'(?i)(?:bearer\s+|sk-)[A-Za-z0-9_.-]+','[秘密値非表示]',text)
     text=re.sub(r'(?i)((?:api[_-]?key|token|secret|password|電話|氏名)\s*[=:：]\s*)[^\s,}\n]+',r'\1[非表示]',text)
@@ -93,6 +106,10 @@ class Office:
         row=self.db.execute('SELECT * FROM office_sessions WHERE token_hash=?',(key,)).fetchone()
         if not row or row['expires_at']<=now().isoformat() or row['seen_at']<(now()-timedelta(minutes=30)).isoformat():
             return None
+        if row['username']:
+            user=self.db.execute('SELECT role FROM office_users WHERE username=?',(row['username'],)).fetchone()
+            if not user or user['role']!=row['role']:
+                return None
         self.db.execute('UPDATE office_sessions SET seen_at=? WHERE token_hash=?',(now().isoformat(),key))
         return dict(row)
 
@@ -132,6 +149,9 @@ class Office:
         if not re.fullmatch(r'[a-f0-9]{32}',nonce):
             raise ValueError('Invalid command')
         def op():
+            current=self.db.execute('SELECT s.*,u.role AS current_role FROM office_sessions s JOIN office_users u ON u.username=s.username WHERE s.token_hash=?',(session.get('token_hash'),)).fetchone()
+            if not current or current['username']!=session['username'] or current['current_role']!='representative' or current['role']!='representative' or current['expires_at']<=now().isoformat() or current['seen_at']<(now()-timedelta(minutes=30)).isoformat():
+                raise PermissionError('セッションが失効しています')
             fingerprint=digest([action,data])
             old=self.db.execute('SELECT * FROM office_commands WHERE nonce=?',(nonce,)).fetchone()
             if old:
@@ -319,3 +339,16 @@ class Office:
             'business':{k:None for k in ['今月の問い合わせ','今月の面談予約','紹介件数','契約件数','SNS投稿数','LINE登録数','SNSからの流入','面談希望数','問い合わせ→面談転換率','面談→契約転換率']},
             'mock':{'LINE仮名登録':self.db.execute('SELECT COUNT(*) FROM ix_customers').fetchone()[0], '問い合わせ':self.db.execute('SELECT COUNT(*) FROM ix_inquiries').fetchone()[0], '予約確定':self.db.execute("SELECT COUNT(*) FROM ix_bookings WHERE status='confirmed'").fetchone()[0]},
             'month':today[:7]}
+
+    def alerts(self):
+        alerts=[]
+        for label,query in [
+            ('失敗タスク',"SELECT COUNT(*) FROM tasks WHERE status='failed'"),
+            ('モックAPI失敗/結果不明',"SELECT COUNT(*) FROM ix_operations WHERE status IN ('failed','manual_reconciliation')"),
+            ('期限切れの実行',"SELECT COUNT(*) FROM runs WHERE status='running' AND deadline<=?"),
+            ('修正が必要な原稿',"SELECT COUNT(*) FROM content_versions WHERE status='changes_requested'"),
+        ]:
+            count=self.db.execute(query,(now().isoformat(),) if '?' in query else ()).fetchone()[0]
+            if count:
+                alerts.append({'label':label,'count':count})
+        return alerts

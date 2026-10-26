@@ -144,3 +144,13 @@ class Coordinator:
                 WHERE d.task_id=t.id AND p.status NOT IN ('completed','approval_pending','manual_execution_pending'))
             ORDER BY o.priority,r.created_at,t.agent""").fetchall()
         return [dict(row) for row in rows]
+
+    def department_report(self):
+        """Five configured department heads; supervision summary, not LLM execution."""
+        result=[]
+        for head in ('AI02','AI07','AI14','AI20','AI25'):
+            members=[a['id'] for a in self.store.agents.values() if a['reports_to']==head]
+            member_tasks=[dict(r) for r in self.db.execute('SELECT id,agent,status FROM tasks') if r['agent'] in members+[head]]
+            result.append({'head':head,'role':self.store.agents[head]['role'],'members':members,
+                'tasks':member_tasks,'execution_mode':'local_supervision_summary','model_connected':False})
+        return result

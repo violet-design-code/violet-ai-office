@@ -313,7 +313,7 @@ class Integrations:
                 raise ValueError('Consent or delivery state changed')
         elif row['kind']=='sns':
             payload=json.loads(row['payload'])
-            content=self.content._latest(payload['content_id'])
+            content=self.content.verify_approved(payload['content_id'])
             if content['status']!='approved' or content['digest']!=payload['digest'] or digest(json.loads(content['body']))!=payload['digest']:
                 raise ValueError('Current approved content required')
             if json.loads(content['body']).get('platform')=='Instagram' and not payload['assets']:

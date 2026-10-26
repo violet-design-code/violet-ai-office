@@ -1,0 +1,1 @@
+{"login": "passed", "browser_form_operations": ["task_assignment", "manual_start", "pause", "content_rejection"], "desktop_pages": 7, "mobile_pages_without_horizontal_overflow": 7, "external_browser_requests": "blocked", "screenshots": ["examples/phase-6/desktop.png", "examples/phase-6/mobile.png"]}

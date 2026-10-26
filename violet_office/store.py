@@ -152,6 +152,8 @@ class Store:
             row = self._active(run)
             if row['deadline'] <= now().isoformat():
                 raise ValueError('Run expired; expire it before retrying')
+            if self.db.execute("SELECT 1 FROM dependencies d JOIN tasks t ON t.id=d.prerequisite WHERE d.task_id=? AND t.status NOT IN ('completed','approval_pending','manual_execution_pending') LIMIT 1",(row['task_id'],)).fetchone():
+                raise ValueError('A prerequisite is no longer accepted')
             artifact = uuid4().hex
             self.db.execute('INSERT INTO artifacts VALUES (?,?,?,?)', (artifact,row['task_id'],row['agent'],content))
             self.db.execute("UPDATE runs SET status='completed' WHERE id=?", (run,))
@@ -174,10 +176,12 @@ class Store:
 
     def expire(self):
         # Do not re-execute a timed-out external call: phase one has no such calls.
-        rows = self.db.execute("SELECT id FROM runs WHERE status='running' AND deadline<=?", (now().isoformat(),)).fetchall()
-        for row in rows:
-            self.fail(row['id'], 'timeout', retryable=True)
-        return len(rows)
+        def op():
+            rows = self.db.execute("SELECT id FROM runs WHERE status='running' AND deadline<=?", (now().isoformat(),)).fetchall()
+            for row in rows:
+                self.fail(row['id'], 'timeout', retryable=True)
+            return len(rows)
+        return self._transaction(op)
 
     def review(self, artifact, reviewer, verdict, note=''):
         if verdict not in {'pass','changes_requested'}:
