@@ -160,6 +160,8 @@ def restore(snapshot,destination):
                 counts['growth_plans_reapproval']=db.execute("UPDATE growth_runs SET decision='approval_pending' WHERE decision='approve'").rowcount
             if 'growth_proposals' in known:
                 counts['growth_proposals_held']=db.execute("UPDATE growth_proposals SET status='approval_pending' WHERE status='approved_local'").rowcount
+            if 'br_requests' in known:
+                counts['readiness_reapproval']=db.execute("UPDATE br_requests SET status='approval_pending',approved_by=NULL,approved_at=NULL WHERE status='approved'").rowcount
             if 'aw_jobs' in known:
                 counts['collaboration_jobs_held']=db.execute("UPDATE aw_jobs SET state='paused',next_at=NULL").rowcount
                 db.execute("UPDATE aw_changes SET status='approval_pending',approved_by=NULL,approved_at=NULL WHERE status='approved_manual_only'")

@@ -1,0 +1,18 @@
+{
+  "mode": "synthetic_temporary_database",
+  "stateless_preview": "passed",
+  "representative_review_then_separate_apply": "passed",
+  "business_creation_list_reflection": "passed",
+  "business_pause_reactivate": "passed",
+  "one_employee_two_businesses": "passed",
+  "release_is_logical_and_scoped": "passed",
+  "28_existing_employee_api": "passed",
+  "owner_only_mutations": "passed",
+  "final_phase20_editors": "not_implemented_by_design",
+  "desktop_routes": 7,
+  "mobile_routes": 7,
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested",
+  "actual_external_services": [],
+  "production_started": false
+}
