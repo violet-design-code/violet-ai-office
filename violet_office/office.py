@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 
 from .store import Store, now
 from .growth import Growth,GOALS,usd
+from .learning import Learning,STYLES,disable_style
 from .registry import load_agents
 from .coordinator import Coordinator
 from .content import ContentOffice, CHECKS, safe_input, encode, digest
@@ -71,7 +72,7 @@ def redact(value):
     text=re.sub(r'(?i)(?:bearer\s+|sk-)[A-Za-z0-9_.-]+','[秘密値非表示]',text)
     text=re.sub(r'(?i)((?:api[_-]?key|token|secret|password|電話|氏名)\s*[=:：]\s*)[^\s,}\n]+',r'\1[非表示]',text)
     text=re.sub(r'U[0-9a-f]{32}','[LINE ID非表示]',text)
-    text=re.sub(r'0\d{1,3}[- ]?\d{2,4}[- ]?\d{4}','[電話非表示]',text)
+    text=re.sub(r'(?<![A-Za-z0-9])0\d{1,3}[- ]?\d{2,4}[- ]?\d{4}(?![A-Za-z0-9])','[電話非表示]',text)
     return text
 
 
@@ -91,6 +92,7 @@ class Office:
         self.db.executescript(SCHEMA)
         self.db.execute('INSERT OR IGNORE INTO office_budgets VALUES (?,0)',(now().astimezone(JST).strftime('%Y-%m'),))
         self.growth=Growth(store)
+        self.learning=Learning(store)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -129,7 +131,8 @@ class Office:
     def login(self,username,password):
         if len(username)>80 or len(password)>256:
             raise PermissionError('認証できません')
-        bucket=now().strftime('%Y%m%d%H')+str(now().minute//10)
+        sampled_at=now()
+        bucket=sampled_at.strftime('%Y%m%d%H')+str(sampled_at.minute//10)
         def check_limit():
             self.db.execute('INSERT INTO office_login_limits VALUES (?,1) ON CONFLICT(bucket) DO UPDATE SET count=count+1',(bucket,))
             return self.db.execute('SELECT count FROM office_login_limits WHERE bucket=?',(bucket,)).fetchone()[0]
@@ -180,6 +183,50 @@ class Office:
 
     def _command(self,session,action,data):
         ref=data.get('id','')
+        principal=Principal(session['role'],session['username'])
+        if action=='learning_feedback':
+            self.learning.feedback(principal,data['key'],data['target_kind'],data['target_id'],data['choice'],data['comment'],{key:data.get(key)=='1' for key in STYLES},data.get('attested')=='1')
+            return '/learning'
+        if action=='learning_feedback_decide':
+            self.learning.decide_feedback(principal,ref,data['decision'])
+            return '/learning'
+        if action in ('learning_knowledge','learning_promote'):
+            expiry=datetime.fromisoformat(data['expires'])
+            if expiry.tzinfo is None:
+                expiry=expiry.replace(tzinfo=JST)
+            scope=[s.strip() for s in data['scope'].split(',') if s.strip()]
+            if action=='learning_promote':
+                self.learning.promote_feedback(principal,ref,data['title'],scope,expiry.isoformat())
+            else:
+                self.learning.knowledge(principal,data['category'],data['task_kind'],data['title'],data['body'],data['source_kind'],data['source_ref'],scope,expiry.isoformat(),data.get('attested')=='1',data.get('previous') or None)
+            return '/learning'
+        if action=='learning_knowledge_decide':
+            self.learning.decide_knowledge(principal,ref,data['decision'])
+            return '/learning'
+        if action=='learning_rate':
+            self.learning.rate(principal,data['target_kind'],data['target_id'],int(data['score']),data['rubric'])
+            return '/learning'
+        if action=='learning_evaluate':
+            identifier,_=self.learning.evaluate(principal,data['task_kind'],data['start'],data['end'])
+            return '/learning?evaluation='+identifier
+        if action=='learning_propose':
+            self.learning.propose(principal,data['task_kind'],[s.strip() for s in data.get('knowledge_ids','').split(',') if s.strip()],data.get('evaluation_id') or None)
+            return '/learning'
+        if action=='learning_compare':
+            self.learning.compare(principal,ref)
+            return '/learning'
+        if action=='learning_improvement_decide':
+            self.learning.decide_proposal(principal,ref,data['decision'])
+            return '/learning'
+        if action=='learning_apply':
+            self.learning.apply(principal,ref)
+            return '/learning'
+        if action=='learning_disable':
+            disable_style(self.learning,principal,ref)
+            return '/learning'
+        if action=='learning_index':
+            self.learning.index_history(principal)
+            return '/learning'
         if action=='growth_goals':
             values={key:None if data.get(key,'').strip()=='' else int(data[key]) for key in GOALS if key!='ai_budget_microusd'}
             values['ai_budget_microusd']=None if not data.get('ai_budget_usd','').strip() else usd(data['ai_budget_usd'])

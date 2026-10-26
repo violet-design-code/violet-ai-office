@@ -44,3 +44,10 @@ python3 -m violet_office.growth_cli tick
 ```
 
 常駐ワーカーは必要な場合だけ `python3 -m violet_office.growth_cli watch --interval 30` で明示起動します。計画承認と外部送信承認は別で、実モデル・外部APIは未接続です。
+
+第8段階では「知識・改善」と社員別業務履歴を追加しました。出典・版・期限・共有範囲を確認した承認済み知識を検索し、代表の指導と評価を保存します。モデル学習は行いません。改善の自動適用は比較・承認を経た固定文章スタイルのみです。
+
+- [第8段階の実装範囲・評価・検証・操作手順](docs/phase-8.md)
+- [合成データによる7日分のサンプル](examples/phase-8/sample.md)
+
+`python3 -m violet_office.learning_demo` で一時DBによる再現確認ができます。通常のWeb起動では本番運用や外部送信を開始しません。

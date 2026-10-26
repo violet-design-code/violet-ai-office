@@ -163,6 +163,9 @@ class Store:
             self.db.execute("UPDATE runs SET status='completed' WHERE id=?", (run,))
             self.db.execute("UPDATE tasks SET status='review_pending' WHERE id=?", (row['task_id'],))
             self._event(row['task_id'], 'artifact_created')
+            from .learning import record_artifact
+            task=self.db.execute('SELECT * FROM tasks WHERE id=?',(row['task_id'],)).fetchone()
+            record_artifact(self.db,task,artifact,self.agents[task['agent']]['role'],now().isoformat())
             return artifact
         return self._transaction(op)
 

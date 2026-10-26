@@ -16,6 +16,7 @@ from .store import Store
 from .office import Office
 from . import web_views as views
 from . import growth_views
+from . import learning_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -119,6 +120,8 @@ class OfficeApp:
                 raise ValueError('Duplicate parameter')
             ref=params.get('id',[None])[0]
             pages={
+                '/learning':('知識・フィードバック・改善',lambda:learning_views.dashboard(office,session,params.get('evaluation',[None])[0],params.get('q',[''])[0],params.get('agent',['AI09'])[0],params.get('kind',['sns'])[0])),
+                '/employee-learning':('社員の業務・改善履歴',lambda:learning_views.employee(office,session,ref)),
                 '/growth':('目標・定期業務',lambda:growth_views.growth(office,session,params.get('month',[None])[0])),
                 '/reports':('業務レポート',lambda:growth_views.reports(office,session,ref)),
                 '/':('社長室ダッシュボード',lambda:views.home(office,session)),
