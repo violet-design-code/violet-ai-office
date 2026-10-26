@@ -21,6 +21,7 @@ from . import phase9_views
 from . import portfolio_views
 from . import development_views
 from . import sales_views
+from . import workflow_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -128,7 +129,7 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path!='/seminars':
                 return self.response(303,extra={'Location':'/seminars'})
-            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard'):
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow'):
                 return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
@@ -139,6 +140,7 @@ class OfficeApp:
                 mime,blob=office.portfolio.photo_bytes(Principal(session['role'],session['username']),params.get('business',[''])[0],ref)
                 return self.response(200,blob,{'Content-Disposition':'attachment; filename="photo.'+('png' if mime=='image/png' else 'jpg')+'"'},content_type=mime)
             pages={
+                '/workflow':('AI社員の業務・営業支援',lambda:workflow_views.home(office,session,params)),
                 '/sales':('営業・顧客管理',lambda:sales_views.home(office,session,params)),
                 '/sales-deal':('営業案件の詳細',lambda:sales_views.detail(office,session,params,ref)),
                 '/sales-dashboard':('売上・営業ダッシュボード',lambda:sales_views.dashboard(office,session,params)),

@@ -1,0 +1,248 @@
+{
+  "mode": "synthetic_temporary_database_not_real_business_results",
+  "registered_agents": 28,
+  "tasks": [
+    {
+      "agent": "AI17",
+      "status": "review_pending",
+      "mode": "local_rule_template_not_llm"
+    },
+    {
+      "agent": "AI28",
+      "status": "review_pending",
+      "mode": "local_rule_template_not_llm"
+    }
+  ],
+  "seminar_draft_status": "approval_pending",
+  "approved_queue_size": 0,
+  "dashboard": {
+    "period": [
+      "2026-10-01",
+      "2026-10-27"
+    ],
+    "mode": "manual_attestations_not_provider_verified",
+    "due_internal_tasks": 2,
+    "active_deals": 1,
+    "alerts": {
+      "unreplied": [],
+      "unhandled": [
+        "dfc9aa30fea6406fbc955daa2024fc1a"
+      ],
+      "overdue": [],
+      "quote_unanswered": []
+    },
+    "bookings": {
+      "candidate": 0,
+      "confirmed": 0
+    },
+    "unpaid_yen": null,
+    "sales": {
+      "legacy_revenue_yen": null,
+      "automatic_ledger_merge": false,
+      "business_id": "BIZ-B",
+      "period": [
+        "2026-10-01",
+        "2026-10-27"
+      ],
+      "mode": "manual_attestations_not_provider_verified",
+      "expected_gross_yen": null,
+      "quote_gross_yen": null,
+      "confirmed_net_yen": null,
+      "paid_net_cash_yen": null,
+      "expense_yen": null,
+      "approx_profit_yen": null,
+      "contact_count": 0,
+      "proposal_count": 0,
+      "quote_approval_percent": null,
+      "booking_percent": null,
+      "contract_percent": 0.0,
+      "repeat_percent": null,
+      "unhandled_count": 1,
+      "overdue_count": 0,
+      "denominators": {
+        "monthly_deals": 1,
+        "quote_decisions": 0,
+        "booking_candidates": 0,
+        "provided_customers": 0
+      },
+      "definitions": "月内受付コホートの集計時点状態。対応済みは承認後の人の確認行為あり、提案件数は準備を含む。予約/成約率は確定申告の履歴を含む（取消後も過去事実は残る）。売上=代表が請求確認した税抜額−同期間の全額取消。入金=同期間の手動入金−返金。法的売上認識/銀行照合ではない。",
+      "exclusions": "所得/法人税・借入・季節性・未入力経費・USDのAI費は概算利益に含めない。旧経費台帳の税区分は未保持。旧売上台帳は重複照合未実施のため別掲し、自動合算しない。事業開発の予測は一切参照しない。"
+    },
+    "employees": [
+      {
+        "agent": "AI01",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI02",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI03",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI04",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI05",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI06",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI07",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI08",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI09",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI10",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI11",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI12",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI13",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI14",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI15",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI16",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI17",
+        "assigned": 1,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI18",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI19",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI20",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI21",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI22",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI23",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI24",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI25",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI26",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI27",
+        "assigned": 0,
+        "approved": 0,
+        "paused": 0
+      },
+      {
+        "agent": "AI28",
+        "assigned": 1,
+        "approved": 0,
+        "paused": 0
+      }
+    ],
+    "external_api": "未接続・実送信なし"
+  },
+  "actual_external_services": [],
+  "external_send_attempts": 0,
+  "invoice_records": 0,
+  "production_started": false,
+  "foreign_key_violations": 0
+}

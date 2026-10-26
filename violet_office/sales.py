@@ -462,3 +462,7 @@ def redact_contact(store,business,contact):
     db.execute("UPDATE scm_notes SET body='論理消去済み' WHERE business_id=? AND deal_id IN(SELECT id FROM scm_deals WHERE business_id=? AND contact_id=?)",(business,business,contact))
     db.execute("UPDATE scm_actions SET evidence=NULL,status=CASE WHEN status IN ('approved','approval_pending','retry_wait') THEN 'stale' ELSE status END WHERE business_id=? AND deal_id IN(SELECT id FROM scm_deals WHERE business_id=? AND contact_id=?)",(business,business,contact))
     db.execute('UPDATE scm_identity_links SET active=0 WHERE business_id=? AND contact_id=?',(business,contact))
+
+    if db.execute("SELECT 1 FROM sqlite_master WHERE name='wf_tasks'").fetchone():
+        db.execute("UPDATE wf_tasks SET purpose='論理消去済み',basis='論理消去済み',result='論理消去済み',paused=1 WHERE business_id=? AND deal_id IN(SELECT id FROM scm_deals WHERE business_id=? AND contact_id=?)",(business,business,contact))
+        db.execute("UPDATE wf_drafts SET status='stale' WHERE business_id=? AND deal_id IN(SELECT id FROM scm_deals WHERE business_id=? AND contact_id=?)",(business,business,contact))

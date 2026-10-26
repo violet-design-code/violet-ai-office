@@ -294,6 +294,7 @@ class Portfolio:
         return self.store._transaction(op)
 
     def task_control(self,p,business,task,action,priority=None):
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='wf_tasks'").fetchone() and self.db.execute('SELECT 1 FROM wf_tasks WHERE task_id=?',(task,)).fetchone(): raise ValueError('Use workflow task controls')
         self.access(p,business,True)
         def op():
             row=self.db.execute('SELECT * FROM portfolio_tasks WHERE business_id=? AND task_id=?',(business,task)).fetchone()
@@ -310,6 +311,7 @@ class Portfolio:
         self.store._transaction(op)
 
     def run(self,p,business,task):
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='wf_tasks'").fetchone() and self.db.execute('SELECT 1 FROM wf_tasks WHERE task_id=?',(task,)).fetchone(): raise ValueError('Use workflow task controls')
         if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='scm_work'").fetchone() and self.db.execute('SELECT 1 FROM scm_work WHERE task_id=?',(task,)).fetchone(): raise ValueError('Use scoped sales task controls')
         if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='bd_tasks'").fetchone() and self.db.execute('SELECT 1 FROM bd_tasks WHERE task_id=?',(task,)).fetchone(): raise ValueError('Use approved development plan controls')
         self.writable(p,business)

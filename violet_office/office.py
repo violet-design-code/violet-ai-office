@@ -109,6 +109,9 @@ class Office:
         from .sales import migrate as migrate_sales,Sales
         migrate_sales(store)
         self.sales=Sales(store,self.portfolio)
+        from .workflow import migrate as migrate_workflow,Workflow
+        migrate_workflow(store)
+        self.workflow=Workflow(self)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -254,7 +257,7 @@ class Office:
         return '/selection' if action.startswith('selection_') else '/seminar-admin'
 
     def portfolio_commands(self,session,nonce,action,data):
-        if not action.startswith(('portfolio_','bd_','scm_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
+        if not action.startswith(('portfolio_','bd_','scm_','wf_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
         def op():
             current=self.session_by_snapshot(session)
             if not current or current['role']!='business_operator': raise PermissionError('Scoped session expired')
@@ -266,7 +269,7 @@ class Office:
                 if action.startswith('bd_'): self.development.access(Principal(session['role'],session['username']),data.get('idea'),True)
                 else: self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
                 return old['result']
-            result=self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
+            result=self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
             self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,session['username'],fingerprint,result))
             return result
         return self.store._transaction(op)
@@ -378,7 +381,23 @@ class Office:
         else: raise ValueError('Unknown sales command')
         return '/sales-deal?business='+b+'&id='+deal if deal else '/sales?business='+b
 
+    def workflow_command(self,session,action,data):
+        w=self.workflow; p=Principal(session['role'],session['username']); b=data['business']; d=data.get('deal')
+        if action=='wf_attach': w.attach(p,b,d)
+        elif action=='wf_advance': w.advance(p,b,d,data['stage'],data['revision'])
+        elif action=='wf_assign': w.assign(p,b,d,data['key'],data['agent'],data['purpose'],data['basis'],data['due'],data.get('priority',3))
+        elif action=='wf_control': w.control(p,b,data['task'],data['control'],data.get('value'))
+        elif action=='wf_run': w.run(p,b,data['task'])
+        elif action=='wf_decide': w.decide_task(p,b,data['task'],data['decision'],data.get('checked')=='1')
+        elif action=='wf_draft': w.draft(p,b,d,data['seminar'],data['username'],data['kind'])
+        elif action=='wf_draft_decide': w.decide_draft(p,b,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='wf_attendance': w.attendance(p,b,d,data['seminar'],data['username'],data['outcome'],data['evidence'])
+        else: raise ValueError('Unknown workflow command')
+        return '/workflow?business='+b
+
     def _command(self,session,action,data):
+        if action.startswith('wf_'):
+            return self.workflow_command(session,action,data)
         if action.startswith('scm_'):
             return self.sales_command(session,action,data)
         if action.startswith('bd_'):
