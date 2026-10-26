@@ -121,6 +121,9 @@ class Office:
         from .business_operations import migrate as migrate_operations,BusinessOperations
         migrate_operations(store)
         self.business_operations=BusinessOperations(self)
+        from .customer_journey import migrate as migrate_journey,CustomerJourney
+        migrate_journey(store)
+        self.customer_journey=CustomerJourney(self)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -271,7 +274,7 @@ class Office:
         return '/selection' if action.startswith('selection_') else '/seminar-admin'
 
     def portfolio_commands(self,session,nonce,action,data):
-        if not action.startswith(('portfolio_','bd_','scm_','wf_','s14_','bf_','ops_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
+        if not action.startswith(('portfolio_','bd_','scm_','wf_','s14_','bf_','ops_','cj_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
         def op():
             current=self.session_by_snapshot(session)
             if not current or current['role']!='business_operator': raise PermissionError('Scoped session expired')
@@ -283,7 +286,7 @@ class Office:
                 if action.startswith('bd_'): self.development.access(Principal(session['role'],session['username']),data.get('idea'),True)
                 else: self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
                 return old['result']
-            result=self.business_operations_command(session,action,data) if action.startswith('ops_') else self.business_foundation_command(session,action,data) if action.startswith('bf_') else self.seminar_support_command(session,action,data) if action.startswith('s14_') else self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
+            result=self.customer_journey_command(session,action,data) if action.startswith('cj_') else self.business_operations_command(session,action,data) if action.startswith('ops_') else self.business_foundation_command(session,action,data) if action.startswith('bf_') else self.seminar_support_command(session,action,data) if action.startswith('s14_') else self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
             self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,session['username'],fingerprint,result))
             return result
         return self.store._transaction(op)
@@ -462,7 +465,23 @@ class Office:
         else: raise ValueError('Unknown operations action')
         return '/business?business='+b+'&start='+data['start']+'&end='+data['end']
 
+    def customer_journey_command(self,session,action,data):
+        p=Principal(session['role'],session['username']); b=data['business']; service=self.customer_journey
+        if action=='cj_profile':
+            from .customer_journey import DETAILS
+            service.save_profile(p,b,data['origin'],{k:data.get(k,'') for k in DETAILS},data.get('revision',0))
+        elif action=='cj_source': service.source(p,b,data['source_id'],data['url'],data['status'],data['checked_day'],data['expires_day'],data['excerpt'],data.get('revision',0))
+        elif action=='cj_decide':
+            if data['decision'] not in ('approve','reject'): raise ValueError('Known representative decision required')
+            service.decide(p,b,data['revision'],data['decision']=='approve',data.get('checked')=='1')
+        elif action=='cj_intake': service.intake(p,b,data['key'],data['interest'],data['inquiry'],data.get('contact') or None,data.get('name',''),data.get('channel',''),data['mode'])
+        elif action=='cj_route': service.route(p,b,data['deal'],data['kind'],data['due'])
+        elif action=='cj_request': service.request(p,b,data['deal'],data['key'],data['start'],data['end'])
+        else: raise ValueError('Known journey action required')
+        return '/customer-journey?business='+b
+
     def _command(self,session,action,data):
+        if action.startswith('cj_'): return self.customer_journey_command(session,action,data)
         if action.startswith('ops_'):
             return self.business_operations_command(session,action,data)
         if action.startswith('bf_'):

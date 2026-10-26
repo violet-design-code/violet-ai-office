@@ -1,0 +1,15 @@
+{
+  "mode": "synthetic_temporary_database",
+  "initial_businesses": 6,
+  "contact_consent_inquiry_estimate_approval_pending": "passed",
+  "private_photo_multipart_upload_download": "passed",
+  "scoped_tasks_and_revenue_expense_records": "passed",
+  "meeting_report": "approval_pending",
+  "operator_cross_business_access": "denied",
+  "desktop_routes": 5,
+  "mobile_routes": 5,
+  "external_browser_requests": "blocked",
+  "actual_external_services": [],
+  "real_iphone": "not_tested",
+  "evidence_context": "Phase17 regression, synthetic temporary database, loopback Chromium; not production"
+}
