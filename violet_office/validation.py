@@ -38,6 +38,18 @@ def source_fingerprint(root=ROOT):
     return aggregate.hexdigest()
 
 
+REQUIRED_TESTS.update({
+    'tests.test_growth.GrowthTests.'+name for name in (
+        'test_goals_unset_remain_nullable_and_zero_is_explicit',
+        'test_daily_generation_needed_roles_handoffs_and_approval_stop',
+        'test_weekly_and_monthly_reports_generate_without_fake_success',
+        'test_failure_auto_pause_safe_retry_reuses_completed_handoffs',
+        'test_plan_assignment_priority_deadline_and_human_gate',
+        'test_two_scheduler_workers_do_not_duplicate_artifacts',
+    )
+})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -82,7 +94,10 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        evidence=json.loads((ROOT/'reports'/'phase6-validation.json').read_text())
+        report=ROOT/'reports'/'phase7-validation.json'
+        if not report.is_file():
+            report=ROOT/'reports'/'phase6-validation.json'
+        evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):
         return assess()

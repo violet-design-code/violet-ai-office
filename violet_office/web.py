@@ -15,6 +15,7 @@ from urllib.parse import urlsplit, parse_qs
 from .store import Store
 from .office import Office
 from . import web_views as views
+from . import growth_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -118,6 +119,8 @@ class OfficeApp:
                 raise ValueError('Duplicate parameter')
             ref=params.get('id',[None])[0]
             pages={
+                '/growth':('目標・定期業務',lambda:growth_views.growth(office,session,params.get('month',[None])[0])),
+                '/reports':('業務レポート',lambda:growth_views.reports(office,session,ref)),
                 '/':('社長室ダッシュボード',lambda:views.home(office,session)),
                 '/employees':('AI社員管理',lambda:views.employees(office,session,ref)),
                 '/instructions':('統括本部長への指示',lambda:views.instructions(office,session)),

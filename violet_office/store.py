@@ -111,6 +111,10 @@ class Store:
             row = self.db.execute('SELECT * FROM tasks WHERE id=?', (task,)).fetchone()
             if not row or row['status'] != 'pending' or row['attempts'] >= row['max_attempts']:
                 raise ValueError('Task unavailable')
+            if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='growth_proposals'").fetchone():
+                proposal=self.db.execute('SELECT status FROM growth_proposals WHERE task_id=?',(task,)).fetchone()
+                if proposal and proposal[0]!='approved_local':
+                    raise ValueError('Business plan requires representative approval')
             blocked = self.db.execute(
                 "SELECT 1 FROM dependencies d JOIN tasks t ON t.id=d.prerequisite WHERE d.task_id=? AND t.status NOT IN ('completed','approval_pending','manual_execution_pending') LIMIT 1",
                 (task,)).fetchone()

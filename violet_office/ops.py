@@ -37,7 +37,9 @@ def health(path):
         known=tables(db)
         cycles=False
         if 'dependencies' in known:
-            edges=list(db.execute('SELECT task_id,prerequisite FROM dependencies'))
+            edges=[('task:'+r[0],'task:'+r[1]) for r in db.execute('SELECT task_id,prerequisite FROM dependencies')]
+            if 'growth_edges' in known:
+                edges.extend(('work:'+r[0],'work:'+r[1]) for r in db.execute('SELECT work_id,prerequisite FROM growth_edges'))
             incoming={node:0 for edge in edges for node in edge}
             next_nodes={node:[] for node in incoming}
             for node,prerequisite in edges:
@@ -151,6 +153,13 @@ def restore(snapshot,destination):
                 counts['operations_held']=db.execute("UPDATE ix_operations SET status='manual_reconciliation',approved_digest=NULL,next_attempt=NULL WHERE status IN ('running','approved','retry_wait','approval_pending')").rowcount
             if 'ix_steps' in known:
                 counts['steps_held']=db.execute("UPDATE ix_steps SET status='recovery_hold' WHERE status='scheduled_mock'").rowcount
+            if 'growth_schedules' in known:
+                counts['growth_schedules_paused']=db.execute("UPDATE growth_schedules SET enabled=0,state='recovery_hold'").rowcount
+            if 'growth_runs' in known:
+                counts['growth_runs_held']=db.execute("UPDATE growth_runs SET status='paused',lease=NULL,error_code='recovery_hold' WHERE status IN ('running','pending')").rowcount
+                counts['growth_plans_reapproval']=db.execute("UPDATE growth_runs SET decision='approval_pending' WHERE decision='approve'").rowcount
+            if 'growth_proposals' in known:
+                counts['growth_proposals_held']=db.execute("UPDATE growth_proposals SET status='approval_pending' WHERE status='approved_local'").rowcount
             if 'content_versions' in known:
                 approved=db.execute("SELECT id FROM content_versions WHERE status='approved'").fetchall()
                 counts['contents_requiring_reapproval']=len(approved)

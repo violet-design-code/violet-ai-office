@@ -40,7 +40,7 @@ def card(title,value,note=''):
 
 
 def layout(title,body,session=None,path=''):
-    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視')]
+    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート')]
     navigation='<nav>'+''.join(f'<a href="{url}"'+(' aria-current="page"' if path==url else '')+'>'+name+'</a>' for url,name in nav)+'</nav>' if session and session.get('username') else ''
     logout=''
     if session and session.get('username'):
@@ -59,7 +59,7 @@ def home(office,session):
     if office.alerts():
         body+='<div class="notice">要対応：'+e(' / '.join(a['label']+' '+str(a['count'])+'件' for a in office.alerts()))+' <a href="/monitor">監視画面を確認</a></div>'
     body+='<div class="grid">'+''.join(card(k,v,'ローカルDBの記録') for k,v in m['local'].items())+card('API確定利用料金',sum(r['amount'] for r in office.costs()['entries'] if r['kind']=='confirmed' and r['mode']=='manual')/1000000 if any(r['kind']=='confirmed' and r['mode']=='manual' for r in office.costs()['entries']) else None,'USD・手動確認記録／API自動取得は未接続')+'</div>'
-    body+='<h2>経営指標</h2><div class="grid">'+''.join(card(k,v,'実サービス未接続') for k,v in list(m['business'].items())[:6])+'</div>'
+    body+='<h2>経営指標</h2><div class="grid">'+''.join(card(k,v,'手動実測申告・対象期間の全日分' if v is not None else '自動取得未接続・計測不足') for k,v in list(m['business'].items())[:6])+'</div>'
     body+='<h2>5人のAI部門長</h2><div class="grid">'+''.join('<a class="card" href="/employees?id='+agent+'"><span class="id">'+agent+'</span><h3>'+e(name+'部長')+'</h3><span class="badge">モデルAPI未接続</span></a>' for agent,name in DEPARTMENTS.items())+'</div>'
     body+='<h2>ローカルタスクの状態</h2><div class="panel">'
     for status in ('pending','running','review_pending','approval_pending','completed','failed','paused'):
@@ -82,6 +82,9 @@ def employees(office,session,agent_id=None):
             controls=''
             blocked=office.db.execute("SELECT 1 FROM dependencies d JOIN tasks t ON t.id=d.prerequisite WHERE d.task_id=? AND t.status NOT IN ('completed','approval_pending','manual_execution_pending')",(task['id'],)).fetchone()
             aggregate=office.db.execute("SELECT 1 FROM request_tasks WHERE task_id=? AND kind='aggregate'",(task['id'],)).fetchone()
+            proposal=office.db.execute('SELECT status FROM growth_proposals WHERE task_id=?',(task['id'],)).fetchone()
+            if proposal and proposal['status']!='approved_local':
+                blocked=True
             if task['status'] in ('pending','paused'):
                 if not blocked and not aggregate and task['attempts']<task['max_attempts']:
                     controls+=form(session,'start',data={'id':task['id']},caption='手動作業を開始',style='inline')
@@ -100,8 +103,8 @@ def employees(office,session,agent_id=None):
                 controls+=form(session,'result','<label>匿名化した成果物（手動登録）</label><textarea name="content" required maxlength="10000"></textarea>',{'id':task['id']},'成果物を登録')
             payload=json.loads(task['payload'])
             summary=payload.get('instruction',payload.get('brief',payload.get('purpose','ローカル作業'))) if isinstance(payload,dict) else 'ローカル作業'
-            rows.append([e(task['id']),e(summary if session['role']=='representative' else '詳細は代表のみ'),e(label(task['status'])),e(task['priority'] or '未設定'),dt(task['updated_at']),controls or '操作対象なし'])
-        body+=table(['タスクID','仕事内容','進捗','優先度','最終イベント（日本時間）','ローカル操作'],rows)
+            rows.append([e(task['id']),e(summary if session['role']=='representative' else '詳細は代表のみ'),e(label(task['status'])),e(task['priority'] or '未設定'),dt(task['updated_at']),dt(task['planned_due']) if task.get('planned_due') else '未設定',controls or '操作対象なし'])
+        body+=table(['タスクID','仕事内容','進捗','優先度','最終イベント（日本時間）','計画期限（日本時間）','ローカル操作'],rows)
         artifacts=office.db.execute('SELECT a.*,t.status FROM artifacts a JOIN tasks t ON t.id=a.task_id WHERE a.author=? ORDER BY a.rowid DESC',(agent_id,)).fetchall()
         body+='<h2>成果物</h2>'
         for a in artifacts:
@@ -153,6 +156,8 @@ def approvals(office,session,campaign=None):
     body='<div class="notice">承認だけでは送信・公開・実予約確定しません。外部実行はすべて未接続。自動チェックは法令適合を保証しません。原稿承認には全確認項目の根拠記録が必要です。</div>'
     query='SELECT * FROM content_versions WHERE status!=\'superseded\''
     rows=office.db.execute(query+(' AND campaign_id=?' if campaign else '')+' ORDER BY rowid DESC', (campaign,) if campaign else ()).fetchall()
+    reports=office.db.execute("SELECT COUNT(*) FROM growth_runs WHERE status='succeeded_local' AND decision='approval_pending'").fetchone()[0]
+    body+='<div class="notice">業務計画・レポートの承認待ち '+str(reports)+'件。<a href="/reports">レポートを確認</a></div>'
     body+='<h2>SNS・LINE・紹介文・制作指示</h2>'
     for row in rows:
         audit=office.db.execute('SELECT * FROM content_audits WHERE content_id=?',(row['id'],)).fetchone()
@@ -199,7 +204,9 @@ def approvals(office,session,campaign=None):
 
 def analytics(office,session):
     m=office.metrics()
-    return '<p>対象月：'+e(m['month'])+'（日本時間）。外部計測ソースは未接続です。分母・分子が未取得の転換率は計算しません。</p><div class="grid">'+''.join(card(k,v,'本番データ未接続') for k,v in m['business'].items())+'</div><h2>モック検証データ（実績に含めない）</h2><div class="grid">'+''.join(card(k,v,'第4段階モックDBの累計') for k,v in m['mock'].items())+'</div>'
+    body='<p>対象月：'+e(m['month'])+'（日本時間）。自動取得は未接続。全日分の手動実測申告がある場合のみ月間件数を表示します。顧客単位の転換率は未計測です。<a href="/growth">実績の記録</a></p><div class="grid">'+''.join(card(k,v,'手動実測申告' if v is not None else '未接続または計測不足') for k,v in m['business'].items())+'</div>'
+    body+='<h2>手動実測の計測範囲（部分計測は月間実績と扱わない）</h2>'+table(['指標','記録済み件数','状態','日数'],[[e(v['title']),e(v['value'] if v['value'] is not None else '未計測'),e(v['status']),e(str(v['coverage_days'])+'/'+str(v['expected_days']))] for v in m['manual_business'].values()])
+    return body+'<h2>モック検証データ（実績に含めない）</h2><div class="grid">'+''.join(card(k,v,'第4段階モックDBの累計') for k,v in m['mock'].items())+'</div>'
 
 
 def costs(office,session):
@@ -228,6 +235,8 @@ def monitor(office,session):
     from .validation import saved_assessment
     readiness=saved_assessment()
     body='<div class="notice">本番移行不可。外部接続・実LINE回帰・セキュリティ確認・代表承認が未完了です。</div>'+table(['対象','状態'],[[e(k),e(v)] for k,v in services])
+    body+='<h2>定期業務の異常履歴</h2>'+table(['処理','参照','日時'],[[e(r[0]),e(r[1]),dt(r[2])] for r in db.execute("SELECT action,ref,created_at FROM growth_audit WHERE action IN ('local_failure_auto_stop','schedule_prepare_failure','attempt_limit_reached') ORDER BY id DESC LIMIT 100")])
+    body+='<h2>定期業務</h2>'+table(['頻度','状態','次回'],[[e(r[0]),e(r[1]),dt(r[2])] for r in db.execute('SELECT cadence,state,next_due FROM growth_schedules')])
     body+='<h2>要対応の通知（画面内のみ）</h2>'+table(['問題','件数'],[[e(a['label']),e(a['count'])] for a in office.alerts()])
     body+='<h2>5部門長の担当管理（ローカル集計）</h2>'+table(['部門長','部下','担当タスク'],[[e(d['head']),e(', '.join(d['members'])),e(len(d['tasks']))] for d in office.coordinator.department_report()])
     body+='<h2>本番移行ゲート</h2>'+table(['条件','状態','根拠'],[[e(g['condition']),e(g['state']),e(g['note'])] for g in readiness['gates']])
