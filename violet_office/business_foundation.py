@@ -128,9 +128,14 @@ class BusinessFoundation:
         self.store._transaction(op)
     def read_for_ai(self,p,b,agent,resource='business_read',start=None,end=None):
         self.pf.access(p,b)
-        if resource not in ('business_read','finance_read') or not ai_allowed(self.store,agent,b,resource): raise PermissionError('Assigned business and explicit read permission required')
+        permission='finance_read' if resource=='kpi_read' else resource
+        if resource not in ('business_read','finance_read','kpi_read') or not ai_allowed(self.store,agent,b,permission):
+            if resource=='kpi_read': self.o.business_operations.audit(p,b,'ai_scope','denied',agent)
+            raise PermissionError('Assigned business and explicit read permission required')
         row=self.db.execute('SELECT name,status FROM portfolio_businesses WHERE id=?',(b,)).fetchone(); meta=self.get(p,b)
         if resource=='business_read': result={'business_id':b,'name':row['name'],'status':row['status'],'overview':meta['overview'],'category':meta['category'],'started_on':meta['started_on']}
+        elif resource=='kpi_read':
+            period(start,end); result=self.o.business_operations.kpis(p,b,start,end)
         else:
             period(start,end); result=self.o.sales.dashboard(p,b,start,end)
         self.event(p,b,'scoped_ai_read',agent,{'resource':resource}); return result

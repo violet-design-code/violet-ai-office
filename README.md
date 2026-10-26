@@ -98,3 +98,10 @@ python3 -m violet_office.growth_cli tick
 - [設計・API・権限境界・操作・移行/復旧・検証](docs/phase-15.md)
 
 ローカル起動後 `/business-foundation`。「複数事業」にも新しい追加導線があります。`python3 -m violet_office.business_foundation_demo` は合成一時DBだけで確認します。実LLM・LINE・予約・決済は未接続で、本番公開・mainマージは行いません。
+
+第16段階「事業別経営管理」は既存の複数事業/事業詳細画面に、期間付き売上・経費・利益、登録顧客・面談・契約集計、KPI達成状況を追加します。旧台帳とSCMは代表が基準を選び、未確認・混在・欠測を勝手に合算しません。AIのKPI参照は認証済み利用者とサーバー側のタスク担当・現行事業権限の両方を検証します。
+
+- [第16段階の出典と範囲](docs/phase-16-requirements.md)
+- [操作・集計定義・権限・移行/復旧・検証・制限](docs/phase-16.md)
+
+画面は既存の `/businesses` / `/business?business=ID`。外部送信・LLM利用・本番公開は追加せず、第20段階の完成版事業追加/担当割当画面も追加しません。

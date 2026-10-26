@@ -1,0 +1,20 @@
+{
+  "login": "passed",
+  "browser_form_operations": [
+    "task_assignment",
+    "manual_start",
+    "pause",
+    "content_rejection"
+  ],
+  "learning_forms": "passed",
+  "learning_data": "synthetic_temporary_database",
+  "growth_forms": "passed",
+  "desktop_pages": 11,
+  "mobile_pages_without_horizontal_overflow": 11,
+  "external_browser_requests": "blocked",
+  "screenshots": [
+    "/tmp/phase16-regression-smoke/desktop.png",
+    "/tmp/phase16-regression-smoke/mobile.png"
+  ],
+  "evidence_context": "Phase16 local synthetic database, Chromium; no production or external API"
+}
