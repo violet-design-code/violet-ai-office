@@ -130,6 +130,8 @@ class Office:
         from .business_readiness import migrate as migrate_readiness,BusinessReadiness
         migrate_readiness(store)
         self.readiness=BusinessReadiness(self)
+        from .business_management import migrate as migrate_management
+        migrate_management(store)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -507,6 +509,9 @@ class Office:
         elif action=='br_decide':service.decide(p,data['id'],data['decision'],data.get('checked')=='1')
         elif action=='br_apply':service.apply(p,data['id'])
         else:raise ValueError('Known readiness action required')
+        if data.get('management_ui')=='1':
+            if action=='br_apply':b=service.row(p,data['id'])['result_business']
+            return '/business-management'+('?business='+b+'&' if b else '?')+'result='+('applied' if action=='br_apply' else 'reviewed')
         return '/business-readiness'+('?business='+b if b else '')
 
     def _command(self,session,action,data):

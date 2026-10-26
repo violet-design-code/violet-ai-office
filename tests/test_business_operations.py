@@ -165,7 +165,8 @@ class BusinessOperationsTests(unittest.TestCase):
         service=self.o.seminar_support; sid=service.save(self.owner,self.b,helpers.SeminarSupportTests.data(self),['cast'],mode='manual'); person=helpers.SeminarSupportTests.member(self)
         service.response(person,sid,'yes'); current=now(); self.store.db.execute('UPDATE seminars SET start_at=?,end_at=? WHERE id=?',((current-timedelta(hours=2)).isoformat(),(current-timedelta(hours=1)).isoformat(),sid))
         service.engagement(self.owner,self.b,sid,person.identity,'interview_requested','合成の本人希望'); service.engagement(self.owner,self.b,sid,person.identity,'interview_completed','合成の確認',(current-timedelta(minutes=5)).isoformat())
-        self.assertEqual(self.data()['counts']['interviews_completed'],1); self.assertEqual(self.data('BIZ-A')['counts']['interviews_completed'],0)
+        start=(current-timedelta(days=1)).astimezone(JST).date().isoformat();end=(current+timedelta(days=1)).astimezone(JST).date().isoformat()
+        self.assertEqual(self.data(start=start,end=end)['counts']['interviews_completed'],1); self.assertEqual(self.data('BIZ-A',start,end)['counts']['interviews_completed'],0)
     def test_task_endpoint_rejects_spoofed_agent_fields_and_scoped_assignment_revocation(self):
         f=self.custom(); f.assign(self.owner,self.b,'AI27','合成','合成',['business_read','work','finance_read']); task=self.o.portfolio.task(self.owner,self.b,'http','analysis','合成',agent='AI27'); h,c=self.headers(); a,z=self.dates(); app=OfficeApp(self.path,8765); route='/business-task-kpis?task='+task+'&start='+a+'&end='+z
         response=app.handle('GET',route,h); self.assertEqual(response[0],200); self.assertEqual(json.loads(response[2])['agent'],'AI27')

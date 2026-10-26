@@ -27,6 +27,7 @@ from . import seminar_support_views
 from . import business_foundation_views
 from . import customer_journey_views
 from . import workflow_collaboration_views
+from . import business_management_views
 from . import business_readiness_views
 
 COOKIE='violet_office_session'
@@ -119,6 +120,9 @@ class OfficeApp:
                 if path=='/business-photo-upload':
                     result=office.commands(session,data.pop('nonce',''),'portfolio_photo',{k:v for k,v in data.items() if k!='csrf'})
                     return self.response(303,extra={'Location':result})
+                if path=='/business-management-confirm':
+                    result=business_management_views.confirm(office,session,data)
+                    return self.response(200,views.layout('保存前の確認',result,session))
                 if path=='/business-readiness-preview':
                     from .integrations.adapters import Principal
                     if set(data)-{'csrf','business','kind','payload'} or not {'kind','payload'}<=set(data):raise ValueError('Explicit preview fields required')
@@ -141,7 +145,7 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path not in ('/seminars','/seminar-participation'):
                 return self.response(303,extra={'Location':'/seminars'})
-            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis','/customer-journey','/ai-workflow','/ai-workflow-data','/business-readiness','/business-readiness-data'):
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis','/customer-journey','/ai-workflow','/ai-workflow-data','/business-readiness','/business-readiness-data','/business-management','/ai-management'):
                 return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
@@ -173,6 +177,8 @@ class OfficeApp:
                 mime,blob=office.portfolio.photo_bytes(Principal(session['role'],session['username']),params.get('business',[''])[0],ref)
                 return self.response(200,blob,{'Content-Disposition':'attachment; filename="photo.'+('png' if mime=='image/png' else 'jpg')+'"'},content_type=mime)
             pages={
+                '/business-management':('事業管理',lambda:business_management_views.home(office,session,params)),
+                '/ai-management':('AI社員管理',lambda:business_management_views.employees(office,session,params)),
                 '/business-foundation':('事業拡張の基盤設定',lambda:business_foundation_views.home(office,session,params)),
                 '/seminar-office':('セミナー運営・面談導線',lambda:seminar_support_views.office(office,session,params)),
                 '/seminar-participation':('セミナー申込・参加希望',lambda:seminar_support_views.participant(office,session,params)),
