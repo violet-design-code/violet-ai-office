@@ -125,6 +125,21 @@ REQUIRED_TESTS.update({
 } | {'tests.test_sales.SalesFinanceTests.test_unknown_tax_is_not_zero_and_not_approvable'})
 
 
+REQUIRED_TESTS.update({
+    'tests.test_workflow.WorkflowTests.'+name for name in (
+        'test_all_28_roles_generate_local_templates_and_do_not_change_registry',
+        'test_pause_resume_reassign_priority_and_owner_only',
+        'test_progress_cannot_claim_sent_from_approval',
+        'test_mock_payment_never_enters_real_dashboard',
+        'test_stop_consent_response_and_seminar_revision_invalidate_queue',
+        'test_three_day_reminder_reuses_original_canonical_id',
+        'test_restore_pauses_tasks_and_reapproves_queued_drafts',
+        'test_additive_migration_preserves_all_phase12_tables_and_rows',
+        'test_web_scope_nonce_csrf_and_owner_controls',
+    )
+})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -169,7 +184,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

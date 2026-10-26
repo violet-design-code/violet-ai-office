@@ -120,6 +120,9 @@ class Store:
                 (task,)).fetchone()
             if blocked:
                 raise ValueError('Dependencies require passed review')
+            if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='wf_tasks'").fetchone():
+                paused=self.db.execute('SELECT paused FROM wf_tasks WHERE task_id=?',(task,)).fetchone()
+                if paused and paused[0]: raise ValueError('Workflow task is paused')
             from .portfolio import guard_claim
             guard_claim(self,task,reserve_microusd)
             from .development import guard_claim as guard_development
