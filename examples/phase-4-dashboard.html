@@ -1,0 +1,399 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>バイオレット外部連携管理</title><h1>外部連携管理（モック）</h1><p>実サービス未接続。公開サーバーなし。操作は認証付きローカルAPI。</p><h2>mode</h2><pre>&quot;mock&quot;</pre><h2>connections</h2><pre>{
+  &quot;LINE&quot;: &quot;未接続&quot;,
+  &quot;既存LINE7日間配信&quot;: &quot;未接続・契約のみ&quot;,
+  &quot;予約&quot;: &quot;未選定・モック&quot;,
+  &quot;Instagram&quot;: &quot;未接続&quot;,
+  &quot;Facebook&quot;: &quot;未接続&quot;,
+  &quot;CRM&quot;: &quot;ローカル仮名データのみ&quot;
+}</pre><h2>customers</h2><pre>[
+  {
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;friend&quot;: 1,
+    &quot;stopped&quot;: 0,
+    &quot;booked&quot;: 1,
+    &quot;state&quot;: &quot;予約済み&quot;
+  }
+]</pre><h2>consents</h2><pre>[
+  {
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;granted&quot;: 1,
+    &quot;notice_version&quot;: &quot;mock-notice-v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612474+00:00&quot;
+  },
+  {
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;美容&quot;,
+    &quot;granted&quot;: 0,
+    &quot;notice_version&quot;: &quot;mock-notice-v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612765+00:00&quot;
+  },
+  {
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;健康&quot;,
+    &quot;granted&quot;: 0,
+    &quot;notice_version&quot;: &quot;mock-notice-v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612795+00:00&quot;
+  },
+  {
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;granted&quot;: 0,
+    &quot;notice_version&quot;: &quot;mock-notice-v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612812+00:00&quot;
+  },
+  {
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;granted&quot;: 1,
+    &quot;notice_version&quot;: &quot;mock-notice-v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612888+00:00&quot;
+  }
+]</pre><h2>inquiries</h2><pre>[
+  {
+    &quot;id&quot;: &quot;99603880454c454e816fe30da553a90d&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;category&quot;: &quot;面談希望&quot;,
+    &quot;status&quot;: &quot;open&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.613021+00:00&quot;
+  }
+]</pre><h2>bookings</h2><pre>[
+  {
+    &quot;id&quot;: &quot;6ff1eaaf53b245ca9cb0abcdfec7e9d9&quot;,
+    &quot;request_key&quot;: &quot;demo-booking&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;slot_id&quot;: &quot;demo-slot&quot;,
+    &quot;status&quot;: &quot;confirmed&quot;,
+    &quot;replacement_for&quot;: null,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.614095+00:00&quot;
+  }
+]</pre><h2>steps</h2><pre>[
+  {
+    &quot;id&quot;: &quot;4a7439c453a741ce9a5b8f6aa94d90ba&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 1,
+    &quot;day&quot;: 1,
+    &quot;due_at&quot;: &quot;2026-10-26T00:59:20.612621+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;fca1eb8051c640008936255cd976bde7&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 1,
+    &quot;day&quot;: 2,
+    &quot;due_at&quot;: &quot;2026-10-27T00:59:20.612629+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;57c67d6689154502a1d3d4d166d9ffa6&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 1,
+    &quot;day&quot;: 3,
+    &quot;due_at&quot;: &quot;2026-10-28T00:59:20.612633+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;1e28117e9be04dc7b086186d1a2759e7&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 1,
+    &quot;day&quot;: 4,
+    &quot;due_at&quot;: &quot;2026-10-29T00:59:20.612637+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;8521bfaea6d94340a8c3f99da9121fa3&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 1,
+    &quot;day&quot;: 5,
+    &quot;due_at&quot;: &quot;2026-10-30T00:59:20.612640+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;08722c97593d4937bff6783e5e0821a7&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 1,
+    &quot;day&quot;: 6,
+    &quot;due_at&quot;: &quot;2026-10-31T00:59:20.612643+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;551a84fda00a48d491c941a7ff1768d5&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 1,
+    &quot;day&quot;: 7,
+    &quot;due_at&quot;: &quot;2026-11-01T00:59:20.612646+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;5f72b12d99da4181a5fd9315700e4944&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 6,
+    &quot;day&quot;: 1,
+    &quot;due_at&quot;: &quot;2026-10-26T00:59:20.612927+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;64a5eb016b0240209a189d521c024eea&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 6,
+    &quot;day&quot;: 2,
+    &quot;due_at&quot;: &quot;2026-10-27T00:59:20.612931+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;e34b4c9f68f04ac69862febfadbf517f&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 6,
+    &quot;day&quot;: 3,
+    &quot;due_at&quot;: &quot;2026-10-28T00:59:20.612934+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;2374cddd4fe84429bac616a631fabb1c&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 6,
+    &quot;day&quot;: 4,
+    &quot;due_at&quot;: &quot;2026-10-29T00:59:20.612938+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;00a3c2a4408c489597a4520548365957&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 6,
+    &quot;day&quot;: 5,
+    &quot;due_at&quot;: &quot;2026-10-30T00:59:20.612941+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;039a6f3c1ffc40f1ae8e83b2ee470c26&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 6,
+    &quot;day&quot;: 6,
+    &quot;due_at&quot;: &quot;2026-10-31T00:59:20.612944+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  },
+  {
+    &quot;id&quot;: &quot;5c2a66e79caa4f80bb4e93355c5f1bb4&quot;,
+    &quot;subject&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;purpose&quot;: &quot;事業紹介&quot;,
+    &quot;cycle&quot;: 6,
+    &quot;day&quot;: 7,
+    &quot;due_at&quot;: &quot;2026-11-01T00:59:20.612947+00:00&quot;,
+    &quot;status&quot;: &quot;stopped&quot;
+  }
+]</pre><h2>operations</h2><pre>[
+  {
+    &quot;id&quot;: &quot;3ec7165f1f0649c4a3be64cbbdc8a792&quot;,
+    &quot;kind&quot;: &quot;line&quot;,
+    &quot;status&quot;: &quot;cancelled&quot;,
+    &quot;attempts&quot;: 0,
+    &quot;mode&quot;: &quot;mock&quot;
+  },
+  {
+    &quot;id&quot;: &quot;7a94ef84ece9403982d4623c87323784&quot;,
+    &quot;kind&quot;: &quot;line&quot;,
+    &quot;status&quot;: &quot;cancelled&quot;,
+    &quot;attempts&quot;: 0,
+    &quot;mode&quot;: &quot;mock&quot;
+  },
+  {
+    &quot;id&quot;: &quot;633b04cb54874a8d97ff39916063c40b&quot;,
+    &quot;kind&quot;: &quot;line&quot;,
+    &quot;status&quot;: &quot;cancelled&quot;,
+    &quot;attempts&quot;: 0,
+    &quot;mode&quot;: &quot;mock&quot;
+  },
+  {
+    &quot;id&quot;: &quot;2d981db99da94df6aadddffbe1ae573c&quot;,
+    &quot;kind&quot;: &quot;line&quot;,
+    &quot;status&quot;: &quot;cancelled&quot;,
+    &quot;attempts&quot;: 0,
+    &quot;mode&quot;: &quot;mock&quot;
+  },
+  {
+    &quot;id&quot;: &quot;58f9762ef3e942ffbe4b567ef0dcc0c7&quot;,
+    &quot;kind&quot;: &quot;booking_confirm&quot;,
+    &quot;status&quot;: &quot;mock_succeeded&quot;,
+    &quot;attempts&quot;: 1,
+    &quot;mode&quot;: &quot;mock&quot;
+  },
+  {
+    &quot;id&quot;: &quot;f9160cf469ad435588dc4714b7e46116&quot;,
+    &quot;kind&quot;: &quot;sns&quot;,
+    &quot;status&quot;: &quot;approval_pending&quot;,
+    &quot;attempts&quot;: 0,
+    &quot;mode&quot;: &quot;mock&quot;
+  }
+]</pre><h2>errors</h2><pre>[]</pre><h2>agents</h2><pre>[
+  {
+    &quot;agent&quot;: &quot;AI25&quot;,
+    &quot;action&quot;: &quot;mock_service_initialized&quot;,
+    &quot;ref&quot;: &quot;mock-config&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.610483+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI21&quot;,
+    &quot;action&quot;: &quot;follow_without_consent&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612314+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI01&quot;,
+    &quot;action&quot;: &quot;approval_required&quot;,
+    &quot;ref&quot;: &quot;3ec7165f1f0649c4a3be64cbbdc8a792&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612407+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI20&quot;,
+    &quot;action&quot;: &quot;consent_recorded&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612525+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI22&quot;,
+    &quot;action&quot;: &quot;schedule_seven_days_mock&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612672+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI01&quot;,
+    &quot;action&quot;: &quot;approval_required&quot;,
+    &quot;ref&quot;: &quot;7a94ef84ece9403982d4623c87323784&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612710+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI20&quot;,
+    &quot;action&quot;: &quot;consent_recorded&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612792+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI20&quot;,
+    &quot;action&quot;: &quot;consent_recorded&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612810+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI20&quot;,
+    &quot;action&quot;: &quot;consent_recorded&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612832+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI22&quot;,
+    &quot;action&quot;: &quot;pause_mock_steps&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612848+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI20&quot;,
+    &quot;action&quot;: &quot;consent_recorded&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612899+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI22&quot;,
+    &quot;action&quot;: &quot;schedule_seven_days_mock&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612961+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI01&quot;,
+    &quot;action&quot;: &quot;approval_required&quot;,
+    &quot;ref&quot;: &quot;633b04cb54874a8d97ff39916063c40b&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.612986+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI18&quot;,
+    &quot;action&quot;: &quot;reply_candidate&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.613037+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI01&quot;,
+    &quot;action&quot;: &quot;approval_required&quot;,
+    &quot;ref&quot;: &quot;2d981db99da94df6aadddffbe1ae573c&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.613071+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI01&quot;,
+    &quot;action&quot;: &quot;approval_required&quot;,
+    &quot;ref&quot;: &quot;58f9762ef3e942ffbe4b567ef0dcc0c7&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.614154+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI23&quot;,
+    &quot;action&quot;: &quot;booking_requested&quot;,
+    &quot;ref&quot;: &quot;6ff1eaaf53b245ca9cb0abcdfec7e9d9&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.614166+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI14&quot;,
+    &quot;action&quot;: &quot;consultation_handoff&quot;,
+    &quot;ref&quot;: &quot;6ff1eaaf53b245ca9cb0abcdfec7e9d9&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.614168+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI28&quot;,
+    &quot;action&quot;: &quot;approval_gate_recorded&quot;,
+    &quot;ref&quot;: &quot;58f9762ef3e942ffbe4b567ef0dcc0c7&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.614743+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI22&quot;,
+    &quot;action&quot;: &quot;pause_mock_steps&quot;,
+    &quot;ref&quot;: &quot;subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.615283+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI26&quot;,
+    &quot;action&quot;: &quot;mock_adapter_attempt&quot;,
+    &quot;ref&quot;: &quot;58f9762ef3e942ffbe4b567ef0dcc0c7&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.615287+00:00&quot;
+  },
+  {
+    &quot;agent&quot;: &quot;AI01&quot;,
+    &quot;action&quot;: &quot;approval_required&quot;,
+    &quot;ref&quot;: &quot;f9160cf469ad435588dc4714b7e46116&quot;,
+    &quot;mode&quot;: &quot;mock_rules_v1&quot;,
+    &quot;created_at&quot;: &quot;2026-10-26T00:59:20.618792+00:00&quot;
+  }
+]</pre><h2>cost</h2><pre>{
+  &quot;actual_microusd&quot;: 0,
+  &quot;network_transport&quot;: &quot;未実装&quot;,
+  &quot;paid_calls_enabled&quot;: false
+}</pre></html>
