@@ -138,13 +138,19 @@ class Portfolio:
     def consent(self,p,business,contact,purpose,granted,notice):
         self.writable(p,business)
         row=self.row(p,business,'portfolio_contacts',contact,True)
-        if row['state']!='active' or purpose not in ('contact','schedule','photo','followup') or type(granted) is not bool: raise ValueError('Active contact and explicit purpose required')
+        if row['state']!='active' or purpose not in ('contact','schedule','photo','followup','identity_link') or type(granted) is not bool: raise ValueError('Active contact and explicit purpose required')
         self.db.execute('INSERT INTO portfolio_consents(business_id,contact_id,purpose,granted,notice,created_at) VALUES(?,?,?,?,?,?)',(business,contact,purpose,int(granted),text(notice,200),now().isoformat()))
         self.event(p,business,'consent_granted' if granted else 'consent_withdrawn',contact,{'purpose':purpose})
         if not granted:
             self.db.execute("UPDATE portfolio_operations SET status='approval_pending' WHERE business_id=? AND status='approved' AND case_id IN(SELECT id FROM portfolio_cases WHERE business_id=? AND contact_id=?)",(business,business,contact))
+            if purpose=='identity_link' and self.db.execute("SELECT 1 FROM sqlite_master WHERE name='scm_identity_links'").fetchone():
+                self.db.execute('UPDATE scm_identity_links SET active=0 WHERE business_id=? AND contact_id=?',(business,contact))
+                self.event(p,business,'identity_link_withdrawn',contact)
 
     def has_consent(self,business,contact,purpose):
+        if purpose in ('contact','schedule','followup') and self.db.execute("SELECT 1 FROM sqlite_master WHERE name='scm_customers'").fetchone():
+            stop=self.db.execute('SELECT stopped FROM scm_customers WHERE business_id=? AND contact_id=?',(business,contact)).fetchone()
+            if stop and stop[0]: return False
         row=self.db.execute('SELECT c.granted FROM portfolio_consents c JOIN portfolio_contacts p ON p.business_id=c.business_id AND p.id=c.contact_id WHERE c.business_id=? AND c.contact_id=? AND c.purpose=? AND p.state=? ORDER BY c.id DESC LIMIT 1',(business,contact,purpose,'active')).fetchone()
         return bool(row and row[0])
 
@@ -304,6 +310,7 @@ class Portfolio:
         self.store._transaction(op)
 
     def run(self,p,business,task):
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='scm_work'").fetchone() and self.db.execute('SELECT 1 FROM scm_work WHERE task_id=?',(task,)).fetchone(): raise ValueError('Use scoped sales task controls')
         if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='bd_tasks'").fetchone() and self.db.execute('SELECT 1 FROM bd_tasks WHERE task_id=?',(task,)).fetchone(): raise ValueError('Use approved development plan controls')
         self.writable(p,business)
         def op():
@@ -464,6 +471,8 @@ class Portfolio:
             self.db.execute("UPDATE portfolio_media SET content=NULL,state='redacted' WHERE business_id=? AND case_id IN(SELECT id FROM portfolio_cases WHERE business_id=? AND contact_id=?)",(business,business,contact))
             self.db.execute("UPDATE portfolio_operations SET status='rejected' WHERE business_id=? AND status IN ('approved','approval_pending') AND case_id IN(SELECT id FROM portfolio_cases WHERE business_id=? AND contact_id=?)",(business,business,contact))
             self.db.execute("UPDATE portfolio_deletions SET status='redacted' WHERE business_id=? AND contact_id=?",(business,contact))
+            from .sales import redact_contact
+            redact_contact(self.store,business,contact)
             self.event(p,business,'contact_redacted',contact,{'backup_erasure':'別途保管先の確認が必要'})
         self.store._transaction(op)
 

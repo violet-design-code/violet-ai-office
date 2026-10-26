@@ -1,0 +1,14 @@
+{
+  "mode": "synthetic_temporary_database",
+  "customer_consent_deal": "passed",
+  "unknown_tax_blocks_approval": "passed",
+  "tax_settings_quote_revision_approval": "passed",
+  "ai_template_not_actual_send": "passed",
+  "approval_no_automatic_execution": "passed",
+  "mock_send_only": "passed",
+  "cross_business_access": "denied",
+  "desktop_routes": 7,
+  "mobile_routes": 7,
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested"
+}

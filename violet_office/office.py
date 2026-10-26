@@ -106,6 +106,9 @@ class Office:
         from .development import migrate as migrate_development,Development
         migrate_development(store)
         self.development=Development(store,self.portfolio)
+        from .sales import migrate as migrate_sales,Sales
+        migrate_sales(store)
+        self.sales=Sales(store,self.portfolio)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -251,7 +254,7 @@ class Office:
         return '/selection' if action.startswith('selection_') else '/seminar-admin'
 
     def portfolio_commands(self,session,nonce,action,data):
-        if not action.startswith(('portfolio_','bd_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
+        if not action.startswith(('portfolio_','bd_','scm_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
         def op():
             current=self.session_by_snapshot(session)
             if not current or current['role']!='business_operator': raise PermissionError('Scoped session expired')
@@ -263,7 +266,7 @@ class Office:
                 if action.startswith('bd_'): self.development.access(Principal(session['role'],session['username']),data.get('idea'),True)
                 else: self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
                 return old['result']
-            result=self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
+            result=self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
             self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,session['username'],fingerprint,result))
             return result
         return self.store._transaction(op)
@@ -342,7 +345,42 @@ class Office:
         else: raise ValueError('Unknown development action')
         return '/development-idea?id='+idea if idea else '/development'
 
+    def sales_command(self,session,action,data):
+        sales=self.sales; p=Principal(session['role'],session['username']); b=data.get('business'); deal=data.get('deal')
+        if action=='scm_customer': sales.customer(p,b,data['name'],data['channel'])
+        elif action=='scm_customer_update': sales.update_customer(p,b,data['contact'],data['name'],data['channel'],data.get('verified')=='1')
+        elif action=='scm_stop': sales.stop(p,b,data['contact'],data['stopped']=='1')
+        elif action=='scm_consent': self.portfolio.consent(p,b,data['contact'],data['purpose'],data['granted']=='1',data['notice'])
+        elif action=='scm_link': sales.link(p,b,data['contact'],data['other_business'],data['other_contact'],data['evidence'])
+        elif action=='scm_unlink': sales.unlink(p,b,data['contact'])
+        elif action=='scm_tax': sales.tax_policy(p,b,data['tax_type'],data.get('rate',''),data.get('rounding',''),data.get('confirmed')=='1')
+        elif action=='scm_rate': sales.rate(p,b,data['label'],data.get('unit'),data['conditions'],data.get('confirmed')=='1',data.get('id') or None,data.get('revision'))
+        elif action=='scm_cleaning_candidate': sales.cleaning_candidate(p,b)
+        elif action=='scm_deal': deal=sales.deal(p,b,data['key'],data['contact'],data['subject'],data['inquiry'],data['mode'],data.get('agent') or None,data.get('human') or None,data.get('next_day') or None)
+        elif action=='scm_assign': sales.update_deal(p,b,deal,data.get('next_day'),data.get('human'),data.get('agent'),data['revision'])
+        elif action=='scm_stage': sales.transition(p,b,deal,data.get('stage') or None,data.get('state') or None,data['revision'])
+        elif action=='scm_quote': sales.quote(p,b,deal,json.loads(data['lines']) if data.get('lines') else [{'label':data['line_label_'+str(i)],'quantity':data['quantity_'+str(i)],'unit_yen':data['unit_'+str(i)]} for i in range(1,6) if data.get('line_label_'+str(i))],data['conditions'],data['expires'],data.get('previous') or None)
+        elif action=='scm_quote_decide': sales.decide_quote(p,b,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='scm_booking':
+            def local(key):
+                parsed=datetime.fromisoformat(data[key]); return (parsed if parsed.tzinfo else parsed.replace(tzinfo=JST)).isoformat()
+            sales.booking(p,b,deal,data['kind'],local('start'),local('end'))
+        elif action=='scm_action': sales.action(p,b,deal,data['key'],data['kind'],data.get('quote') or None,data.get('booking') or None,{'message':data.get('message',''),'purpose':data.get('purpose','contact'),**({'invoice_id':data['invoice']} if data.get('invoice') else {}),**({'amount_yen':int(data['amount'])} if data.get('amount') else {})})
+        elif action=='scm_action_decide': sales.decide_action(p,b,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='scm_mock': sales.execute_mock(p,b,data['id'],data.get('outcome','success'))
+        elif action=='scm_manual': sales.record_manual(p,b,data['id'],data['evidence'],data.get('observed')=='1')
+        elif action=='scm_delete': sales.delete_contact(p,b,data['id'],data.get('checked')=='1')
+        elif action=='scm_note': sales.note(p,b,deal,data['body'])
+        elif action=='scm_work': sales.work(p,b,deal,data['key'],data['activity'],data.get('body') or None,data.get('agent') or None)
+        elif action=='scm_run': sales.run_work(p,b,data['id'])
+        elif action=='scm_role_request': sales.role_request(p,b,data['work'],data.get('agent') or None,data['reason'])
+        elif action=='scm_seminar': sales.seminar(p,b,deal,data['seminar'],data.get('participant') or None,data.get('evidence'))
+        else: raise ValueError('Unknown sales command')
+        return '/sales-deal?business='+b+'&id='+deal if deal else '/sales?business='+b
+
     def _command(self,session,action,data):
+        if action.startswith('scm_'):
+            return self.sales_command(session,action,data)
         if action.startswith('bd_'):
             return self.development_command(session,action,data)
         if action.startswith('portfolio_'):
