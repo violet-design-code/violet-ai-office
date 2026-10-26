@@ -108,3 +108,9 @@ Store.finishでメタデータを追記し、Coordinator/ContentOffice/Growthは
 `portfolio_schema.py` / `migrations/010_multi_business.sql` は第9段階から追加型で移行し、旧レコードを事業へ割り当てない。`portfolio.py` が事業スコープ/現在のロール/ACL、複合外部キー、タスク参照、会計/部分計測/会議、個別承認を扱う。共通Storeには匿名参照のみを保存し、事業固有の指示/成果物/顧客/画像を分離する。Store.claimには紐付いたタスクだけの追加予算/停止ガードを置く。
 
 `portfolio_views.py` と写真用の限定POST/認証付き取得を既存Webへ追加。`business_operator` は許可事業だけに限定し、旧代表/閲覧者/参加者の権限を変更しない。実行用APIクライアントは実装せず、手動申告を外部結果検証と区別する。既存セミナーとの参照は代表の明示操作だけ。詳細は [第10段階](phase-10.md)。第11〜20段階の計画は変更していない。
+
+## 第11段階の事業開発
+
+追加型 `011_business_development.sql` と `development.py` に候補/資料/仮定/提案/内部計画/実績/比較/監査を分離する。計算は `development_finance.py` のDecimal月次モデル、UIは `development_views.py`。第10段階のACLを再利用し、未所属は代表専用、所属は代表の明示選択のみ。事業/顧客を自動生成・移行しない。
+
+提案前の役割別下書き記録と、提案承認後の共通Storeの内部タスクを分ける。Store.claimには承認・入力/計画ハッシュ・予算・停止の追加ガードを設け、既存画面から迂回させない。旧機能の本体や28役の権限を変更しない。外部データ/モデル/送信アダプターは追加しない。[定義・制限](phase-11.md) と [正式要求の出典](phase-11-requirements.md) を参照。

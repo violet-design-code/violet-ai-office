@@ -96,6 +96,20 @@ REQUIRED_TESTS.update({
 })
 
 
+REQUIRED_TESTS.update({
+    'tests.test_development.DevelopmentTests.'+name for name in (
+        'test_multiple_ideas_no_seeded_targets_or_automatic_business_link',
+        'test_unapproved_plan_and_safety_field_changes_are_blocked',
+        'test_new_evidence_or_scenario_revision_invalidates_approval_and_pauses',
+        'test_scope_and_unlinked_ideas_are_representative_only',
+        'test_actual_estimate_mock_and_revision_are_separate_from_forecast',
+        'test_upgrade_from_phase10_schema_is_additive_and_idempotent',
+        'test_restore_reapproval_and_no_automatic_plan_restart',
+    )
+} | {'tests.test_development.FinanceTests.test_known_monthly_profit_break_even_and_payback',
+     'tests.test_development.FinanceTests.test_missing_values_do_not_default_to_zero'})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -140,7 +154,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):
