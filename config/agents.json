@@ -1,0 +1,707 @@
+{
+  "schema_version": 1,
+  "agents": [
+    {
+      "id": "AI01",
+      "role": "統括本部長",
+      "reports_to": "representative",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "分解タスク案・担当案・集約報告"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write",
+        "task.propose"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI02",
+      "role": "経営戦略部長",
+      "reports_to": "AI01",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "戦略案と評価指標"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI03",
+      "role": "市場調査担当",
+      "reports_to": "AI02",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "出典付き市場調査"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI04",
+      "role": "競合調査担当",
+      "reports_to": "AI02",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "出典付き競合比較"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI05",
+      "role": "ターゲット分析担当",
+      "reports_to": "AI02",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "匿名化顧客像"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI06",
+      "role": "事業改善担当",
+      "reports_to": "AI02",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "改善仮説"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI07",
+      "role": "マーケティング部長",
+      "reports_to": "AI01",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "施策計画"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI08",
+      "role": "SNS企画担当",
+      "reports_to": "AI07",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "SNS企画案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI09",
+      "role": "投稿文章作成担当",
+      "reports_to": "AI07",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "投稿原稿"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI10",
+      "role": "画像企画担当",
+      "reports_to": "AI07",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "画像制作指示書"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI11",
+      "role": "動画台本担当",
+      "reports_to": "AI07",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "動画台本"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI12",
+      "role": "動画編集指示担当",
+      "reports_to": "AI07",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "編集指示書"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI13",
+      "role": "投稿スケジュール担当",
+      "reports_to": "AI07",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "投稿予定案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI14",
+      "role": "営業・紹介促進部長",
+      "reports_to": "AI01",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "営業・紹介計画"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI15",
+      "role": "紹介制度設計担当",
+      "reports_to": "AI14",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "公式規約確認付き紹介制度案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI16",
+      "role": "紹介文作成担当",
+      "reports_to": "AI14",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "紹介文案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI17",
+      "role": "見込み客対応文作成担当",
+      "reports_to": "AI14",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "同意範囲内の返信案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI18",
+      "role": "面談誘導担当",
+      "reports_to": "AI14",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "面談案内文案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI19",
+      "role": "営業トーク改善担当",
+      "reports_to": "AI14",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "営業トーク改善案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI20",
+      "role": "顧客サポート部長",
+      "reports_to": "AI01",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "サポート方針"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI21",
+      "role": "LINE自動応答担当",
+      "reports_to": "AI20",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "LINE応答案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI22",
+      "role": "7日間ステップ配信担当",
+      "reports_to": "AI20",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "7日間配信原稿案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI23",
+      "role": "面談予約管理担当",
+      "reports_to": "AI20",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "予約候補・停止連携案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI24",
+      "role": "既存顧客フォロー担当",
+      "reports_to": "AI20",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "同意確認付きフォロー案"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI25",
+      "role": "システム・分析部長",
+      "reports_to": "AI01",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "システム・分析計画"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI26",
+      "role": "Codex開発・外部API連携担当",
+      "reports_to": "AI25",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "実装計画・API仕様確認"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI27",
+      "role": "数値分析・レポート担当",
+      "reports_to": "AI25",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "集計レポート"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI28",
+      "enabled": false
+    },
+    {
+      "id": "AI28",
+      "role": "品質・法令・個人情報保護監査担当",
+      "reports_to": "AI01",
+      "inputs": [
+        "代表が指定した目的",
+        "承認済み資料・必要最小限の匿名化データ",
+        "関連成果物"
+      ],
+      "outputs": [
+        "監査所見・要修正事項"
+      ],
+      "tools": [
+        "artifact.read",
+        "artifact.write",
+        "review.record"
+      ],
+      "permissions": {
+        "external_send": false,
+        "approve": false,
+        "production_access": false,
+        "spend": false
+      },
+      "reviewer": "AI25",
+      "enabled": false
+    }
+  ]
+}
