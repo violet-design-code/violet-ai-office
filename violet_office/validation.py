@@ -221,6 +221,22 @@ REQUIRED_TESTS.update({
 })
 
 
+REQUIRED_TESTS.update({
+    'tests.test_business_readiness.ReadinessTests.'+name for name in (
+        'test_approval_is_not_application_and_new_business_safe_defaults',
+        'test_unicode_case_and_spacing_duplicate_rejected_without_merging',
+        'test_stop_and_reactivate_keep_customer_ledger_consent_and_history',
+        'test_28_existing_definitions_unchanged_and_no_employee_recreation',
+        'test_release_enforces_old_legacy_tasks_without_changing_other_employees',
+        'test_contract_and_approval_history_are_business_scoped',
+        'test_parallel_apply_produces_exactly_one_business',
+        'test_batch_failure_rolls_back_all_assignment_changes',
+        'test_migration_preserves_all_existing_rows_and_repeats',
+        'test_restore_invalidates_unapplied_approvals_and_keeps_controlled_assignments',
+    )
+})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -265,7 +281,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase18-validation.json','phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase19-validation.json','phase18-validation.json','phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

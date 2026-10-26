@@ -27,6 +27,7 @@ from . import seminar_support_views
 from . import business_foundation_views
 from . import customer_journey_views
 from . import workflow_collaboration_views
+from . import business_readiness_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -118,6 +119,12 @@ class OfficeApp:
                 if path=='/business-photo-upload':
                     result=office.commands(session,data.pop('nonce',''),'portfolio_photo',{k:v for k,v in data.items() if k!='csrf'})
                     return self.response(303,extra={'Location':result})
+                if path=='/business-readiness-preview':
+                    from .integrations.adapters import Principal
+                    if set(data)-{'csrf','business','kind','payload'} or not {'kind','payload'}<=set(data):raise ValueError('Explicit preview fields required')
+                    actor=Principal(session['role'],session['username'])
+                    result=office.readiness.preview(actor,data['kind'],data.get('business') or None,json.loads(data['payload']))
+                    return self.response(200,json.dumps(result,ensure_ascii=False),content_type='application/json; charset=utf-8')
                 if path.startswith('/actions/'):
                     action=path[len('/actions/'):]
                     result=office.commands(session,data.pop('nonce',''),action,{k:v for k,v in data.items() if k!='csrf'})
@@ -134,7 +141,7 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path not in ('/seminars','/seminar-participation'):
                 return self.response(303,extra={'Location':'/seminars'})
-            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis','/customer-journey','/ai-workflow','/ai-workflow-data'):
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis','/customer-journey','/ai-workflow','/ai-workflow-data','/business-readiness','/business-readiness-data'):
                 return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
@@ -148,6 +155,12 @@ class OfficeApp:
                 if path=='/business-task-kpis': result=office.business_operations.for_task(actor,params.get('task',[''])[0],start,end)
                 elif params.get('business'): result=office.business_operations.summary(actor,params['business'][0],start,end)
                 else: result=office.business_operations.global_summary(actor,start,end)
+                return self.response(200,json.dumps(result,ensure_ascii=False),content_type='application/json; charset=utf-8')
+            if path=='/business-readiness-data':
+                from .integrations.adapters import Principal
+                if set(params)-{'business'}:raise ValueError('Known readiness scope required')
+                actor=Principal(session['role'],session['username']);b=params.get('business',[''])[0] or None
+                result={'contract':office.readiness.contract(actor,b),'requests':office.readiness.listing(actor,b),'history':office.readiness.history(actor,b),'businesses':office.readiness.catalog(actor,b)}
                 return self.response(200,json.dumps(result,ensure_ascii=False),content_type='application/json; charset=utf-8')
             if path=='/ai-workflow-data':
                 from .integrations.adapters import Principal
@@ -170,6 +183,7 @@ class OfficeApp:
                 '/development':('新規事業開発',lambda:development_views.home(office,session)),
                 '/development-idea':('事業アイデア・検証',lambda:development_views.detail(office,session,ref)),
                 '/development-compare':('事業候補の比較',lambda:development_views.comparison(office,session,ref)),
+                '/business-readiness':('事業・担当設定の完成準備',lambda:business_readiness_views.home(office,session,params)),
                 '/ai-workflow':('AI社員の業務・引き継ぎ',lambda:workflow_collaboration_views.home(office,session,params)),
                 '/customer-journey':('事業別案内・問い合わせ導線',lambda:customer_journey_views.home(office,session,params)),
                 '/businesses':('統合経営ダッシュボード',lambda:portfolio_views.home(office,session,params)),
@@ -198,7 +212,7 @@ class OfficeApp:
         except PermissionError:
             if office:
                 office.audit('authenticated','permission_denied')
-                if path.startswith(('/actions/ops_','/actions/cj_','/actions/aw_')) and session and session.get('username'):
+                if path.startswith(('/actions/ops_','/actions/cj_','/actions/aw_','/actions/br_')) and session and session.get('username'):
                     from .integrations.adapters import Principal
                     office.business_operations.audit(Principal(session['role'],session['username']),data.get('business'),'operations_command','denied')
             return self.response(403,'この操作の権限がありません。')

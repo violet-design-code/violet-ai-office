@@ -32,7 +32,8 @@ def ai_allowed(store,agent,business,permission,strict=True):
     if not row: return not strict
     if not row['enabled']: return False
     if permission=='work' and (store.db.execute('SELECT halted FROM portfolio_controls').fetchone()[0] or store.db.execute('SELECT status FROM portfolio_businesses WHERE id=?',(business,)).fetchone()[0] in ('paused','closed')): return False
-    if not strict and not row['ai_enforced']: return True
+    controlled=store.db.execute("SELECT 1 FROM sqlite_master WHERE name='br_assignment_controls'").fetchone() and store.db.execute('SELECT 1 FROM br_assignment_controls WHERE business_id=? AND agent=?',(business,agent)).fetchone()
+    if not strict and not row['ai_enforced'] and not controlled: return True
     assigned=store.db.execute('SELECT * FROM bf_ai_assignments WHERE business_id=? AND agent=?',(business,agent)).fetchone()
     return bool(assigned and assigned['active'] and permission in json.loads(assigned['permissions']))
 

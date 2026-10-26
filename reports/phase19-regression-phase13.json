@@ -1,0 +1,15 @@
+{
+  "mode": "synthetic_temporary_database",
+  "attach_and_manual_progress": "passed",
+  "assignment_pause_resume_local_template": "passed",
+  "representative_approval_no_execution": "passed",
+  "seminar_queue_and_decline_invalidation": "passed",
+  "cross_business_access": "denied",
+  "desktop_routes": 7,
+  "mobile_routes": 7,
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested",
+  "actual_external_services": [],
+  "production_started": false,
+  "evidence_context": "Phase19 regression on synthetic temporary DB; loopback Chromium only; not production"
+}

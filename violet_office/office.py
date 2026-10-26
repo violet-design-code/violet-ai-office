@@ -127,6 +127,9 @@ class Office:
         from .workflow_collaboration import migrate as migrate_collaboration,WorkflowCollaboration
         migrate_collaboration(store)
         self.collaboration=WorkflowCollaboration(self)
+        from .business_readiness import migrate as migrate_readiness,BusinessReadiness
+        migrate_readiness(store)
+        self.readiness=BusinessReadiness(self)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -277,7 +280,7 @@ class Office:
         return '/selection' if action.startswith('selection_') else '/seminar-admin'
 
     def portfolio_commands(self,session,nonce,action,data):
-        if not action.startswith(('portfolio_','bd_','scm_','wf_','s14_','bf_','ops_','cj_','aw_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
+        if not action.startswith(('portfolio_','bd_','scm_','wf_','s14_','bf_','ops_','cj_','aw_','br_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
         def op():
             current=self.session_by_snapshot(session)
             if not current or current['role']!='business_operator': raise PermissionError('Scoped session expired')
@@ -289,7 +292,7 @@ class Office:
                 if action.startswith('bd_'): self.development.access(Principal(session['role'],session['username']),data.get('idea'),True)
                 else: self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
                 return old['result']
-            result=self.collaboration_command(session,action,data) if action.startswith('aw_') else self.customer_journey_command(session,action,data) if action.startswith('cj_') else self.business_operations_command(session,action,data) if action.startswith('ops_') else self.business_foundation_command(session,action,data) if action.startswith('bf_') else self.seminar_support_command(session,action,data) if action.startswith('s14_') else self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
+            result=self.readiness_command(session,action,data) if action.startswith('br_') else self.collaboration_command(session,action,data) if action.startswith('aw_') else self.customer_journey_command(session,action,data) if action.startswith('cj_') else self.business_operations_command(session,action,data) if action.startswith('ops_') else self.business_foundation_command(session,action,data) if action.startswith('bf_') else self.seminar_support_command(session,action,data) if action.startswith('s14_') else self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
             self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,session['username'],fingerprint,result))
             return result
         return self.store._transaction(op)
@@ -498,7 +501,16 @@ class Office:
         else:raise ValueError('Known collaboration action required')
         return '/ai-workflow?business='+b
 
+    def readiness_command(self,session,action,data):
+        p=Principal(session['role'],session['username']);service=self.readiness;b=data.get('business') or None
+        if action=='br_prepare':service.prepare(p,data['key'],data['kind'],b,json.loads(data['payload']))
+        elif action=='br_decide':service.decide(p,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='br_apply':service.apply(p,data['id'])
+        else:raise ValueError('Known readiness action required')
+        return '/business-readiness'+('?business='+b if b else '')
+
     def _command(self,session,action,data):
+        if action.startswith('br_'):return self.readiness_command(session,action,data)
         if action.startswith('aw_'):return self.collaboration_command(session,action,data)
         if action.startswith('cj_'): return self.customer_journey_command(session,action,data)
         if action.startswith('ops_'):
