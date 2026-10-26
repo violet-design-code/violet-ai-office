@@ -56,6 +56,8 @@ def home(office,session):
     m=office.metrics()
     tasks=office.tasks()
     body='<p class="subtitle">代表の判断に必要な進捗・成果・承認を、一つの場所に。</p><div class="notice">現在はローカル管理・テンプレート生成・モック連携です。28人の自律AIと外部APIは未接続。モックを実績として集計しません。</div>'
+    if office.alerts():
+        body+='<div class="notice">要対応：'+e(' / '.join(a['label']+' '+str(a['count'])+'件' for a in office.alerts()))+' <a href="/monitor">監視画面を確認</a></div>'
     body+='<div class="grid">'+''.join(card(k,v,'ローカルDBの記録') for k,v in m['local'].items())+card('API確定利用料金',sum(r['amount'] for r in office.costs()['entries'] if r['kind']=='confirmed' and r['mode']=='manual')/1000000 if any(r['kind']=='confirmed' and r['mode']=='manual' for r in office.costs()['entries']) else None,'USD・手動確認記録／API自動取得は未接続')+'</div>'
     body+='<h2>経営指標</h2><div class="grid">'+''.join(card(k,v,'実サービス未接続') for k,v in list(m['business'].items())[:6])+'</div>'
     body+='<h2>5人のAI部門長</h2><div class="grid">'+''.join('<a class="card" href="/employees?id='+agent+'"><span class="id">'+agent+'</span><h3>'+e(name+'部長')+'</h3><span class="badge">モデルAPI未接続</span></a>' for agent,name in DEPARTMENTS.items())+'</div>'
@@ -155,6 +157,11 @@ def approvals(office,session,campaign=None):
     for row in rows:
         audit=office.db.execute('SELECT * FROM content_audits WHERE content_id=?',(row['id'],)).fetchone()
         body+='<details class="panel"><summary>'+e(row['logical_key'])+' / '+e(row['kind'])+' / '+e(label(row['status']))+' / v'+str(row['version'])+'</summary><p class="micro">'+e(row['id'])+'</p><pre>'+e(row['body'] if session['role']=='representative' else '本文は代表のみ閲覧できます')+'</pre>'
+        if row['status']=='approved':
+            try:
+                office.content.verify_approved(row['id'])
+            except ValueError:
+                body+='<div class="notice">過去の承認記録はありますが、現行基準では要再確認です。新しい版を作成して監査してください。</div>'
         if audit:
             body+='<p>自動監査・要確認：</p><pre>'+e(audit['findings'])+'\n'+e(audit['blockers'])+'</pre>'
             checks=json.loads(audit['checks'])
@@ -218,7 +225,12 @@ def monitor(office,session):
     db=office.db
     okay=db.execute('PRAGMA quick_check').fetchone()[0]=='ok'
     services=[['LINE API','未接続'],['既存LINE7日間配信','別リポジトリ・未接続・未検証'],['予約サービス','未選定・モックのみ'],['Instagram / Facebook','未接続'],['AIモデルAPI','未接続'],['SQLite','正常（quick_check）' if okay else '要確認'],['Webhook','本番入口なし・署名検証はモック試験済み']]
-    body=table(['対象','状態'],[[e(k),e(v)] for k,v in services])
+    from .validation import saved_assessment
+    readiness=saved_assessment()
+    body='<div class="notice">本番移行不可。外部接続・実LINE回帰・セキュリティ確認・代表承認が未完了です。</div>'+table(['対象','状態'],[[e(k),e(v)] for k,v in services])
+    body+='<h2>要対応の通知（画面内のみ）</h2>'+table(['問題','件数'],[[e(a['label']),e(a['count'])] for a in office.alerts()])
+    body+='<h2>5部門長の担当管理（ローカル集計）</h2>'+table(['部門長','部下','担当タスク'],[[e(d['head']),e(', '.join(d['members'])),e(len(d['tasks']))] for d in office.coordinator.department_report()])
+    body+='<h2>本番移行ゲート</h2>'+table(['条件','状態','根拠'],[[e(g['condition']),e(g['state']),e(g['note'])] for g in readiness['gates']])
     success=db.execute("SELECT MAX(e.created_at) FROM events e WHERE e.event='artifact_created'").fetchone()[0]
     mock_success=db.execute("SELECT MAX(created_at) FROM ix_attempts WHERE outcome='success'").fetchone()[0]
     webhook_count=db.execute('SELECT COUNT(*) FROM ix_webhooks').fetchone()[0]

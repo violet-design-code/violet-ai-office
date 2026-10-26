@@ -4,6 +4,9 @@ import getpass
 import hmac
 import os
 import sqlite3
+import threading
+import time
+from collections import deque
 from http.cookies import SimpleCookie, CookieError
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -26,6 +29,9 @@ class OfficeApp:
         self.db_path=str(db_path)
         self.port=port
         self.hosts={f'127.0.0.1:{port}',f'localhost:{port}'}
+        self._rate_lock=threading.Lock()
+        self._requests=deque()
+        self._clock=time.monotonic
 
     def response(self,status,body='',extra=None,content_type='text/html; charset=utf-8'):
         raw=body.encode() if isinstance(body,str) else body
@@ -42,7 +48,17 @@ class OfficeApp:
             return self.response(413,'リクエストが大きすぎます。')
         if method not in ('GET','POST'):
             return self.response(405,'許可されていない操作です。')
-        parsed=urlsplit(target)
+        with self._rate_lock:
+            current=self._clock()
+            while self._requests and self._requests[0]<=current-60:
+                self._requests.popleft()
+            if len(self._requests)>=180:
+                return self.response(429,'リクエストが多いため、時間をおいてください。',{'Retry-After':'60'})
+            self._requests.append(current)
+        try:
+            parsed=urlsplit(target)
+        except ValueError:
+            return self.response(400,'接続先を確認してください。')
         if parsed.scheme or parsed.netloc:
             return self.response(400,'入力を確認してください。')
         path=parsed.path
@@ -137,8 +153,37 @@ class OfficeApp:
                 store.close()
 
 
+class BoundedLocalServer(ThreadingHTTPServer):
+    max_workers=16
+    request_queue_size=16
+    daemon_threads=True
+    def __init__(self,*args,**kwargs):
+        self._workers=threading.BoundedSemaphore(self.max_workers)
+        super().__init__(*args,**kwargs)
+    def process_request(self,request,client_address):
+        if not self._workers.acquire(blocking=False):
+            self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request,client_address)
+        except BaseException:
+            self._workers.release()
+            raise
+    def process_request_thread(self,request,client_address):
+        try:
+            super().process_request_thread(request,client_address)
+        finally:
+            self._workers.release()
+    def handle_error(self,request,client_address):
+        # Raw exceptions and HTTP request data must not reach stdout/stderr.
+        pass
+
+
 def make_server(db_path,port=8765):
     class Handler(BaseHTTPRequestHandler):
+        def setup(self):
+            self.request.settimeout(5)
+            super().setup()
         server_version='VioletLocal'
         sys_version=''
         def log_message(self,*args):
@@ -150,6 +195,9 @@ def make_server(db_path,port=8765):
             self.respond('POST')
         def respond(self,method):
             self.connection.settimeout(5)
+            if len(self.headers.get_all('Host',[]))!=1 or len(self.headers.get_all('Content-Length',[]))>1:
+                self.send_error(400)
+                return
             length=self.headers.get('Content-Length','0')
             if self.headers.get('Transfer-Encoding') or not length.isdigit() or int(length)>131072:
                 self.send_error(413)
@@ -167,7 +215,7 @@ def make_server(db_path,port=8765):
             self.end_headers()
             self.wfile.write(payload)
     # Bound to loopback unconditionally. No option exposes this on 0.0.0.0.
-    server=ThreadingHTTPServer(('127.0.0.1',port),Handler)
+    server=BoundedLocalServer(('127.0.0.1',port),Handler)
     server.daemon_threads=True
     server.app=OfficeApp(db_path,server.server_port)
     return server
@@ -181,6 +229,8 @@ def main():
     parser.add_argument('--port',type=int,default=8765)
     parser.add_argument('--open-browser',action='store_true',help='PC内のブラウザを開く')
     args=parser.parse_args()
+    if os.environ.get('INTEGRATION_MODE','mock') not in ('mock','local','test'):
+        parser.error('本番モードは未対応です。外部接続は開始しません')
     path=Path(args.db)
     if args.command=='serve' and not path.is_file():
         parser.error('先にinitで代表アカウントを作成してください')

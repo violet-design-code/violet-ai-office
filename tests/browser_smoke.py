@@ -1,5 +1,5 @@
 """任意の実ブラウザ検証。PlaywrightとChromiumを導入済みの環境で実行。"""
-import json, tempfile, threading, shutil
+import json, tempfile, threading, shutil, argparse
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from violet_office.store import Store
@@ -8,6 +8,13 @@ from violet_office.integrations.demo import run_demo
 from violet_office.web import make_server
 
 root=Path(__file__).resolve().parent.parent
+parser=argparse.ArgumentParser(description='ローカル合成データの実ブラウザ検証')
+parser.add_argument('--output-dir')
+args=parser.parse_args()
+artifacts=Path(args.output_dir) if args.output_dir else root/'examples'
+artifacts.mkdir(parents=True,exist_ok=True)
+desktop=artifacts/('desktop.png' if args.output_dir else 'phase-5-desktop.png')
+mobile=artifacts/('mobile.png' if args.output_dir else 'phase-5-mobile.png')
 with tempfile.TemporaryDirectory() as temp:
     db=Path(temp)/'visual.db'
     store=Store(db)
@@ -29,7 +36,7 @@ with tempfile.TemporaryDirectory() as temp:
         page.get_by_label('パスワード',exact=True).fill('SyntheticVisualTest!123')
         page.get_by_role('button',name='ログイン',exact=True).click()
         page.wait_for_url(base+'/')
-        page.screenshot(path=str(root/'examples/phase-5-desktop.png'),full_page=True)
+        page.screenshot(path=str(desktop),full_page=True)
         # Exercise the rendered forms, not only page rendering.
         page.goto(base+'/instructions')
         task_form=page.locator('form[action="/actions/submit"]')
@@ -56,8 +63,8 @@ with tempfile.TemporaryDirectory() as temp:
             width=page.evaluate('({width:innerWidth,scroll:document.documentElement.scrollWidth})')
             assert width['scroll']<=width['width'],(route,width)
         page.goto(base+'/employees')
-        page.screenshot(path=str(root/'examples/phase-5-mobile.png'),full_page=True)
+        page.screenshot(path=str(mobile),full_page=True)
         browser.close()
     server.shutdown()
     server.server_close()
-print(json.dumps({'login':'passed','browser_form_operations':['task_assignment','manual_start','pause','content_rejection'],'desktop_pages':7,'mobile_pages_without_horizontal_overflow':7,'external_browser_requests':'blocked','screenshots':['examples/phase-5-desktop.png','examples/phase-5-mobile.png']},ensure_ascii=False))
+print(json.dumps({'login':'passed','browser_form_operations':['task_assignment','manual_start','pause','content_rejection'],'desktop_pages':7,'mobile_pages_without_horizontal_overflow':7,'external_browser_requests':'blocked','screenshots':[str(desktop),str(mobile)]},ensure_ascii=False))

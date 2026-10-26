@@ -17,7 +17,7 @@ SOURCES = [
     {'name':'厚生労働省','url':'https://www.mhlw.go.jp/','status':'未取得・要確認'},
     {'name':'ベネシード公式規約','url':None,'status':'代表から正規の最新版提供が必要'},
 ]
-CHECKS = ['事実・出典','誤字脱字・媒体表現','特定商取引法','景品表示法','薬機法・健康増進法','個人情報・同意','ベネシード公式規約','リンク・予約導線']
+CHECKS = ['事実・出典','誤字脱字・媒体表現','特定商取引法','景品表示法','薬機法・健康増進法','個人情報・同意','ベネシード公式規約','リンク・予約導線','LINE利用規約','SNS利用規約']
 SCHEMA = '''
 CREATE TABLE IF NOT EXISTS campaigns (
  id TEXT PRIMARY KEY, campaign_key TEXT UNIQUE NOT NULL, fingerprint TEXT NOT NULL,
@@ -65,6 +65,8 @@ def safe_input(text):
     # Conservative input guard, not a general PII detector. Synthetic briefs only.
     if not isinstance(text,str) or not text.strip() or len(text)>10000:
         raise ValueError('Invalid text')
+    if re.search(r'(?i)[\"\']?(?:api[_-]?key|access[_-]?token|channel[_-]?secret|password)[\"\']?\s*[:=]\s*[\"\']?[A-Za-z0-9_-]{6,}|-----BEGIN [A-Z ]*PRIVATE KEY-----',text):
+        raise ValueError('Do not enter credentials')
     if re.search(r'[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}|(?:sk-|Bearer\s+)[A-Za-z0-9_-]+|0\d{1,3}[- ]?\d{2,4}[- ]?\d{4}',text):
         raise ValueError('Do not enter personal information or credentials')
 
@@ -211,6 +213,22 @@ class ContentOffice:
             self._event(content,'check_confirmed',actor,encode({'check':check,'evidence':evidence}))
         return self.store._transaction(op)
 
+    def verify_quality(self, content):
+        row=self._latest(content)
+        audit=self.db.execute('SELECT * FROM content_audits WHERE content_id=?',(content,)).fetchone()
+        if not audit or audit['digest']!=row['digest'] or digest(json.loads(row['body']))!=row['digest'] or json.loads(audit['blockers']):
+            raise ValueError('Unresolved audit checks')
+        checks=json.loads(audit['checks'])
+        if not all(isinstance(checks.get(key),str) and checks[key].strip() for key in CHECKS):
+            raise ValueError('Current legal and platform checks required')
+        return row
+
+    def verify_approved(self, content):
+        row=self.verify_quality(content)
+        if row['status']!='approved':
+            raise ValueError('Current approved content required')
+        return row
+
     def decide(self, content, decision, actor):
         if actor!='representative' or decision not in ('approve','reject'):
             raise ValueError('Representative required')
@@ -219,8 +237,8 @@ class ContentOffice:
             if row['status']!='approval_pending':
                 raise ValueError('Quality review required')
             audit=self.db.execute('SELECT * FROM content_audits WHERE content_id=?',(content,)).fetchone()
-            if decision=='approve' and (audit['digest']!=row['digest'] or digest(json.loads(row['body']))!=row['digest'] or json.loads(audit['blockers']) or not all(json.loads(audit['checks']).values())):
-                raise ValueError('Unresolved audit checks')
+            if decision=='approve':
+                self.verify_quality(content)
             status='approved' if decision=='approve' else 'rejected'
             self.db.execute('UPDATE content_versions SET status=? WHERE id=?',(status,content))
             self._event(content,status,actor,row['digest'])
@@ -233,6 +251,7 @@ class ContentOffice:
             row=self._latest(content)
             if actor!='representative' or row['status']!='approved':
                 raise ValueError('Approved content and representative required')
+            self.verify_approved(content)
             self.db.execute("UPDATE content_versions SET status='published' WHERE id=?",(content,))
             self._event(content,'published_manual_record',actor,evidence)
         return self.store._transaction(op)
