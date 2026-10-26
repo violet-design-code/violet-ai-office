@@ -57,3 +57,9 @@ python3 -m violet_office.growth_cli tick
 - [第9段階の機能・互換性・試験・操作手順](docs/phase-9.md)
 
 `python3 -m violet_office.phase9_demo` は一時DBだけで合成シナリオを実行します。`python3 -m violet_office.seminar_cli status` で再案内準備の停止/有効状態を確認できます。
+
+第10段階では「複数事業」「経営会議」を追加しました。共通28役を使い、6事業の顧客・原稿・会計・同意・担当を事業IDで分離します。初期6事業は代表操作で登録し、旧LINE/セミナー/顧客を自動配賦しません。実モデル・外部送信・請求/決済は未接続です。
+
+- [第10段階の実装範囲・6事業・権限・互換性・操作手順](docs/phase-10.md)
+
+`python3 -m violet_office.portfolio_demo` で一時DBだけの合成シナリオを確認できます。本番起動や既存データ移行は行いません。

@@ -1,0 +1,420 @@
+{
+  "mode": "synthetic_temporary_database_not_real_business_results",
+  "source": "代表が確認した6事業の名称と提供状況。金額・件数は合成の検証値。",
+  "businesses": [
+    {
+      "id": "BIZ-A",
+      "name": "健康・美容・ベネシードディーラー関連",
+      "status": "active",
+      "pricing": "",
+      "region": ""
+    },
+    {
+      "id": "BIZ-B",
+      "name": "鏡のウロコ取り出張サービス",
+      "status": "active",
+      "pricing": "佐久市内6,000円（出張費込み）。佐久市外は出張費別途、要相談。",
+      "region": "佐久市内・市外。軽井沢エリアは対応候補。"
+    },
+    {
+      "id": "BIZ-C",
+      "name": "ホームページ制作・LINE自動化",
+      "status": "active",
+      "pricing": "",
+      "region": ""
+    },
+    {
+      "id": "BIZ-D",
+      "name": "人生プロデュース・相談サービス",
+      "status": "active",
+      "pricing": "",
+      "region": ""
+    },
+    {
+      "id": "BIZ-E",
+      "name": "セルフホワイトニング",
+      "status": "active",
+      "pricing": "",
+      "region": ""
+    },
+    {
+      "id": "BIZ-F",
+      "name": "スマホ教室",
+      "status": "active",
+      "pricing": "",
+      "region": ""
+    }
+  ],
+  "assignments": [
+    {
+      "business": "BIZ-A",
+      "agent": "AI09",
+      "task_id": "039f143d6348431a8e7baf9968cfa008"
+    },
+    {
+      "business": "BIZ-B",
+      "agent": "AI09",
+      "task_id": "c0686091748f4d9a919961c0633e625f"
+    },
+    {
+      "business": "BIZ-C",
+      "agent": "AI02",
+      "task_id": "a3925b524fe34d76949e2daf457482f6"
+    },
+    {
+      "business": "BIZ-D",
+      "agent": "AI23",
+      "task_id": "e2b5b302dde84a85bb511a3688b7af0a"
+    },
+    {
+      "business": "BIZ-E",
+      "agent": "AI09",
+      "task_id": "1d3ca574b7de402fb6e3f052f6bafb67"
+    },
+    {
+      "business": "BIZ-F",
+      "agent": "AI09",
+      "task_id": "79e32fac89094591ac0458d828b13422"
+    }
+  ],
+  "registered_agents": 28,
+  "dashboard": {
+    "period": [
+      "2026-10-26",
+      "2026-10-27"
+    ],
+    "businesses": [
+      {
+        "business_id": "BIZ-A",
+        "name": "健康・美容・ベネシードディーラー関連",
+        "status": "active",
+        "period": [
+          "2026-10-26",
+          "2026-10-27"
+        ],
+        "measurement": "同一期間・手動実績申告/部分計測。実API未照合。",
+        "metrics": {
+          "inquiries": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "bookings": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "contracts": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "owner_minutes": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          }
+        },
+        "mode": "local_manual_records",
+        "revenue_yen": null,
+        "expense_yen": null,
+        "profit_yen": null,
+        "profit_margin_percent": null,
+        "api_microusd": {
+          "confirmed": null,
+          "estimated": null
+        },
+        "local_processing_seconds": 0.0006025920010870323,
+        "registered_inquiries": null,
+        "registered_booking_requests": null,
+        "manual_booking_records": null,
+        "manual_contract_records": null,
+        "goals": {},
+        "goal_gaps": {}
+      },
+      {
+        "business_id": "BIZ-B",
+        "name": "鏡のウロコ取り出張サービス",
+        "status": "active",
+        "period": [
+          "2026-10-26",
+          "2026-10-27"
+        ],
+        "measurement": "同一期間・手動実績申告/部分計測。実API未照合。",
+        "metrics": {
+          "inquiries": {
+            "recorded": 1,
+            "days": 1,
+            "complete": true,
+            "total": 1
+          },
+          "bookings": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "contracts": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "owner_minutes": {
+            "recorded": 12,
+            "days": 1,
+            "complete": true,
+            "total": 12
+          }
+        },
+        "mode": "local_manual_records",
+        "revenue_yen": 6000,
+        "expense_yen": 1500,
+        "profit_yen": 4500,
+        "profit_margin_percent": 75.0,
+        "api_microusd": {
+          "confirmed": null,
+          "estimated": null
+        },
+        "local_processing_seconds": 0.00033769999936339445,
+        "registered_inquiries": 1,
+        "registered_booking_requests": 1,
+        "manual_booking_records": null,
+        "manual_contract_records": null,
+        "goals": {},
+        "goal_gaps": {}
+      },
+      {
+        "business_id": "BIZ-C",
+        "name": "ホームページ制作・LINE自動化",
+        "status": "active",
+        "period": [
+          "2026-10-26",
+          "2026-10-27"
+        ],
+        "measurement": "同一期間・手動実績申告/部分計測。実API未照合。",
+        "metrics": {
+          "inquiries": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "bookings": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "contracts": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "owner_minutes": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          }
+        },
+        "mode": "local_manual_records",
+        "revenue_yen": null,
+        "expense_yen": null,
+        "profit_yen": null,
+        "profit_margin_percent": null,
+        "api_microusd": {
+          "confirmed": null,
+          "estimated": null
+        },
+        "local_processing_seconds": 9.85790029517375e-05,
+        "registered_inquiries": null,
+        "registered_booking_requests": null,
+        "manual_booking_records": null,
+        "manual_contract_records": null,
+        "goals": {},
+        "goal_gaps": {}
+      },
+      {
+        "business_id": "BIZ-D",
+        "name": "人生プロデュース・相談サービス",
+        "status": "active",
+        "period": [
+          "2026-10-26",
+          "2026-10-27"
+        ],
+        "measurement": "同一期間・手動実績申告/部分計測。実API未照合。",
+        "metrics": {
+          "inquiries": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "bookings": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "contracts": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "owner_minutes": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          }
+        },
+        "mode": "local_manual_records",
+        "revenue_yen": null,
+        "expense_yen": null,
+        "profit_yen": null,
+        "profit_margin_percent": null,
+        "api_microusd": {
+          "confirmed": null,
+          "estimated": null
+        },
+        "local_processing_seconds": 9.455299732508138e-05,
+        "registered_inquiries": null,
+        "registered_booking_requests": null,
+        "manual_booking_records": null,
+        "manual_contract_records": null,
+        "goals": {},
+        "goal_gaps": {}
+      },
+      {
+        "business_id": "BIZ-E",
+        "name": "セルフホワイトニング",
+        "status": "active",
+        "period": [
+          "2026-10-26",
+          "2026-10-27"
+        ],
+        "measurement": "同一期間・手動実績申告/部分計測。実API未照合。",
+        "metrics": {
+          "inquiries": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "bookings": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "contracts": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "owner_minutes": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          }
+        },
+        "mode": "local_manual_records",
+        "revenue_yen": null,
+        "expense_yen": null,
+        "profit_yen": null,
+        "profit_margin_percent": null,
+        "api_microusd": {
+          "confirmed": null,
+          "estimated": null
+        },
+        "local_processing_seconds": 0.0007757029998174403,
+        "registered_inquiries": null,
+        "registered_booking_requests": null,
+        "manual_booking_records": null,
+        "manual_contract_records": null,
+        "goals": {},
+        "goal_gaps": {}
+      },
+      {
+        "business_id": "BIZ-F",
+        "name": "スマホ教室",
+        "status": "active",
+        "period": [
+          "2026-10-26",
+          "2026-10-27"
+        ],
+        "measurement": "同一期間・手動実績申告/部分計測。実API未照合。",
+        "metrics": {
+          "inquiries": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "bookings": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "contracts": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          },
+          "owner_minutes": {
+            "recorded": null,
+            "days": 0,
+            "complete": false,
+            "total": null
+          }
+        },
+        "mode": "local_manual_records",
+        "revenue_yen": null,
+        "expense_yen": null,
+        "profit_yen": null,
+        "profit_margin_percent": null,
+        "api_microusd": {
+          "confirmed": null,
+          "estimated": null
+        },
+        "local_processing_seconds": 0.0003215569995518308,
+        "registered_inquiries": null,
+        "registered_booking_requests": null,
+        "manual_booking_records": null,
+        "manual_contract_records": null,
+        "goals": {},
+        "goal_gaps": {}
+      }
+    ],
+    "revenue_yen": null,
+    "expense_yen": null,
+    "profit_yen": null,
+    "total_note": "全事業に記録がある場合だけ記録済み額を合算。期間全体の完全計測を保証しない。",
+    "today_priority": [],
+    "unassigned_legacy": "第1〜9段階のデータは事業未配賦。自動集計・コピーしない。"
+  },
+  "report_id": "3b970a0c42fe4610b9f1c4bdd14abf7c",
+  "report_status": "approval_pending",
+  "external_operation_states": [
+    "approval_pending",
+    "approval_pending"
+  ],
+  "seminar_original_unchanged": true,
+  "old_data_automatically_assigned": false,
+  "actual_external_services": [],
+  "new_paid_api_calls": 0,
+  "external_send_attempts": 0,
+  "foreign_key_violations": 0,
+  "production_started": false
+}

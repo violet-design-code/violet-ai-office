@@ -99,12 +99,16 @@ class Office:
         migrate(store)
         self.seminars=Seminars(store)
         self.selection=Selection(store,self.learning)
+        from .portfolio_schema import migrate as migrate_portfolio
+        from .portfolio import Portfolio
+        migrate_portfolio(store)
+        self.portfolio=Portfolio(store)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
 
     def add_user(self,username,role,password):
-        if not re.fullmatch(r'[A-Za-z0-9_-]{1,40}',username) or role not in ('representative','viewer','participant') or len(password)<12 or len(password)>256:
+        if not re.fullmatch(r'[A-Za-z0-9_-]{1,40}',username) or role not in ('representative','viewer','participant','business_operator') or len(password)<12 or len(password)>256:
             raise ValueError('Invalid account')
         salt=secrets.token_hex(16)
         self.db.execute('INSERT INTO office_users VALUES (?,?,?,?)',(username,role,salt,password_hash(password,salt)))
@@ -154,6 +158,8 @@ class Office:
         return self.new_session(row['username'],row['role'])
 
     def commands(self,session,nonce,action,data):
+        if session['role']=='business_operator':
+            return self.portfolio_commands(session,nonce,action,data)
         if session['role']=='participant':
             return self.member_commands(session,nonce,action,data)
         require(Principal(session['role']),True)
@@ -241,7 +247,74 @@ class Office:
         self.audit(session['username'],action,data.get('id',''))
         return '/selection' if action.startswith('selection_') else '/seminar-admin'
 
+    def portfolio_commands(self,session,nonce,action,data):
+        if not action.startswith('portfolio_') or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
+        def op():
+            current=self.session_by_snapshot(session)
+            if not current or current['role']!='business_operator': raise PermissionError('Scoped session expired')
+            fingerprint=digest([session['username'],action,data])
+            old=self.db.execute('SELECT * FROM office_commands WHERE nonce=?',(nonce,)).fetchone()
+            if old:
+                if old['actor']!=session['username'] or old['fingerprint']!=fingerprint: raise ValueError('Command conflict')
+                # Recheck access even for replay after a grant is revoked.
+                self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
+                return old['result']
+            result=self.portfolio_command(session,action,data)
+            self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,session['username'],fingerprint,result))
+            return result
+        return self.store._transaction(op)
+
+    def portfolio_command(self,session,action,data):
+        service=self.portfolio; p=Principal(session['role'],session['username']); business=data.get('business')
+        if action=='portfolio_seed': service.seed(p)
+        elif action=='portfolio_create': service.create(p,data['business'],data['name'],data['kind'])
+        elif action=='portfolio_update': service.update(p,business,{**data,'confirmed':data.get('confirmed')=='1'},data['revision'])
+        elif action=='portfolio_grant':
+            service.access(p,business,owner=True)
+            if not self.db.execute('SELECT 1 FROM office_users WHERE username=?',(data['username'],)).fetchone(): self.add_user(data['username'],'business_operator',data['password'])
+            service.grant(p,business,data['username'],data.get('write')=='1')
+        elif action=='portfolio_revoke': service.revoke(p,business,data['username'])
+        elif action=='portfolio_halt': service.halt(p,data['halted']=='1')
+        elif action=='portfolio_contact': service.contact(p,business,data['name'],data['channel_ref'])
+        elif action=='portfolio_consent': service.consent(p,business,data['contact'],data['purpose'],data['granted']=='1',data['notice'])
+        elif action=='portfolio_case':
+            times=[]
+            for key in ('start_at','end_at'):
+                value=data.get(key)
+                if value:
+                    parsed=datetime.fromisoformat(value)
+                    if parsed.tzinfo is None: parsed=parsed.replace(tzinfo=JST)
+                    value=parsed.isoformat()
+                times.append(value or None)
+            service.case(p,business,data['key'],data['kind'],data['subject'],data.get('contact') or None,*times)
+        elif action=='portfolio_progress': service.progress(p,business,data['id'],data['status'])
+        elif action=='portfolio_document': service.document(p,business,data['kind'],data.get('case') or None,{'body':data['body']} if data.get('body') else None,data.get('parent') or None)
+        elif action=='portfolio_document_decide': service.decide_document(p,business,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='portfolio_operation': service.operation(p,business,data['key'],data['kind'],data.get('case') or None,data.get('document') or None)
+        elif action=='portfolio_operation_decide': service.decide_operation(p,business,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='portfolio_manual': service.record_manual(p,business,data['id'],data['evidence'])
+        elif action=='portfolio_task': service.task(p,business,data['key'],data['kind'],data['instruction'],int(data['priority']),data.get('agent') or None)
+        elif action=='portfolio_run': service.run(p,business,data['id'])
+        elif action=='portfolio_task_control': service.task_control(p,business,data['id'],data['control'],data.get('priority'))
+        elif action=='portfolio_cost': service.cost(p,business,data['key'],data['task'],data['model'],usd(data['amount']),data['kind'])
+        elif action=='portfolio_budget': service.budget(p,business,data['month'],usd(data['amount']))
+        elif action=='portfolio_ledger': service.ledger(p,business,data['key'],data['day'],data['kind'],int(data['amount']),data['mode'],data['evidence'])
+        elif action=='portfolio_measure': service.measure(p,business,data['day'],data['metric'],int(data['value']),data['mode'],data['evidence'],data.get('previous') or None)
+        elif action=='portfolio_goal': service.goal(p,business,data['month'],data['metric'],int(data['value']) if data.get('value') else None)
+        elif action=='portfolio_report': service.report(p,data['start'],data['end'])
+        elif action=='portfolio_report_decide': service.decide_report(p,data['id'],data['decision'])
+        elif action=='portfolio_delete_request': service.request_delete(p,business,data['contact'])
+        elif action=='portfolio_delete_approve': service.approve_delete(p,business,data['contact'],data.get('checked')=='1')
+        elif action=='portfolio_seminar': service.link_seminar(p,business,data['id'])
+        elif action=='portfolio_photo':
+            import base64
+            service.photo(p,business,data['case'],data['stage'],base64.b64decode(data['image'],validate=True))
+        else: raise ValueError('Unknown scoped action')
+        return '/business?business='+business if business and action!='portfolio_create' else '/businesses'
+
     def _command(self,session,action,data):
+        if action.startswith('portfolio_'):
+            return self.portfolio_command(session,action,data)
         if action.startswith(('seminar_','selection_')):
             return self.phase9_command(session,action,data)
 
@@ -340,6 +413,7 @@ class Office:
             campaign=self.content.generate(data['key'],data['instruction'],int(data['days']),data['platform'],data['start_date'])
             return '/approvals?campaign='+campaign
         if action in ('start','stop','retry'):
+            if self.db.execute('SELECT 1 FROM portfolio_tasks WHERE task_id=?',(ref,)).fetchone(): raise ValueError('Use the scoped business task controls')
             if self.db.execute('SELECT 1 FROM growth_work WHERE task_id=?',(ref,)).fetchone():
                 raise ValueError('Use the local scheduler controls for generated work')
             row=self.db.execute('SELECT * FROM tasks WHERE id=?',(ref,)).fetchone()
@@ -380,6 +454,7 @@ class Office:
             self.db.execute('UPDATE request_options SET priority=? WHERE request_id=?',(priority,ref))
             return '/requests?id='+ref
         if action=='result':
+            if self.db.execute('SELECT 1 FROM portfolio_tasks WHERE task_id=?',(ref,)).fetchone(): raise ValueError('Business outputs must remain in scoped storage')
             safe_input(data['content'])
             run=self.db.execute("SELECT id FROM runs WHERE task_id=? AND status='running'",(ref,)).fetchone()
             if not run:
