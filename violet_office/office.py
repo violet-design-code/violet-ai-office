@@ -124,6 +124,9 @@ class Office:
         from .customer_journey import migrate as migrate_journey,CustomerJourney
         migrate_journey(store)
         self.customer_journey=CustomerJourney(self)
+        from .workflow_collaboration import migrate as migrate_collaboration,WorkflowCollaboration
+        migrate_collaboration(store)
+        self.collaboration=WorkflowCollaboration(self)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -274,7 +277,7 @@ class Office:
         return '/selection' if action.startswith('selection_') else '/seminar-admin'
 
     def portfolio_commands(self,session,nonce,action,data):
-        if not action.startswith(('portfolio_','bd_','scm_','wf_','s14_','bf_','ops_','cj_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
+        if not action.startswith(('portfolio_','bd_','scm_','wf_','s14_','bf_','ops_','cj_','aw_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
         def op():
             current=self.session_by_snapshot(session)
             if not current or current['role']!='business_operator': raise PermissionError('Scoped session expired')
@@ -286,7 +289,7 @@ class Office:
                 if action.startswith('bd_'): self.development.access(Principal(session['role'],session['username']),data.get('idea'),True)
                 else: self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
                 return old['result']
-            result=self.customer_journey_command(session,action,data) if action.startswith('cj_') else self.business_operations_command(session,action,data) if action.startswith('ops_') else self.business_foundation_command(session,action,data) if action.startswith('bf_') else self.seminar_support_command(session,action,data) if action.startswith('s14_') else self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
+            result=self.collaboration_command(session,action,data) if action.startswith('aw_') else self.customer_journey_command(session,action,data) if action.startswith('cj_') else self.business_operations_command(session,action,data) if action.startswith('ops_') else self.business_foundation_command(session,action,data) if action.startswith('bf_') else self.seminar_support_command(session,action,data) if action.startswith('s14_') else self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
             self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,session['username'],fingerprint,result))
             return result
         return self.store._transaction(op)
@@ -404,7 +407,9 @@ class Office:
         elif action=='wf_advance': w.advance(p,b,d,data['stage'],data['revision'])
         elif action=='wf_assign': w.assign(p,b,d,data['key'],data['agent'],data['purpose'],data['basis'],data['due'],data.get('priority',3))
         elif action=='wf_control': w.control(p,b,data['task'],data['control'],data.get('value'))
-        elif action=='wf_run': w.run(p,b,data['task'])
+        elif action=='wf_run':
+            job=self.db.execute('SELECT job_id FROM aw_tasks WHERE task_id=? AND business_id=?',(data['task'],b)).fetchone()
+            self.collaboration.run(p,b,job[0]) if job else w.run(p,b,data['task'])
         elif action=='wf_decide': w.decide_task(p,b,data['task'],data['decision'],data.get('checked')=='1')
         elif action=='wf_draft': w.draft(p,b,d,data['seminar'],data['username'],data['kind'])
         elif action=='wf_draft_decide': w.decide_draft(p,b,data['id'],data['decision'],data.get('checked')=='1')
@@ -480,7 +485,21 @@ class Office:
         else: raise ValueError('Known journey action required')
         return '/customer-journey?business='+b
 
+    def collaboration_command(self,session,action,data):
+        p=Principal(session['role'],session['username']);b=data['business'];service=self.collaboration
+        if action=='aw_submit':service.submit(p,b,data['key'],data['deal'],data['kind'],data['due'],data.get('priority',3))
+        elif action=='aw_dispatch':service.dispatch(p,b,data['job'])
+        elif action=='aw_run':service.run(p,b,data['job'])
+        elif action=='aw_handoff':service.handoff(p,b,data['job'],data['key'],data['target'],data['kind'],data['reason'])
+        elif action=='aw_control':service.control(p,b,data['job'],data['control'])
+        elif action=='aw_propose':service.propose(p,b,data['key'],data['kind'],json.loads(data['payload']))
+        elif action=='aw_decide':service.decide(p,b,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='aw_apply_capability':service.apply_capability(p,b,data['id'])
+        else:raise ValueError('Known collaboration action required')
+        return '/ai-workflow?business='+b
+
     def _command(self,session,action,data):
+        if action.startswith('aw_'):return self.collaboration_command(session,action,data)
         if action.startswith('cj_'): return self.customer_journey_command(session,action,data)
         if action.startswith('ops_'):
             return self.business_operations_command(session,action,data)

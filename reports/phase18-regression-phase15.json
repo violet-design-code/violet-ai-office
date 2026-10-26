@@ -1,0 +1,15 @@
+{
+  "mode": "synthetic_temporary_database",
+  "business_registration_update_disable_enable": "passed",
+  "authenticated_assignment_api": "passed",
+  "no_phase20_allocation_console": "passed",
+  "scoped_ai_metadata": "passed",
+  "human_scope_and_owner_only_settings": "passed",
+  "desktop_routes": 7,
+  "mobile_routes": 7,
+  "external_browser_requests": "blocked",
+  "actual_external_services": [],
+  "real_iphone": "not_tested",
+  "production_started": false,
+  "evidence_context": "Phase18 regression on synthetic temporary DB; loopback Chromium only; not production"
+}
