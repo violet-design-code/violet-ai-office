@@ -1,0 +1,412 @@
+{
+  "mode": "mock",
+  "connections": {
+    "LINE": "未接続",
+    "既存LINE7日間配信": "未接続・契約のみ",
+    "予約": "未選定・モック",
+    "Instagram": "未接続",
+    "Facebook": "未接続",
+    "CRM": "ローカル仮名データのみ"
+  },
+  "customers": [
+    {
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "friend": 1,
+      "stopped": 0,
+      "booked": 1,
+      "state": "予約済み"
+    }
+  ],
+  "consents": [
+    {
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "granted": 1,
+      "notice_version": "mock-notice-v1",
+      "created_at": "2026-10-26T00:59:20.612474+00:00"
+    },
+    {
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "美容",
+      "granted": 0,
+      "notice_version": "mock-notice-v1",
+      "created_at": "2026-10-26T00:59:20.612765+00:00"
+    },
+    {
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "健康",
+      "granted": 0,
+      "notice_version": "mock-notice-v1",
+      "created_at": "2026-10-26T00:59:20.612795+00:00"
+    },
+    {
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "granted": 0,
+      "notice_version": "mock-notice-v1",
+      "created_at": "2026-10-26T00:59:20.612812+00:00"
+    },
+    {
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "granted": 1,
+      "notice_version": "mock-notice-v1",
+      "created_at": "2026-10-26T00:59:20.612888+00:00"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "99603880454c454e816fe30da553a90d",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "category": "面談希望",
+      "status": "open",
+      "created_at": "2026-10-26T00:59:20.613021+00:00"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "6ff1eaaf53b245ca9cb0abcdfec7e9d9",
+      "request_key": "demo-booking",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "slot_id": "demo-slot",
+      "status": "confirmed",
+      "replacement_for": null,
+      "created_at": "2026-10-26T00:59:20.614095+00:00"
+    }
+  ],
+  "steps": [
+    {
+      "id": "4a7439c453a741ce9a5b8f6aa94d90ba",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 1,
+      "day": 1,
+      "due_at": "2026-10-26T00:59:20.612621+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "fca1eb8051c640008936255cd976bde7",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 1,
+      "day": 2,
+      "due_at": "2026-10-27T00:59:20.612629+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "57c67d6689154502a1d3d4d166d9ffa6",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 1,
+      "day": 3,
+      "due_at": "2026-10-28T00:59:20.612633+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "1e28117e9be04dc7b086186d1a2759e7",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 1,
+      "day": 4,
+      "due_at": "2026-10-29T00:59:20.612637+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "8521bfaea6d94340a8c3f99da9121fa3",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 1,
+      "day": 5,
+      "due_at": "2026-10-30T00:59:20.612640+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "08722c97593d4937bff6783e5e0821a7",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 1,
+      "day": 6,
+      "due_at": "2026-10-31T00:59:20.612643+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "551a84fda00a48d491c941a7ff1768d5",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 1,
+      "day": 7,
+      "due_at": "2026-11-01T00:59:20.612646+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "5f72b12d99da4181a5fd9315700e4944",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 6,
+      "day": 1,
+      "due_at": "2026-10-26T00:59:20.612927+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "64a5eb016b0240209a189d521c024eea",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 6,
+      "day": 2,
+      "due_at": "2026-10-27T00:59:20.612931+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "e34b4c9f68f04ac69862febfadbf517f",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 6,
+      "day": 3,
+      "due_at": "2026-10-28T00:59:20.612934+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "2374cddd4fe84429bac616a631fabb1c",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 6,
+      "day": 4,
+      "due_at": "2026-10-29T00:59:20.612938+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "00a3c2a4408c489597a4520548365957",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 6,
+      "day": 5,
+      "due_at": "2026-10-30T00:59:20.612941+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "039a6f3c1ffc40f1ae8e83b2ee470c26",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 6,
+      "day": 6,
+      "due_at": "2026-10-31T00:59:20.612944+00:00",
+      "status": "stopped"
+    },
+    {
+      "id": "5c2a66e79caa4f80bb4e93355c5f1bb4",
+      "subject": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "purpose": "事業紹介",
+      "cycle": 6,
+      "day": 7,
+      "due_at": "2026-11-01T00:59:20.612947+00:00",
+      "status": "stopped"
+    }
+  ],
+  "operations": [
+    {
+      "id": "3ec7165f1f0649c4a3be64cbbdc8a792",
+      "kind": "line",
+      "status": "cancelled",
+      "attempts": 0,
+      "mode": "mock"
+    },
+    {
+      "id": "7a94ef84ece9403982d4623c87323784",
+      "kind": "line",
+      "status": "cancelled",
+      "attempts": 0,
+      "mode": "mock"
+    },
+    {
+      "id": "633b04cb54874a8d97ff39916063c40b",
+      "kind": "line",
+      "status": "cancelled",
+      "attempts": 0,
+      "mode": "mock"
+    },
+    {
+      "id": "2d981db99da94df6aadddffbe1ae573c",
+      "kind": "line",
+      "status": "cancelled",
+      "attempts": 0,
+      "mode": "mock"
+    },
+    {
+      "id": "58f9762ef3e942ffbe4b567ef0dcc0c7",
+      "kind": "booking_confirm",
+      "status": "mock_succeeded",
+      "attempts": 1,
+      "mode": "mock"
+    },
+    {
+      "id": "f9160cf469ad435588dc4714b7e46116",
+      "kind": "sns",
+      "status": "approval_pending",
+      "attempts": 0,
+      "mode": "mock"
+    }
+  ],
+  "errors": [],
+  "agents": [
+    {
+      "agent": "AI25",
+      "action": "mock_service_initialized",
+      "ref": "mock-config",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.610483+00:00"
+    },
+    {
+      "agent": "AI21",
+      "action": "follow_without_consent",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612314+00:00"
+    },
+    {
+      "agent": "AI01",
+      "action": "approval_required",
+      "ref": "3ec7165f1f0649c4a3be64cbbdc8a792",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612407+00:00"
+    },
+    {
+      "agent": "AI20",
+      "action": "consent_recorded",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612525+00:00"
+    },
+    {
+      "agent": "AI22",
+      "action": "schedule_seven_days_mock",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612672+00:00"
+    },
+    {
+      "agent": "AI01",
+      "action": "approval_required",
+      "ref": "7a94ef84ece9403982d4623c87323784",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612710+00:00"
+    },
+    {
+      "agent": "AI20",
+      "action": "consent_recorded",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612792+00:00"
+    },
+    {
+      "agent": "AI20",
+      "action": "consent_recorded",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612810+00:00"
+    },
+    {
+      "agent": "AI20",
+      "action": "consent_recorded",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612832+00:00"
+    },
+    {
+      "agent": "AI22",
+      "action": "pause_mock_steps",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612848+00:00"
+    },
+    {
+      "agent": "AI20",
+      "action": "consent_recorded",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612899+00:00"
+    },
+    {
+      "agent": "AI22",
+      "action": "schedule_seven_days_mock",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612961+00:00"
+    },
+    {
+      "agent": "AI01",
+      "action": "approval_required",
+      "ref": "633b04cb54874a8d97ff39916063c40b",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.612986+00:00"
+    },
+    {
+      "agent": "AI18",
+      "action": "reply_candidate",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.613037+00:00"
+    },
+    {
+      "agent": "AI01",
+      "action": "approval_required",
+      "ref": "2d981db99da94df6aadddffbe1ae573c",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.613071+00:00"
+    },
+    {
+      "agent": "AI01",
+      "action": "approval_required",
+      "ref": "58f9762ef3e942ffbe4b567ef0dcc0c7",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.614154+00:00"
+    },
+    {
+      "agent": "AI23",
+      "action": "booking_requested",
+      "ref": "6ff1eaaf53b245ca9cb0abcdfec7e9d9",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.614166+00:00"
+    },
+    {
+      "agent": "AI14",
+      "action": "consultation_handoff",
+      "ref": "6ff1eaaf53b245ca9cb0abcdfec7e9d9",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.614168+00:00"
+    },
+    {
+      "agent": "AI28",
+      "action": "approval_gate_recorded",
+      "ref": "58f9762ef3e942ffbe4b567ef0dcc0c7",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.614743+00:00"
+    },
+    {
+      "agent": "AI22",
+      "action": "pause_mock_steps",
+      "ref": "subject_6fb2467afc7ecd04bd766e576fa4cbbe962e56485933471ad39c98a6564cda68",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.615283+00:00"
+    },
+    {
+      "agent": "AI26",
+      "action": "mock_adapter_attempt",
+      "ref": "58f9762ef3e942ffbe4b567ef0dcc0c7",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.615287+00:00"
+    },
+    {
+      "agent": "AI01",
+      "action": "approval_required",
+      "ref": "f9160cf469ad435588dc4714b7e46116",
+      "mode": "mock_rules_v1",
+      "created_at": "2026-10-26T00:59:20.618792+00:00"
+    }
+  ],
+  "cost": {
+    "actual_microusd": 0,
+    "network_transport": "未実装",
+    "paid_calls_enabled": false
+  },
+  "notice": "合成イベント・承認・予約確定のモック試験。実際の顧客や代表承認ではありません。"
+}
