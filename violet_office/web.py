@@ -17,6 +17,7 @@ from .office import Office
 from . import web_views as views
 from . import growth_views
 from . import learning_views
+from . import phase9_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -115,11 +116,16 @@ class OfficeApp:
                 return self.response(200,views.login(session),{'Set-Cookie':self.cookie(token)})
             if not session or not session.get('username'):
                 return self.response(303,extra={'Location':'/login'})
+            if session['role']=='participant' and path!='/seminars':
+                return self.response(303,extra={'Location':'/seminars'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
                 raise ValueError('Duplicate parameter')
             ref=params.get('id',[None])[0]
             pages={
+                '/selection':('AI社員の能力評価・選抜',lambda:phase9_views.selection(office,session)),
+                '/seminar-admin':('代表専用セミナー管理',lambda:phase9_views.admin(office,session,params)),
+                '/seminars':('セミナーのご案内',lambda:phase9_views.portal(office,session,ref)),
                 '/learning':('知識・フィードバック・改善',lambda:learning_views.dashboard(office,session,params.get('evaluation',[None])[0],params.get('q',[''])[0],params.get('agent',['AI09'])[0],params.get('kind',['sns'])[0])),
                 '/employee-learning':('社員の業務・改善履歴',lambda:learning_views.employee(office,session,ref)),
                 '/growth':('目標・定期業務',lambda:growth_views.growth(office,session,params.get('month',[None])[0])),

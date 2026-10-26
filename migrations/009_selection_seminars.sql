@@ -1,0 +1,20 @@
+-- Additive phase-9 migration. No existing table rewrite or deletion.
+CREATE TABLE IF NOT EXISTS office_migrations(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS selection_settings(id INTEGER PRIMARY KEY CHECK(id=1),enabled INTEGER NOT NULL DEFAULT 0);
+INSERT OR IGNORE INTO selection_settings VALUES(1,0);
+CREATE TABLE IF NOT EXISTS selection_plans(id TEXT PRIMARY KEY,request_key TEXT UNIQUE NOT NULL,kind TEXT NOT NULL,evaluation_id TEXT,selection TEXT NOT NULL,chosen TEXT NOT NULL,reason TEXT NOT NULL,status TEXT NOT NULL,task_id TEXT REFERENCES tasks(id),created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS selection_events(id INTEGER PRIMARY KEY,actor TEXT NOT NULL,event TEXT NOT NULL,ref TEXT NOT NULL,detail TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminar_accounts(username TEXT PRIMARY KEY REFERENCES office_users(username),display_name TEXT NOT NULL,identity_evidence TEXT NOT NULL,verified_by TEXT NOT NULL,verified_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminar_key_ids(id INTEGER PRIMARY KEY CHECK(id=1),fingerprint TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminar_registrations(username TEXT PRIMARY KEY REFERENCES seminar_accounts(username),segment TEXT NOT NULL,card_hash TEXT UNIQUE,card_suffix TEXT,status TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminars(id TEXT PRIMARY KEY,title TEXT NOT NULL,start_at TEXT NOT NULL,end_at TEXT NOT NULL,location TEXT NOT NULL,fee_yen INTEGER NOT NULL,description TEXT NOT NULL,deadline TEXT NOT NULL,audience TEXT NOT NULL,capacity INTEGER,status TEXT NOT NULL DEFAULT 'open',revision INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminar_responses(seminar_id TEXT NOT NULL REFERENCES seminars(id),username TEXT NOT NULL REFERENCES seminar_registrations(username),answer TEXT NOT NULL,answered_at TEXT NOT NULL,revision INTEGER NOT NULL,PRIMARY KEY(seminar_id,username));
+CREATE TABLE IF NOT EXISTS seminar_consents(id INTEGER PRIMARY KEY,username TEXT NOT NULL REFERENCES seminar_accounts(username),granted INTEGER NOT NULL,notice_version TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminar_events(id INTEGER PRIMARY KEY,actor TEXT NOT NULL,event TEXT NOT NULL,ref TEXT NOT NULL,detail TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminar_reminders(id TEXT PRIMARY KEY,seminar_id TEXT NOT NULL REFERENCES seminars(id),username TEXT NOT NULL REFERENCES seminar_registrations(username),seminar_revision INTEGER NOT NULL,registration_revision INTEGER NOT NULL,response_revision INTEGER NOT NULL,consent_id INTEGER NOT NULL,body TEXT NOT NULL,digest TEXT NOT NULL,status TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,next_at TEXT,UNIQUE(seminar_id,username));
+CREATE TABLE IF NOT EXISTS seminar_attempts(id TEXT PRIMARY KEY,reminder_id TEXT NOT NULL REFERENCES seminar_reminders(id),outcome TEXT NOT NULL,code TEXT NOT NULL,mode TEXT NOT NULL,deadline TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminar_scheduler(id INTEGER PRIMARY KEY CHECK(id=1),enabled INTEGER NOT NULL DEFAULT 0,state TEXT NOT NULL DEFAULT 'paused');
+INSERT OR IGNORE INTO seminar_scheduler VALUES(1,0,'paused');
+CREATE TABLE IF NOT EXISTS seminar_ticks(id TEXT PRIMARY KEY,day TEXT NOT NULL,status TEXT NOT NULL,prepared INTEGER NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS seminar_work(id TEXT PRIMARY KEY,seminar_id TEXT NOT NULL REFERENCES seminars(id),revision INTEGER NOT NULL,input_digest TEXT NOT NULL,agent TEXT NOT NULL,task_id TEXT NOT NULL REFERENCES tasks(id),UNIQUE(seminar_id,revision,input_digest,agent));
+CREATE TABLE IF NOT EXISTS seminar_reminder_history(id TEXT PRIMARY KEY,reminder_id TEXT NOT NULL REFERENCES seminar_reminders(id),snapshot TEXT NOT NULL,created_at TEXT NOT NULL);

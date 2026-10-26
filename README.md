@@ -51,3 +51,9 @@ python3 -m violet_office.growth_cli tick
 - [合成データによる7日分のサンプル](examples/phase-8/sample.md)
 
 `python3 -m violet_office.learning_demo` で一時DBによる再現確認ができます。通常のWeb起動では本番運用や外部送信を開始しません。
+
+第9段階では「評価・選抜」「セミナー管理」と、参加者専用画面を追加しました。自動選抜は初期停止、再案内は代表承認待ちのモック下書きまで。公式カード照合・実LINE・iPhone実機接続は未対応です。第10段階以降の仕様は変更していません。
+
+- [第9段階の機能・互換性・試験・操作手順](docs/phase-9.md)
+
+`python3 -m violet_office.phase9_demo` は一時DBだけで合成シナリオを実行します。`python3 -m violet_office.seminar_cli status` で再案内準備の停止/有効状態を確認できます。

@@ -1,0 +1,43 @@
+{
+  "mode": "synthetic_temporary_database",
+  "real_identity_verification": false,
+  "production_approval": false,
+  "business_copy": "ベネシードディーラー事業\n\n健康・美容に関する商品やサービスの提供をはじめ、さまざまな事業活動を通じて、お客様の暮らしや目標をサポートします。\n\nセミナーや体験会では、それぞれの目的に合った情報をご案内します。",
+  "migration_version": 9,
+  "seminar_id": "a3aaec29b73d41f7a495ac87c56c177d",
+  "counts": {
+    "参加する": 1,
+    "参加しない": 1,
+    "検討中": 1,
+    "未回答": 1
+  },
+  "reminders_prepared": 3,
+  "duplicate_preparation": 0,
+  "reminder_states": [
+    "approval_pending",
+    "approval_pending",
+    "approval_pending"
+  ],
+  "representative_approval": "原稿・再案内は代表承認待ちで停止",
+  "local_roles": [
+    "AI01",
+    "AI08",
+    "AI17",
+    "AI22",
+    "AI23",
+    "AI27",
+    "AI28"
+  ],
+  "task_count": 7,
+  "selection": {
+    "chosen": "AI09",
+    "reason": "データ不足のため既存の主担当を提案。実績による優劣は評価不能。",
+    "status": "proposed"
+  },
+  "scheduler_enabled": false,
+  "selection_enabled": false,
+  "mock_delivery_attempts": 0,
+  "real_external_services": [],
+  "new_paid_api_calls": 0,
+  "foreign_key_violations": 0
+}

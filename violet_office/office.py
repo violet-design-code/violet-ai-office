@@ -93,12 +93,18 @@ class Office:
         self.db.execute('INSERT OR IGNORE INTO office_budgets VALUES (?,0)',(now().astimezone(JST).strftime('%Y-%m'),))
         self.growth=Growth(store)
         self.learning=Learning(store)
+        from .phase9_migrations import migrate
+        from .seminars import Seminars
+        from .selection import Selection
+        migrate(store)
+        self.seminars=Seminars(store)
+        self.selection=Selection(store,self.learning)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
 
     def add_user(self,username,role,password):
-        if not re.fullmatch(r'[A-Za-z0-9_-]{1,40}',username) or role not in ('representative','viewer') or len(password)<12 or len(password)>256:
+        if not re.fullmatch(r'[A-Za-z0-9_-]{1,40}',username) or role not in ('representative','viewer','participant') or len(password)<12 or len(password)>256:
             raise ValueError('Invalid account')
         salt=secrets.token_hex(16)
         self.db.execute('INSERT INTO office_users VALUES (?,?,?,?)',(username,role,salt,password_hash(password,salt)))
@@ -148,6 +154,8 @@ class Office:
         return self.new_session(row['username'],row['role'])
 
     def commands(self,session,nonce,action,data):
+        if session['role']=='participant':
+            return self.member_commands(session,nonce,action,data)
         require(Principal(session['role']),True)
         if data.get('id') and not re.fullmatch(r'[A-Za-z0-9_-]{1,100}',data['id']):
             raise ValueError('Invalid reference')
@@ -181,7 +189,62 @@ class Office:
         integration._destination=None
         return integration
 
+    def member_commands(self,session,nonce,action,data):
+        if not re.fullmatch(r'[a-f0-9]{32}',nonce): raise ValueError('Invalid command')
+        def op():
+            current=self.session_by_snapshot(session)
+            if not current or current['role']!='participant': raise PermissionError('Participant session required')
+            fingerprint=digest([session['username'],action,data])
+            old=self.db.execute('SELECT * FROM office_commands WHERE nonce=?',(nonce,)).fetchone()
+            if old:
+                if old['actor']!=session['username'] or old['fingerprint']!=fingerprint: raise ValueError('Conflicting command')
+                return old['result']
+            username=session['username']
+            if action=='seminar_member_register': self.seminars.register(username,data['segment'],data.get('card',''))
+            elif action=='seminar_member_response': self.seminars.respond(username,data['id'],data['answer'])
+            elif action=='seminar_member_consent': self.seminars.consent(username,data['granted']=='1')
+            else: raise PermissionError('Participant action denied')
+            self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,username,fingerprint,'/seminars'))
+            self.audit(username,action)
+            return '/seminars'
+        return self.store._transaction(op)
+
+    def session_by_snapshot(self,session):
+        row=self.db.execute('SELECT s.*,u.role AS current_role FROM office_sessions s JOIN office_users u USING(username) WHERE s.token_hash=?',(session.get('token_hash'),)).fetchone()
+        return row if row and row['username']==session['username'] and row['role']==row['current_role'] and row['expires_at']>now().isoformat() and row['seen_at']>(now()-timedelta(minutes=30)).isoformat() else None
+
+    def phase9_command(self,session,action,data):
+        principal=Principal(session['role'],session['username'])
+        sem=self.seminars
+        if action=='selection_toggle': self.selection.set_enabled(principal,data['enabled']=='1')
+        elif action=='selection_propose': self.selection.propose(principal,data['key'],data['kind'],data['start'],data['end'])
+        elif action=='selection_assign': self.selection.assign(principal,data['id'],data['agent'])
+        elif action=='seminar_account':
+            self.add_user(data['username'],'participant',data['password'])
+            sem.account(principal,data['username'],data['display_name'],data['evidence'],data.get('attested')=='1')
+        elif action=='seminar_save':
+            values=dict(data)
+            for key in ('start_at','end_at','deadline'):
+                parsed=datetime.fromisoformat(values[key])
+                if parsed.tzinfo is None: parsed=parsed.replace(tzinfo=JST)
+                values[key]=parsed.isoformat()
+            sem.save(principal,values,data.get('id') or None,data.get('revision'))
+        elif action=='seminar_state': sem.change_state(principal,data['id'],data['status'])
+        elif action=='seminar_registration': sem.decide_registration(principal,data['username'],data['decision'])
+        elif action=='seminar_schedule': sem.schedule(principal,data['enabled']=='1')
+        elif action=='seminar_tick': sem.tick(principal)
+        elif action=='seminar_reprepare': sem.reprepare(principal,data['id'])
+        elif action=='seminar_approve': sem.approve_reminder(principal,data['id'],data['decision'])
+        elif action=='seminar_mock': sem.dispatch_mock(principal,data['id'])
+        elif action=='seminar_work': sem.prepare_work(principal,data['id'])
+        else: raise ValueError('Unknown phase-9 action')
+        self.audit(session['username'],action,data.get('id',''))
+        return '/selection' if action.startswith('selection_') else '/seminar-admin'
+
     def _command(self,session,action,data):
+        if action.startswith(('seminar_','selection_')):
+            return self.phase9_command(session,action,data)
+
         ref=data.get('id','')
         principal=Principal(session['role'],session['username'])
         if action=='learning_feedback':
