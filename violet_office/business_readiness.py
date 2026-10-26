@@ -36,6 +36,12 @@ class BusinessReadiness:
     def validate(self,p,kind,b,payload,check_duplicates=True):
         self.access(p,b,True)
         if kind not in KINDS_READY or not isinstance(payload,dict):raise ValueError('Known operation and explicit fields required')
+        management=payload.get('management')
+        if 'management' in payload:
+            if kind not in ('create','update'):raise ValueError('Business metadata only')
+            from .business_management import validate
+            management=validate(self.o,p,management,b)
+            payload={k:v for k,v in payload.items() if k!='management'}
         if kind=='create':
             if b is not None or set(payload)-{'name','overview','category','started_on','kind'} or not {'name','overview','category'}<=set(payload):raise ValueError('New business fields required, no arbitrary IDs or metrics')
             result={k:text(payload[k],120 if k!='overview' else 2000) for k in ('name','overview','category')};result['started_on']=payload.get('started_on') or None;result['kind']=payload.get('kind','other')
@@ -65,11 +71,18 @@ class BusinessReadiness:
             old=self.db.execute('SELECT name FROM portfolio_businesses WHERE id=?',(b,)).fetchone() if b else None
             if not old or result['name']!=old['name']:
                 if any(normalized(r['name'])==normalized(result['name']) for r in self.db.execute('SELECT id,name FROM portfolio_businesses') if r['id']!=b):raise ValueError('Business name already exists; never merge automatically')
+        if management is not None:
+            if kind=='update' and (result['status']!=management['status'] or result['enabled']!=(management['status']!='paused') or result['confirmed']!=management['confirmed']):raise ValueError('Business state must match the previewed management settings')
+            result['management']=management
         return result
     def snapshot(self,b):
         if b is None:return digest([(r['id'],normalized(r['name'])) for r in self.db.execute('SELECT id,name FROM portfolio_businesses ORDER BY id')])
         business=self.db.execute('SELECT * FROM portfolio_businesses WHERE id=?',(b,)).fetchone();profile=self.db.execute('SELECT * FROM bf_profiles WHERE business_id=?',(b,)).fetchone();assignments=[dict(r) for r in self.db.execute('SELECT * FROM bf_ai_assignments WHERE business_id=? ORDER BY agent',(b,))];controls=[r['agent'] for r in self.db.execute('SELECT agent FROM br_assignment_controls WHERE business_id=? ORDER BY agent',(b,))]
-        return digest([dict(business) if business else None,dict(profile) if profile else None,assignments,controls])
+        parts=[dict(business) if business else None,dict(profile) if profile else None,assignments,controls]
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='bm_profiles'").fetchone():
+            meta=self.db.execute('SELECT * FROM bm_profiles WHERE business_id=?',(b,)).fetchone();goals=[dict(r) for r in self.db.execute('SELECT * FROM bm_month_goals WHERE business_id=? ORDER BY month',(b,))]
+            if meta or goals:parts.append([dict(meta) if meta else None,goals])
+        return digest(parts)
     def preview(self,p,kind,b,payload):
         values=self.validate(p,kind,b,payload);before=None;after=values
         if kind=='create':impact=['準備中・AI制限有効で登録。料金/目標/顧客/実績/APIキー/担当は未設定。']
@@ -88,6 +101,12 @@ class BusinessReadiness:
             if before:before['permissions']=json.loads(before['permissions'])
             if kind=='unassign':after={'agent':values['agent'],'active':False,'permissions':before['permissions']}
             impact=['既存社員定義は変更しない。当該事業・当該社員だけ現行権限を厳密検証。解除は論理停止。','既存の進行中/待機中タスク・引き継ぎは人間が確認し、無断で担当変更しない。']
+        if 'management' in values:
+            meta=self.db.execute('SELECT * FROM bm_profiles WHERE business_id=?',(b,)).fetchone() if b else None
+            goal=self.db.execute('SELECT * FROM bm_month_goals WHERE business_id=? AND month=?',(b,values['management']['month'])).fetchone() if b else None
+            before={'business':before,'management':dict(meta) if meta else None,'monthly_goal':dict(goal) if goal else None}
+            if kind=='create':impact=['登録時に明示した提供サービス・責任者・月次目標・状態を設定。顧客・実績・料金・担当は自動追加しません。']
+            impact.append('責任者選択は権限付与ではありません。月次目標は予測・実績とは別保存。未設定は空欄。')
         return {'kind':kind,'business_id':b,'before':before,'after':after,'impact':impact,'external_execution':False}
     def prepare(self,p,key,kind,b,payload):
         key=text(key,80)
@@ -128,6 +147,9 @@ class BusinessReadiness:
                     if row['kind']=='unassign':self.f.assign(p,b,node['agent'],old['role_note'],old['scope_note'],json.loads(old['permissions']),False,old['revision'])
                     else:self.f.assign(p,b,node['agent'],node['role_note'],node['scope_note'],node['permissions'],node['active'],old['revision'] if old else 0)
                     self.db.execute('INSERT OR IGNORE INTO br_assignment_controls VALUES(?,?)',(b,node['agent']))
+            if 'management' in v:
+                from .business_management import apply as apply_management
+                apply_management(self.o,p,b,v['management'])
             self.db.execute("UPDATE br_requests SET status='applied',applied_by=?,result_business=? WHERE id=?",(p.identity,b,identifier));self.event(p,self.row(p,identifier),'applied');return b
         return self.store._transaction(op)
     def contract(self,p,b=None):

@@ -127,3 +127,9 @@ python3 -m violet_office.growth_cli tick
 - [第20段階の完成画面・API契約・受入条件](docs/phase-20-screen-contract.md)
 
 第20段階の新規事業入力ウィザード・28人割当エディターは未実装です。既存社員設定・事業データ・公式条件の確認待ちを保持し、実送信・公開・決済は行いません。
+
+### 第20段階：事業管理・AI社員の担当設定
+
+「事業管理」(`/business-management`) から「＋ 新規事業を追加」、編集・停止・再開、事業・対象月別の目標設定ができます。「AI社員管理」(`/ai-management`) は既存28人の担当・兼務・解除を扱います。設定変更は確認→代表承認→別適用。責任者の選択で権限は増えません。目標空欄は未設定で実績に加算しません。
+
+[操作・移行・PC/iPhone共通構成と未対応事項](docs/phase-20.md) / [自動テスト結果](reports/phase20-validation.json) / [画面検証](reports/phase20-browser.json)。現行はローカル専用でiPhone実接続・外部公開・実送信は未実施です。

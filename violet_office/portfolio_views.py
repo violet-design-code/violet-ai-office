@@ -55,6 +55,7 @@ def home(o,s,params):
         return '<p>許可された事業だけ表示します。</p>'+table(['事業','状態'],[[f'<a href="/business?business={e(r["id"])}">'+e(r['name'])+'</a>',e(STATES[r['status']])] for r in rows])
     start,end=periods(params); data=o.portfolio.dashboard(p,start,end)
     body='<div class="notice">共通AI社員28人を利用します。旧LINE・セミナー・顧客データは未配賦で、事業へ自動コピーしません。金額は円、API料金はUSD別管理。未計測を0とみなしません。</div>'
+    body+='<p><a class="button" href="/business-management?new=1">＋ 新規事業を追加</a> / <a href="/ai-management">AI社員管理</a></p>'
     from .business_operations_views import global_section
     body+=pf(s,'portfolio_seed',caption='確認済みの初期6事業を登録（既存IDは維持）')
     body+='<form method="get">'+inp('start','集計開始日（JST）',start,'date')+inp('end','集計終了日（含まない）',end,'date')+'<button>同じ期間で集計</button></form>'

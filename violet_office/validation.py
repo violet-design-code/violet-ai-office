@@ -237,6 +237,20 @@ REQUIRED_TESTS.update({
 })
 
 
+REQUIRED_TESTS.update({
+    'tests.test_business_management.ManagementTests.'+name for name in (
+        'test_new_form_confirm_approval_apply_separate',
+        'test_monthly_goals_never_ledger_entries',
+        'test_manager_does_not_grant_acl',
+        'test_manager_change_audited_before_after',
+        'test_optimistic_editor_stale_rejected',
+        'test_operator_read_scoped_and_cannot_modify',
+        'test_all_28_existing_definitions_unchanged_multibusiness',
+        'test_release_preserves_pending_tasks',
+        'test_backup_restore_metadata_goals_preserved',
+    )
+})
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -281,7 +295,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase19-validation.json','phase18-validation.json','phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase20-validation.json','phase19-validation.json','phase18-validation.json','phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

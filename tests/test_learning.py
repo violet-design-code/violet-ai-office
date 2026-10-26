@@ -228,7 +228,9 @@ class LearningTests(unittest.TestCase):
         _,artifact=self.artifact()
         for rubric in ('正確性','読みやすさ','適切さ'):
             self.l.rate(self.owner,'artifact',artifact,5,rubric)
-        _,ev=self.l.evaluate(self.owner,'sns',(now().date()-timedelta(days=1)).isoformat(),(now().date()+timedelta(days=1)).isoformat())
+        from zoneinfo import ZoneInfo
+        today=now().astimezone(ZoneInfo('Asia/Tokyo')).date()
+        _,ev=self.l.evaluate(self.owner,'sns',(today-timedelta(days=1)).isoformat(),(today+timedelta(days=1)).isoformat())
         a=next(a for a in ev['agents'] if a['agent']=='AI09')
         self.assertIsNone(a['quality_score'])
         self.assertEqual(a['denominators']['rated_items'],1)
