@@ -6,3 +6,6 @@ input[type=checkbox]{width:auto;margin-right:8px;accent-color:var(--violet)}
 
 /* Phase16 KPI columns stay readable inside the existing scroll container. */
 .ops-wide table{min-width:680px}
+
+/* Phase17 source evidence stays readable within its own scroll container. */
+.cj-wide table{min-width:640px}

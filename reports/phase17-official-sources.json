@@ -1,0 +1,29 @@
+{
+  "attempted_at": "2026-10-26T13:17:58+00:00",
+  "sources": [
+    {
+      "url": "https://beneseed.co.jp/business-info/",
+      "status": "unavailable",
+      "administrator_state": "管理者確認待ち",
+      "reason": "環境プロキシのCONNECTが403で拒否。公式本文未取得。公式サーバーの認証エラーとは断定しない。",
+      "verified_content": null
+    },
+    {
+      "url": "https://ads.beneseed.co.jp/dealership/",
+      "status": "unavailable",
+      "administrator_state": "管理者確認待ち",
+      "reason": "環境プロキシのCONNECTが403で拒否。公式本文未取得。公式サーバーの認証エラーとは断定しない。",
+      "verified_content": null
+    }
+  ],
+  "unverified": [
+    "契約条件",
+    "参加資格",
+    "VIOLETの提供資格・営業権限",
+    "法的分類",
+    "報酬条件",
+    "20歳以上の社会人という条件の適用範囲"
+  ],
+  "customer_publication": false,
+  "official_facts_invented": false
+}

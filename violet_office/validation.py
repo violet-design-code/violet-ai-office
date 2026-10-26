@@ -188,6 +188,22 @@ REQUIRED_TESTS.update({
 })
 
 
+REQUIRED_TESTS.update({
+    'tests.test_customer_journey.CustomerJourneyTests.'+name for name in (
+        'test_pending_profile_no_invented_conditions_and_no_approval',
+        'test_official_pages_unavailable_do_not_establish_authority_or_age',
+        'test_intake_atomic_idempotent_no_customer_duplication_or_implicit_consent',
+        'test_three_existing_roles_selected_deduplicated_and_28_unchanged',
+        'test_many_business_assignments_do_not_inherit_each_others_access',
+        'test_role_revocation_blocks_existing_tasks_even_legacy_compatibility',
+        'test_pending_profile_cannot_be_bypassed_from_existing_sales_approval',
+        'test_mock_journey_booking_approval_is_separate_and_never_sales',
+        'test_migration_preserves_existing_rows_and_is_repeatable',
+        'test_restore_retains_records_and_requires_reapproval',
+    )
+})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -232,7 +248,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

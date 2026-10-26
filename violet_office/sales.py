@@ -226,10 +226,19 @@ class Sales:
         state=self.db.execute('SELECT * FROM scm_customers WHERE business_id=? AND contact_id=?',(business,deal['contact_id'])).fetchone()
         consents=[dict(r) for r in self.db.execute('SELECT * FROM portfolio_consents WHERE business_id=? AND contact_id=? ORDER BY id',(business,deal['contact_id']))]
         q=self.db.execute('SELECT digest FROM scm_quotes WHERE business_id=? AND id=?',(business,quote)).fetchone() if quote else None
-        return digest([dict(deal),dict(contact),dict(state) if state else None,consents,kind,quote,q[0] if q else None,booking,body])
+        payload=[dict(deal),dict(contact),dict(state) if state else None,consents,kind,quote,q[0] if q else None,booking,body]
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='cj_cases'").fetchone() and self.db.execute('SELECT 1 FROM cj_cases WHERE business_id=? AND deal_id=?',(business,deal['id'])).fetchone():
+            profile=self.db.execute('SELECT * FROM cj_profiles WHERE business_id=?',(business,)).fetchone()
+            sources=[dict(r) for r in self.db.execute('SELECT * FROM cj_sources WHERE business_id=? ORDER BY id',(business,))]
+            payload.append([dict(profile) if profile else None,sources])
+        return digest(payload)
     def eligible(self,p,business,action):
         self.writable(p,business); deal=self.row(p,business,'scm_deals',action['deal_id']); body=json.loads(action['body'])
         if deal['state']!='active' or self.snapshot(business,deal,action['kind'],action['quote_id'],action['booking_id'],body)!=action['snapshot']: raise ValueError('Deal, consent or content changed')
+        # Office supplies authoritative shared policy; absent journey cases leave legacy behavior unchanged.
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='cj_cases'").fetchone():
+            from .customer_journey import check_sales_action
+            check_sales_action(self,p,business,action)
         if risky(action['body']): raise ValueError('Unsupported claim or instruction')
         if action['kind'] in ('send','publish','contract','booking_confirm','invoice','charge','payment','refund','void_invoice','provided'):
             if not action['quote_id']: raise ValueError('Approved tax-confirmed quote required')
@@ -361,6 +370,8 @@ class Sales:
         if not choices: raise PermissionError('Assign an employee for this business first')
         agent=agent or min(choices,key=lambda a:self.db.execute("SELECT COUNT(*) FROM tasks WHERE agent=? AND status IN ('pending','running')",(a,)).fetchone()[0])
         if agent not in choices: raise ValueError('Existing expertise required')
+        from .customer_journey import check_sales_work
+        check_sales_work(self,p,business,deal,agent,activity)
         from .portfolio import CANDIDATES
         category=next((k for k,v in CANDIDATES.items() if agent in v),'planning')
         task=self.portfolio.task(p,business,'scm:'+key,category,'営業支援の下書き。顧客本文は権限付き営業画面でのみ参照。',agent=agent)
@@ -371,6 +382,8 @@ class Sales:
         self.writable(p,business)
         row=self.db.execute('SELECT * FROM scm_work WHERE business_id=? AND task_id=?',(business,task)).fetchone()
         if not row: raise ValueError('Scoped work required')
+        from .customer_journey import check_sales_work
+        check_sales_work(self,p,business,row['deal_id'],self.db.execute('SELECT agent FROM tasks WHERE id=?',(task,)).fetchone()[0],row['activity'])
         def op():
             existing=self.db.execute("SELECT ref FROM scm_events WHERE business_id=? AND deal_id=? AND event='work_result' AND detail=?",(business,row['deal_id'],encode({'task_id':task}))).fetchone()
             if existing: return existing[0]

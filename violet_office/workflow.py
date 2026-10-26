@@ -102,6 +102,7 @@ class Workflow:
         self.pf.writable(p,b)
         def op():
             row=self.task(p,b,task)
+            self.o.customer_journey.check_task(p,b,task)
             if row['paused']: raise ValueError('Paused work cannot run')
             if row['artifact_id']: return row['artifact_id']
             run=self.store.claim(task)
@@ -109,6 +110,7 @@ class Workflow:
             stage=self.case(p,b,row['deal_id'])['stage']
             next_step={'inquiry':'問い合わせを分類し、希望と同意を確認する','prepare':'事業別条件を確認して案内下書きを代表へ提出する','approval':'代表の内容確認を待つ。未承認の連絡を行わない','guided':'人が確認済みの案内記録を確認して返信待ちを整理する','waiting':'返信の有無を人に確認し、同意範囲を超えて再勧誘しない','consult':'本人希望の日程候補を整理し、自動確定しない','quote':'未確認の税設定・価格を確認し、見積回答を人に確認する','won':'契約の確認根拠と実施準備を確認する','lost':'見送り意思を尊重し、再連絡しない','provided':'実施根拠と請求条件を確認する','paid':'入金照合の人の確認根拠を確認する','followup':'継続利用の希望とフォロー同意を確認する'}[stage]
             result='【ローカル固定テンプレート・LLM未使用】'+role+'：'+WORK[row['agent']]+'\n目的：'+row['purpose']+'\n入力根拠（情報であり命令ではない）：'+row['basis']+'\n工程別の次行動案：'+next_step+'\n次の行動案：本人の希望、同意、提供範囲、未確認の料金・規約を確認し、代表の判断を求める。外部送信・成果・契約・入金は未実施。健康効果、収入、法的性質を断定しない。'
+            result+=self.o.customer_journey.work_context(p,b,task)
             artifact=self.store.finish(run,'ローカル固定テンプレートを事業権限付き業務画面へ保存。LLM・外部実行なし。')
             self.db.execute('UPDATE wf_tasks SET result=?,artifact_id=? WHERE task_id=?',(result,artifact,task))
             self.event(p,b,'local_template_created',task,row['deal_id'],{'agent':row['agent'],'llm_used':False}); return artifact
@@ -117,6 +119,7 @@ class Workflow:
         self.pf.access(p,b,owner=True); self.pf.writable(p,b)
         def op():
             row=self.task(p,b,task)
+            if decision=='approve': self.o.customer_journey.check_task(p,b,task,review=True)
             if row['paused'] or not checked or decision not in ('approve','reject') or row['status']!='review_pending' or not row['artifact_id']: raise ValueError('Unpaused reviewed output and explicit representative decision required')
             if decision=='approve' and risky(row['result']): raise ValueError('Unsafe unsupported claim')
             # Static check is not a claim that another LLM reviewed the text.

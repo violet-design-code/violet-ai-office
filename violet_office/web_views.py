@@ -40,9 +40,9 @@ def card(title,value,note=''):
 
 
 def layout(title,body,session=None,path=''):
-    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理'),('/businesses','複数事業'),('/business-reports','経営会議'),('/development','新規事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営'),('/business-foundation','事業基盤')]
+    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理'),('/businesses','複数事業'),('/business-reports','経営会議'),('/development','新規事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営'),('/business-foundation','事業基盤'),('/customer-journey','事業別案内・導線')]
     if session and session.get('role')=='participant': nav=[('/seminars','初回登録・セミナー'),('/seminar-participation','申込・参加希望') ]
-    if session and session.get('role')=='business_operator': nav=[('/businesses','担当事業'),('/development','事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営'),('/business-foundation','事業基盤')]
+    if session and session.get('role')=='business_operator': nav=[('/businesses','担当事業'),('/development','事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営'),('/business-foundation','事業基盤'),('/customer-journey','事業別案内・導線')]
     navigation='<nav>'+''.join(f'<a href="{url}"'+(' aria-current="page"' if path==url else '')+'>'+name+'</a>' for url,name in nav)+'</nav>' if session and session.get('username') else ''
     logout=''
     if session and session.get('username'):

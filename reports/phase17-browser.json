@@ -1,0 +1,16 @@
+{
+  "mode": "synthetic_temporary_database",
+  "assisted_interest_intake": "passed",
+  "purpose_specific_consent_forms": "passed",
+  "existing_three_role_routing": "passed",
+  "local_template_and_provenance": "passed",
+  "interview_candidate_no_confirmation": "passed",
+  "profile_revision_reapproval": "passed",
+  "human_business_acl": "passed",
+  "desktop_routes": 7,
+  "mobile_routes": 7,
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested",
+  "actual_external_services": [],
+  "production_started": false
+}
