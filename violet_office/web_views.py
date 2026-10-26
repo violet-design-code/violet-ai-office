@@ -40,7 +40,7 @@ def card(title,value,note=''):
 
 
 def layout(title,body,session=None,path=''):
-    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート')]
+    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善')]
     navigation='<nav>'+''.join(f'<a href="{url}"'+(' aria-current="page"' if path==url else '')+'>'+name+'</a>' for url,name in nav)+'</nav>' if session and session.get('username') else ''
     logout=''
     if session and session.get('username'):
@@ -104,6 +104,7 @@ def employees(office,session,agent_id=None):
             payload=json.loads(task['payload'])
             summary=payload.get('instruction',payload.get('brief',payload.get('purpose','ローカル作業'))) if isinstance(payload,dict) else 'ローカル作業'
             rows.append([e(task['id']),e(summary if session['role']=='representative' else '詳細は代表のみ'),e(label(task['status'])),e(task['priority'] or '未設定'),dt(task['updated_at']),dt(task['planned_due']) if task.get('planned_due') else '未設定',controls or '操作対象なし'])
+        body+='<p><a href="/employee-learning?id='+agent_id+'">業務記録・指導・評価・改善履歴</a></p>'
         body+=table(['タスクID','仕事内容','進捗','優先度','最終イベント（日本時間）','計画期限（日本時間）','ローカル操作'],rows)
         artifacts=office.db.execute('SELECT a.*,t.status FROM artifacts a JOIN tasks t ON t.id=a.task_id WHERE a.author=? ORDER BY a.rowid DESC',(agent_id,)).fetchall()
         body+='<h2>成果物</h2>'

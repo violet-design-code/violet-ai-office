@@ -11,6 +11,7 @@ root=Path(__file__).resolve().parent.parent
 parser=argparse.ArgumentParser(description='ローカル合成データの実ブラウザ検証')
 parser.add_argument('--output-dir')
 parser.add_argument('--with-growth',action='store_true')
+parser.add_argument('--with-learning',action='store_true')
 args=parser.parse_args()
 artifacts=Path(args.output_dir) if args.output_dir else root/'examples'
 artifacts.mkdir(parents=True,exist_ok=True)
@@ -85,9 +86,29 @@ with tempfile.TemporaryDirectory() as temp:
             check.close()
             page.goto(base+'/growth')
             page.screenshot(path=str(desktop),full_page=True)
-        routes=['/employees','/instructions','/approvals','/analytics','/costs','/monitor']
+        if args.with_learning:
+            page.goto(base+'/learning')
+            knowledge=page.locator('form[action="/actions/learning_knowledge"]')
+            knowledge.locator('[name="task_kind"]').select_option('sns')
+            knowledge.locator('[name="title"]').fill('合成テストの文章方針')
+            knowledge.locator('[name="body"]').fill('本人の希望を尊重する表現を使用する')
+            knowledge.locator('[name="source_ref"]').fill('合成の社内方針・版1・確認済み')
+            knowledge.locator('[name="scope"]').fill('AI09')
+            knowledge.locator('[name="attested"]').check()
+            knowledge.get_by_role('button').click()
+            approve=page.locator('form[action="/actions/learning_knowledge_decide"]').filter(has=page.locator('input[name="decision"][value="approve"]')).first
+            approve.locator('xpath=ancestor::details[1]').locator('summary').first.click()
+            approve.get_by_role('button').click()
+            assert '承認済み・参照可' in page.locator('main').inner_text()
+            page.locator('form[action="/actions/learning_evaluate"]').get_by_role('button').click()
+            assert '評価不能' in page.locator('main').inner_text()
+            assert page.locator('a[href="/employee-learning?id=AI28"]').count()>0
+            page.screenshot(path=str(desktop),full_page=True)
+        routes=['/employees' ,'/instructions','/approvals','/analytics','/costs','/monitor']
         if args.with_growth:
             routes+=['/growth','/reports']
+        if args.with_learning:
+            routes+=['/learning','/employee-learning?id=AI09']
         for route in routes:
             r=page.goto(base+route)
             assert r.status==200,(route,r.status)
@@ -96,9 +117,9 @@ with tempfile.TemporaryDirectory() as temp:
             page.goto(base+route)
             width=page.evaluate('({width:innerWidth,scroll:document.documentElement.scrollWidth})')
             assert width['scroll']<=width['width'],(route,width)
-        page.goto(base+(growth_report_url if args.with_growth else '/employees'))
+        page.goto(base+('/learning' if args.with_learning else growth_report_url if args.with_growth else '/employees'))
         page.screenshot(path=str(mobile),full_page=True)
         browser.close()
     server.shutdown()
     server.server_close()
-print(json.dumps({'login':'passed','browser_form_operations':['task_assignment','manual_start','pause','content_rejection'],'growth_forms':'passed' if args.with_growth else 'not_run','desktop_pages':len(routes)+1,'mobile_pages_without_horizontal_overflow':len(routes)+1,'external_browser_requests':'blocked','screenshots':[str(desktop),str(mobile)]},ensure_ascii=False))
+print(json.dumps({'login':'passed','browser_form_operations':['task_assignment','manual_start','pause','content_rejection'],'learning_forms':'passed' if args.with_learning else 'not_run','learning_data':'synthetic_temporary_database','growth_forms':'passed' if args.with_growth else 'not_run','desktop_pages':len(routes)+1,'mobile_pages_without_horizontal_overflow':len(routes)+1,'external_browser_requests':'blocked','screenshots':[str(desktop),str(mobile)]},ensure_ascii=False))

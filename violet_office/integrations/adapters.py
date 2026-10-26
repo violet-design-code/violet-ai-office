@@ -9,6 +9,7 @@ import hmac
 @dataclass(frozen=True)
 class Principal:
     role: str
+    identity: str | None = None
 
 
 class Authorizer:

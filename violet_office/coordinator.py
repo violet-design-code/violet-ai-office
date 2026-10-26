@@ -79,6 +79,8 @@ class Coordinator:
                 }, action=self._action(agent))
                 self.db.execute('INSERT INTO request_tasks VALUES (?,?,?)',(request,task,'specialist'))
                 children.append(task)
+                from .learning import Learning,task_kind
+                Learning(self.store,initialize=False).runtime(agent,task_kind(self._action(agent),agent),task)
             if children:
                 # Aggregate is also a draft, never a way to bypass external approval.
                 external = any(self._action(a['agent']) != 'internal' for a in plan['assignments'])

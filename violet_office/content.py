@@ -67,15 +67,16 @@ def safe_input(text):
         raise ValueError('Invalid text')
     if re.search(r'(?i)[\"\']?(?:api[_-]?key|access[_-]?token|channel[_-]?secret|password)[\"\']?\s*[:=]\s*[\"\']?[A-Za-z0-9_-]{6,}|-----BEGIN [A-Z ]*PRIVATE KEY-----',text):
         raise ValueError('Do not enter credentials')
-    if re.search(r'[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}|(?:sk-|Bearer\s+)[A-Za-z0-9_-]+|0\d{1,3}[- ]?\d{2,4}[- ]?\d{4}',text):
+    if re.search(r'[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}|(?:sk-|Bearer\s+)[A-Za-z0-9_-]+|(?<![A-Za-z0-9])0\d{1,3}[- ]?\d{2,4}[- ]?\d{4}(?![A-Za-z0-9])',text):
         raise ValueError('Do not enter personal information or credentials')
 
 
 class ContentOffice:
-    def __init__(self, store):
+    def __init__(self, store, initialize=True):
         self.store=store
         self.db=store.db
-        self.db.executescript(SCHEMA)
+        if initialize:
+            self.db.executescript(SCHEMA)
 
     def _event(self, content, event, actor, detail=''):
         self.db.execute('INSERT INTO content_events(content_id,event,actor,detail,created_at) VALUES (?,?,?,?,?)',
@@ -117,6 +118,9 @@ class ContentOffice:
             plan=[{'day':i+1,'theme':themes[i%7],'date':(start+timedelta(days=i)).isoformat()} for i in range(days)]
             self._work(campaign,'AI08',{'plan':plan,'audience':'40〜60代を主な想定とする成人。属性から希望を断定しない。'})
             task,_=self._work(campaign,'AI09',{'method':'以下の原稿は固定テンプレートを媒体別に調整。生成AI未使用。','count':days})
+            from .learning import Learning,apply_style
+            learner=Learning(self.store,initialize=False)
+            sns_learning=learner.runtime('AI09','line' if platform=='LINE' else 'sns',task)
             for item in plan:
                 title=item['theme']
                 body=f'バイオレットから、{title}について考えるきっかけをお届けします。関心や生活のペースは一人ひとり異なります。ご自身が知りたいことを大切にしてください。'
@@ -127,7 +131,7 @@ class ContentOffice:
                 cta='関心のある成人の方へ。プロフィールの公式LINE案内（登録先は代表確認後に設定）から、希望する情報と利用目的を確認のうえ任意で登録できます。面談は希望者のみ候補日時をご相談ください。'
                 if item['day']%7==6:
                     body+=' ベネシードディーラーについて知りたい方向けの案内を準備しています。具体的な条件・費用・制度は公式資料の確認後にご説明します。'
-                self._insert(campaign,f'post-{item["day"]}','sns',{'title':title,'body':body,'hashtags':['#バイオレット','#暮らしを考える','#人とのつながり'] if platform!='LINE' else [],'cta':cta,'platform':platform,'day':item['day'],'disclosure':'事業活動の案内・下書き'},item['date'],task=task)
+                self._insert(campaign,f'post-{item["day"]}','sns',apply_style({'title':title,'body':body,'hashtags':['#バイオレット','#暮らしを考える','#人とのつながり'] if platform!='LINE' else [],'cta':cta,'platform':platform,'day':item['day'],'disclosure':'事業活動の案内・下書き'},sns_learning['styles']),item['date'],task=task)
             visual={'image':'落ち着いた紫を基調に、暮らしの風景と読みやすい見出しを配置。人物写真は許諾済み素材のみ。効能や収益の図示、ビフォーアフターは禁止。',
                 'video':'15〜30秒。問いかけ→日常の風景→任意の情報登録案内。字幕を付け、健康効果・成功実績を捏造しない。','generation_api':'未接続・制作指示書のみ'}
             task,_=self._work(campaign,'AI10',visual)
@@ -141,6 +145,10 @@ class ContentOffice:
                 '紹介ページ':'事業活動の案内／運営者情報・問い合わせ先（要設定）／目的・同意／公式資料／任意の登録／停止方法。公開先未設定。',
                 '報酬・特典':'公式規約未確認のため金額・条件・特典の記載なし。'}
             task,_=self._work(campaign,'AI16',referral)
+            referral_learning=learner.runtime('AI16','referral',task)
+            for referral_field in ('初めて知る方へ','知人への紹介依頼','第三者へ渡す案内','興味を示した方への返信'):
+                styled=apply_style({'body':referral[referral_field],'cta':''},referral_learning['styles'])
+                referral[referral_field]=styled['body']+styled['cta']
             self._insert(campaign,'referral','referral',referral,task=task)
             line=[]
             for i,theme in enumerate(themes,1):
@@ -150,7 +158,9 @@ class ContentOffice:
                     'delivery':'送信禁止・既存7日間配信への取込未接続'}
                 line.append(draft)
             task,_=self._work(campaign,'AI22',{'days':7,'integration':'既存システム未接続。既存DBの変更なし。'})
+            line_learning=learner.runtime('AI22','line',task)
             for item in line:
+                item=apply_style(item,line_learning['styles'])
                 self._insert(campaign,f'line-{item["day"]}','line',item,task=task)
             # Rule audit actually executes, while legal/factual checks stay unresolved.
             ids=[r[0] for r in self.db.execute('SELECT id FROM content_versions WHERE campaign_id=?',(campaign,))]
@@ -218,6 +228,8 @@ class ContentOffice:
         audit=self.db.execute('SELECT * FROM content_audits WHERE content_id=?',(content,)).fetchone()
         if not audit or audit['digest']!=row['digest'] or digest(json.loads(row['body']))!=row['digest'] or json.loads(audit['blockers']):
             raise ValueError('Unresolved audit checks')
+        from .learning import validate_task_references
+        validate_task_references(self.store,row['task_id'])
         checks=json.loads(audit['checks'])
         if not all(isinstance(checks.get(key),str) and checks[key].strip() for key in CHECKS):
             raise ValueError('Current legal and platform checks required')

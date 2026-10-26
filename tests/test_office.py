@@ -199,11 +199,14 @@ class OfficeTests(unittest.TestCase):
     def test_session_idle_expiry_and_login_rate_limit(self):
         self.store.db.execute('UPDATE office_sessions SET seen_at=?',((now()-timedelta(minutes=31)).isoformat(),))
         self.assertIsNone(self.office.session(self.token))
-        for _ in range(11):
+        # Keep this test in one ten-minute bucket even across wall-clock boundaries.
+        from unittest.mock import patch
+        with patch('violet_office.office.now',return_value=now()):
+            for _ in range(11):
+                with self.assertRaises(PermissionError):
+                    self.office.login('owner','wrong')
             with self.assertRaises(PermissionError):
-                self.office.login('owner','wrong')
-        with self.assertRaises(PermissionError):
-            self.office.login('owner','SyntheticOwnerPass!123')
+                self.office.login('owner','SyntheticOwnerPass!123')
 
     def test_no_dispatch_route_and_operation_approval_does_not_execute(self):
         service,admin,data=run_demo(self.store)

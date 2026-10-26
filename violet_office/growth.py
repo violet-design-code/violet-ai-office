@@ -424,6 +424,8 @@ class Growth:
             task=self.store.create_task(f'growth:{run}:{step}',agent,{'run_id':run,'step':step,'mode':'local_rules_v1'},action='sns_post' if agent=='AI09' else 'customer_contact' if agent in ('AI16','AI18') else 'management_decision' if agent=='AI01' else 'internal',max_attempts=3,timeout_seconds=10)
             execution=self.store.claim(task,0)
             self._lease(run,lease)
+            from .learning import Learning,task_kind
+            Learning(self.store,initialize=False).runtime(agent,task_kind('internal',agent),task)
             artifact=self.store.finish(execution,encode(output))
             identifier=uuid4().hex
             self.db.execute('INSERT INTO growth_work VALUES (?,?,?,?,?,?,?,?,?)',(identifier,run,step,agent,task,artifact,'succeeded_local',due,digest(output)))
@@ -504,6 +506,11 @@ class Growth:
                 referral={'紹介依頼案':'関心がありそうな成人の知人へ、ご自身が希望する場合だけ案内を共有できます。相手の連絡先をこちらへ渡す必要はありません。',
                     '第三者向け案内':'バイオレットの活動やベネシードディーラーについて、知りたい場合だけご案内をご確認ください。登録・面談は任意です。条件は正規の公式資料確認後に説明します。',
                     'status':'下書き。公式規約・根拠・法令を人が確認するまで発信禁止。'}
+                from .learning import Learning,apply_style
+                learning=Learning(self.store,initialize=False).runtime('AI16','referral','growth:'+identifier+':referral')
+                for field in ('紹介依頼案','第三者向け案内'):
+                    rendered=apply_style({'body':referral[field],'cta':''},learning['styles'])
+                    referral[field]=rendered['body']+rendered['cta']
                 item=work('referral','AI16',referral)
                 def make_referral():
                     self._lease(identifier,lease)
@@ -526,6 +533,9 @@ class Growth:
                 work('content_plan','AI08',{'theme':'暮らしで大切にしたいこと','mode':'固定テンプレート案','target':None})
                 body={'title':'ご自身が知りたいことを大切に','body':'バイオレットからの情報案内です。健康・美容・新しい働き方など、関心は人それぞれ。希望する情報を、ご自身の意思で選んでください。',
                       'hashtags':['#バイオレット','#暮らしを考える'],'cta':'案内先と利用目的を代表確認後に設定。登録・面談は希望者のみ。','platform':'Instagram','source':'固定テンプレート・未公開'}
+                from .learning import Learning,apply_style
+                learning=Learning(self.store,initialize=False).runtime('AI09','sns','growth:'+identifier+':copy')
+                body=apply_style(body,learning['styles'])
                 item=work('copy','AI09',body)
                 def create_draft():
                     self._lease(identifier,lease)

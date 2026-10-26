@@ -50,6 +50,20 @@ REQUIRED_TESTS.update({
 })
 
 
+REQUIRED_TESTS.update({
+    'tests.test_learning.LearningTests.'+name for name in (
+        'test_feedback_guidance_changes_next_same_work_after_full_approval',
+        'test_unapproved_improvement_not_applied_and_comparison_not_business_proof',
+        'test_source_revocation_removes_profile_and_blocks_old_draft_approval',
+        'test_private_data_and_customer_conversation_import_are_rejected',
+        'test_prompt_injection_quarantine_and_permission_flags_rejected',
+        'test_28_employee_evaluation_insufficient_data_and_no_ranking',
+        'test_api_budget_and_permissions_are_unchanged',
+        'test_recovery_copy_requires_knowledge_feedback_and_style_reapproval',
+    )
+})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -94,9 +108,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=ROOT/'reports'/'phase7-validation.json'
-        if not report.is_file():
-            report=ROOT/'reports'/'phase6-validation.json'
+        report=next((ROOT/'reports'/name for name in ('phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):
