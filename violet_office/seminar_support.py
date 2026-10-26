@@ -266,7 +266,9 @@ class SeminarSupport:
     def work(self,p,b,s,activity,key,agent=None):
         self.access(p,b,s,write=True); self.pf.writable(p,b)
         if not key or len(key)>60 or activity not in ACTIVITIES or agent and agent not in ACTIVITIES[activity]: raise ValueError('Existing specialty required')
-        choices=ACTIVITIES[activity]
+        from .business_foundation import eligible
+        choices=eligible(self.store,b,ACTIVITIES[activity])
+        if not choices: raise PermissionError('Assign an employee with this specialty first')
         old=self.db.execute('SELECT w.task_id,w.activity,t.agent FROM s14_work w JOIN tasks t ON t.id=w.task_id WHERE t.dedupe_key=?',('portfolio:'+digest([b,'s14:'+s+':'+key]),)).fetchone()
         if old:
             if old['activity']!=activity or agent and old['agent']!=agent: raise ValueError('Task key conflict')

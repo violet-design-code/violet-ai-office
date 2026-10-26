@@ -65,7 +65,7 @@ def home(o,s,params):
             body+='<div class="business-stat"><span>'+label+'</span><strong>'+e(b[key] if b[key] is not None else '未計測')+'</strong></div>'
         body+='<details><summary>件数・負担・API料金</summary>'+stats(b)+'</details></article>'
     body+='</div>'
-    body+='<h2>事業の追加</h2>'+pf(s,'portfolio_create',inp('business','事業ID')+inp('name','事業名')+'<label>業種</label>'+opts('kind',KINDS),caption='準備中として追加')
+    body+='<p><a href="/business-foundation">新規事業を追加・基盤設定（自動ID/AI割当制限）</a></p><h2>従来仕様の事業追加（互換用）</h2>'+pf(s,'portfolio_create',inp('business','事業ID')+inp('name','事業名')+'<label>業種</label>'+opts('kind',KINDS),caption='準備中として追加')
     body+='<h2>緊急停止</h2><p>'+('停止中' if o.portfolio.halted() else 'ローカル業務受付中（本番未接続）')+'</p>'+pf(s,'portfolio_halt',data={'halted':'0' if o.portfolio.halted() else '1'},caption='停止を解除' if o.portfolio.halted() else '事業横断の新規実行を停止')
     body+='<h2>今日の優先業務</h2>'+table(['事業','担当','業務','優先度','状態'],[[e(t['business_id']),e(t['agent']),e(t['kind']),e(t['priority']),e(LABELS.get(t['status'],t['status']))] for t in data['today_priority']])
     body+='<h2>承認待ち</h2>'+table(['事業','種別','状態'],[[f'<a href="/business?business={e(r[0])}">'+e(r[0])+'</a>',e(r[1]),'代表承認待ち'] for r in o.db.execute("SELECT business_id,kind FROM portfolio_operations WHERE status='approval_pending' UNION ALL SELECT business_id,kind FROM portfolio_documents WHERE status='approval_pending' LIMIT 100")])

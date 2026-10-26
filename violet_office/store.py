@@ -126,6 +126,8 @@ class Store:
             if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='s14_work'").fetchone():
                 paused=self.db.execute('SELECT paused FROM s14_work WHERE task_id=?',(task,)).fetchone()
                 if paused and paused[0]: raise ValueError('Seminar extension task is paused')
+            from .business_foundation import guard_task
+            guard_task(self,task)
             from .portfolio import guard_claim
             guard_claim(self,task,reserve_microusd)
             from .development import guard_claim as guard_development
@@ -168,6 +170,8 @@ class Store:
                 raise ValueError('Run expired; expire it before retrying')
             if self.db.execute("SELECT 1 FROM dependencies d JOIN tasks t ON t.id=d.prerequisite WHERE d.task_id=? AND t.status NOT IN ('completed','approval_pending','manual_execution_pending') LIMIT 1",(row['task_id'],)).fetchone():
                 raise ValueError('A prerequisite is no longer accepted')
+            from .business_foundation import guard_task
+            guard_task(self,row['task_id'])
             artifact = uuid4().hex
             self.db.execute('INSERT INTO artifacts VALUES (?,?,?,?)', (artifact,row['task_id'],row['agent'],content))
             self.db.execute("UPDATE runs SET status='completed' WHERE id=?", (run,))
@@ -207,6 +211,8 @@ class Store:
             row = self.db.execute('SELECT a.*, t.status FROM artifacts a JOIN tasks t ON t.id=a.task_id WHERE a.id=?', (artifact,)).fetchone()
             if not row or row['status'] != 'review_pending' or reviewer != self.agents[row['author']]['reviewer']:
                 raise ValueError('Independent assigned reviewer required')
+            from .business_foundation import guard_reviewer
+            guard_reviewer(self,row['task_id'],reviewer)
             self.db.execute('INSERT INTO reviews VALUES (?,?,?,?,?)', (uuid4().hex,artifact,reviewer,verdict,note))
             task = self.db.execute('SELECT action FROM tasks WHERE id=?', (row['task_id'],)).fetchone()
             status = ('completed' if task['action']=='internal' else 'approval_pending') if verdict=='pass' else 'changes_requested'

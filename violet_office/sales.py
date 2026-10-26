@@ -356,7 +356,10 @@ class Sales:
         if existing:
             if existing['business_id']!=business or existing['deal_id']!=deal or existing['activity']!=activity or agent and existing['agent']!=agent: raise ValueError('Work key conflict')
             return existing['task_id']
-        choices=ACTIVITIES[activity]; agent=agent or min(choices,key=lambda a:self.db.execute("SELECT COUNT(*) FROM tasks WHERE agent=? AND status IN ('pending','running')",(a,)).fetchone()[0])
+        from .business_foundation import eligible
+        choices=eligible(self.store,business,ACTIVITIES[activity])
+        if not choices: raise PermissionError('Assign an employee for this business first')
+        agent=agent or min(choices,key=lambda a:self.db.execute("SELECT COUNT(*) FROM tasks WHERE agent=? AND status IN ('pending','running')",(a,)).fetchone()[0])
         if agent not in choices: raise ValueError('Existing expertise required')
         from .portfolio import CANDIDATES
         category=next((k for k,v in CANDIDATES.items() if agent in v),'planning')
