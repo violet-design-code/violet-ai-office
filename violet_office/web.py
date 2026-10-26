@@ -23,6 +23,7 @@ from . import development_views
 from . import sales_views
 from . import workflow_views
 from . import seminar_support_views
+from . import business_foundation_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -130,7 +131,7 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path not in ('/seminars','/seminar-participation'):
                 return self.response(303,extra={'Location':'/seminars'})
-            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office'):
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation'):
                 return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
@@ -141,6 +142,7 @@ class OfficeApp:
                 mime,blob=office.portfolio.photo_bytes(Principal(session['role'],session['username']),params.get('business',[''])[0],ref)
                 return self.response(200,blob,{'Content-Disposition':'attachment; filename="photo.'+('png' if mime=='image/png' else 'jpg')+'"'},content_type=mime)
             pages={
+                '/business-foundation':('事業拡張の基盤設定',lambda:business_foundation_views.home(office,session,params)),
                 '/seminar-office':('セミナー運営・面談導線',lambda:seminar_support_views.office(office,session,params)),
                 '/seminar-participation':('セミナー申込・参加希望',lambda:seminar_support_views.participant(office,session,params)),
                 '/workflow':('AI社員の業務・営業支援',lambda:workflow_views.home(office,session,params)),

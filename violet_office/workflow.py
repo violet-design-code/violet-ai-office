@@ -63,6 +63,8 @@ class Workflow:
     def assign(self,p,b,d,key,agent,purpose,basis,due,priority=3):
         self.pf.writable(p,b); self.case(p,b,d)
         if agent not in WORK or agent not in self.store.agents or not key or len(key)>80 or not 1<=int(priority)<=5: raise ValueError('Existing role, key and priority required')
+        from .business_foundation import require_work
+        require_work(self.store,agent,b)
         purpose,basis=text(purpose,1000),text(basis,2000); date.fromisoformat(due)
         def op():
             fingerprint=digest([b,d,key]); old=self.db.execute('SELECT w.*,t.agent FROM wf_tasks w JOIN tasks t ON t.id=w.task_id WHERE t.dedupe_key=?',('workflow:'+fingerprint,)).fetchone()
@@ -87,6 +89,8 @@ class Workflow:
                 self.db.execute('UPDATE wf_tasks SET paused=? WHERE task_id=?',(int(action=='pause'),task))
             elif action=='assign':
                 if row['status'] not in ('pending','paused') or value not in WORK or value not in self.store.agents: raise ValueError('Unstarted task and existing role required')
+                from .business_foundation import require_work
+                require_work(self.store,value,b)
                 self.db.execute('UPDATE tasks SET agent=? WHERE id=?',(value,task))
             elif action=='priority':
                 if not 1<=int(value)<=5: raise ValueError('Priority 1..5 required')

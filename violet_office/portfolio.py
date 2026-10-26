@@ -50,6 +50,9 @@ class Portfolio:
     def access(self,p,business=None,write=False,owner=False):
         row=self.db.execute('SELECT role FROM office_users WHERE username=?',(p.identity,)).fetchone()
         if not row or row[0]!=p.role: raise PermissionError('Current authenticated identity required')
+        from .business_foundation import profile
+        state=profile(self.db,business) if business else None
+        if write and state and not state['enabled']: raise PermissionError('Business is disabled')
         if p.role=='representative':
             if business is not None and not self.db.execute('SELECT 1 FROM portfolio_businesses WHERE id=?',(business,)).fetchone(): raise ValueError('Unknown business')
             return
@@ -276,7 +279,9 @@ class Portfolio:
         instruction=text(instruction,2000)
         if kind not in CANDIDATES or not key or len(key)>120 or not 1<=int(priority)<=5: raise ValueError('Known work and priority required')
         def op():
-            choices=CANDIDATES[kind]
+            from .business_foundation import eligible
+            choices=eligible(self.store,business,CANDIDATES[kind])
+            if not choices: raise PermissionError('Assign an employee with this expertise first')
             loads={a:self.db.execute("SELECT COUNT(*) FROM tasks WHERE agent=? AND status IN ('pending','running')",(a,)).fetchone()[0] for a in choices}
             selected=agent or min(choices,key=lambda a:(loads[a],choices.index(a)))
             if selected not in choices: raise ValueError('Agent expertise mismatch')

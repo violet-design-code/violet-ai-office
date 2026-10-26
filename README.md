@@ -91,3 +91,10 @@ python3 -m violet_office.growth_cli tick
 - [画面操作・28役分担・移行/復旧・検証・未実装](docs/phase-14.md)
 
 ローカル起動後は代表が `/seminar-office`、本人が `/seminar-participation`。`python3 -m violet_office.seminar_support_demo` は一時DBだけの合成確認です。既存DBへの適用前にバックアップと復元コピーで確認してください。第13.5段階の商品計画は保持し、商品制作は開始していません。
+
+第15段階「事業基盤」は、既存事業ID/顧客/収支を再利用し、自動IDでの新規登録、自由カテゴリ/開始日、論理無効化、共通28役の複数事業割当・限定権限、追加KPIを提供します。完成版の割当操作画面は第20段階へ残し、現版は最小設定画面と認証付き基盤APIです。旧事業のAI制限は代表の明示切替まで互換運用します。
+
+- [第15段階の要求・第14段階への依存・旧計画との差分](docs/phase-15-requirements.md)
+- [設計・API・権限境界・操作・移行/復旧・検証](docs/phase-15.md)
+
+ローカル起動後 `/business-foundation`。「複数事業」にも新しい追加導線があります。`python3 -m violet_office.business_foundation_demo` は合成一時DBだけで確認します。実LLM・LINE・予約・決済は未接続で、本番公開・mainマージは行いません。

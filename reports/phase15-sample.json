@@ -1,0 +1,144 @@
+{
+  "mode": "synthetic_temporary_database_not_real_business_results",
+  "registered_agents": 28,
+  "old_businesses_preserved": 6,
+  "new_businesses": [
+    "BIZ-af39d9d5ac364b438da1dfe39ad3e7e6",
+    "BIZ-971a5dc09c304b4380c9950e828c198b"
+  ],
+  "one_employee_multiple_businesses": 2,
+  "unassigned_access_denied": true,
+  "disabled_business_preserved": true,
+  "own_ai_metadata": {
+    "business_id": "BIZ-af39d9d5ac364b438da1dfe39ad3e7e6",
+    "name": "合成の追加事業A",
+    "status": "preparing",
+    "overview": "合成の概要・実提供ではない",
+    "category": "自由カテゴリA",
+    "started_on": null
+  },
+  "summary": {
+    "business_id": "BIZ-af39d9d5ac364b438da1dfe39ad3e7e6",
+    "profile": {
+      "business_id": "BIZ-af39d9d5ac364b438da1dfe39ad3e7e6",
+      "overview": "合成の概要・実提供ではない",
+      "category": "自由カテゴリA",
+      "started_on": null,
+      "enabled": 1,
+      "ai_enforced": 1,
+      "revision": 1,
+      "business_revision": 1
+    },
+    "sales": {
+      "legacy_revenue_yen": null,
+      "automatic_ledger_merge": false,
+      "business_id": "BIZ-af39d9d5ac364b438da1dfe39ad3e7e6",
+      "period": [
+        "2026-10-26",
+        "2026-10-27"
+      ],
+      "mode": "manual_attestations_not_provider_verified",
+      "expected_gross_yen": null,
+      "quote_gross_yen": null,
+      "confirmed_net_yen": null,
+      "paid_net_cash_yen": null,
+      "expense_yen": null,
+      "approx_profit_yen": null,
+      "contact_count": null,
+      "proposal_count": null,
+      "quote_approval_percent": null,
+      "booking_percent": null,
+      "contract_percent": null,
+      "repeat_percent": null,
+      "unhandled_count": null,
+      "overdue_count": null,
+      "denominators": {
+        "monthly_deals": 0,
+        "quote_decisions": 0,
+        "booking_candidates": 0,
+        "provided_customers": 0
+      },
+      "definitions": "月内受付コホートの集計時点状態。対応済みは承認後の人の確認行為あり、提案件数は準備を含む。予約/成約率は確定申告の履歴を含む（取消後も過去事実は残る）。売上=代表が請求確認した税抜額−同期間の全額取消。入金=同期間の手動入金−返金。法的売上認識/銀行照合ではない。",
+      "exclusions": "所得/法人税・借入・季節性・未入力経費・USDのAI費は概算利益に含めない。旧経費台帳の税区分は未保持。旧売上台帳は重複照合未実施のため別掲し、自動合算しない。事業開発の予測は一切参照しない。"
+    },
+    "portfolio": {
+      "business_id": "BIZ-af39d9d5ac364b438da1dfe39ad3e7e6",
+      "name": "合成の追加事業A",
+      "status": "preparing",
+      "period": [
+        "2026-10-26",
+        "2026-10-27"
+      ],
+      "measurement": "同一期間・手動実績申告/部分計測。実API未照合。",
+      "metrics": {
+        "inquiries": {
+          "recorded": null,
+          "days": 0,
+          "complete": false,
+          "total": null
+        },
+        "bookings": {
+          "recorded": null,
+          "days": 0,
+          "complete": false,
+          "total": null
+        },
+        "contracts": {
+          "recorded": null,
+          "days": 0,
+          "complete": false,
+          "total": null
+        },
+        "owner_minutes": {
+          "recorded": null,
+          "days": 0,
+          "complete": false,
+          "total": null
+        }
+      },
+      "mode": "local_manual_records",
+      "revenue_yen": null,
+      "expense_yen": null,
+      "profit_yen": null,
+      "profit_margin_percent": null,
+      "api_microusd": {
+        "confirmed": null,
+        "estimated": null
+      },
+      "local_processing_seconds": 0.0006852060032542795,
+      "registered_inquiries": null,
+      "registered_booking_requests": null,
+      "manual_booking_records": null,
+      "manual_contract_records": null,
+      "goals": {},
+      "goal_gaps": {}
+    },
+    "kpi_definitions": [
+      {
+        "business_id": "BIZ-af39d9d5ac364b438da1dfe39ad3e7e6",
+        "metric_key": "sample_questions",
+        "label": "合成の質問件数",
+        "unit": "件",
+        "active": 1,
+        "revision": 1
+      }
+    ],
+    "kpis": [
+      {
+        "business_id": "BIZ-af39d9d5ac364b438da1dfe39ad3e7e6",
+        "metric_key": "sample_questions",
+        "day": "2026-10-26",
+        "mode": "mock",
+        "value": "5",
+        "evidence": "合成データ・実績ではない",
+        "revision": 1
+      }
+    ]
+  },
+  "actual_external_services": [],
+  "external_send_attempts": 0,
+  "real_invoice_records": 0,
+  "paid_api_calls": 0,
+  "production_started": false,
+  "foreign_key_violations": 0
+}

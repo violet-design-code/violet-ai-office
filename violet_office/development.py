@@ -148,6 +148,9 @@ class Development:
             self.db.execute('INSERT INTO bd_proposals VALUES(?,?,?,?,?,?,?)',(identifier,idea,fingerprint,encoded,digest(encoded),'approval_pending',now().isoformat()))
             roles=CORE+(('AI08','AI09') if with_content else ())
             for agent in roles:
+                if row['business_id']:
+                    from .business_foundation import require_work
+                    require_work(self.store,agent,row['business_id'])
                 output={'role_work':ROLES[agent],'status':'要調査・代表確認待ち','facts':'外部調査・実モデル呼出なし','source_ids':[r['id'] for r in sources]}
                 if agent=='AI27': output['scenarios']=scenarios
                 elif agent=='AI04': output['evidence']=[r for r in sources if r['topic']=='competition']
@@ -193,6 +196,9 @@ class Development:
             idea=self.access(p,row['idea_id']); identifier=uuid4().hex
             self.db.execute('INSERT INTO bd_plans VALUES(?,?,?,?,?,?,?)',(identifier,row['idea_id'],proposal,horizon,encode(config),'ready',now().isoformat()))
             for stage,agent in [('research','AI03'),('competition','AI04'),('finance','AI27'),('marketing','AI07'),('sales','AI14'),('quality','AI28'),('summary','AI01')]:
+                if idea['business_id']:
+                    from .business_foundation import require_work
+                    require_work(self.store,agent,idea['business_id'])
                 task=self.store.create_task('bd:'+identifier+':'+stage,agent,{'scope':'bd_internal','reference':identifier,'stage':stage,'mode':'local_preparation_only'},action='management_decision')
                 self.db.execute('INSERT INTO bd_tasks VALUES(?,?,?)',(task,identifier,stage))
                 if idea['business_id']:

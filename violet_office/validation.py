@@ -156,6 +156,22 @@ REQUIRED_TESTS.update({
 })
 
 
+REQUIRED_TESTS.update({
+    'tests.test_business_foundation.BusinessFoundationTests.'+name for name in (
+        'test_registration_unique_id_idempotency_and_no_seeded_performance',
+        'test_assignment_many_to_many_all_28_definitions_unchanged',
+        'test_scoped_ai_reads_do_not_inherit_representative_global_access',
+        'test_assignment_revocation_blocks_pending_and_inflight_output',
+        'test_human_business_acl_and_customers_remain_separate',
+        'test_sales_expenses_profit_and_estimates_are_scoped',
+        'test_legacy_businesses_and_pending_tasks_unchanged_until_opt_in',
+        'test_migration_is_additive_idempotent_and_keeps_previous_rows',
+        'test_restore_revokes_assignment_preserves_business_and_customer_rows',
+        'test_independent_reviewer_also_needs_business_assignment',
+    )
+})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -200,7 +216,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):
