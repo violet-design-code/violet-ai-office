@@ -120,6 +120,8 @@ class Store:
                 (task,)).fetchone()
             if blocked:
                 raise ValueError('Dependencies require passed review')
+            from .portfolio import guard_claim
+            guard_claim(self,task,reserve_microusd)
             used = self.db.execute('SELECT COALESCE(SUM(COALESCE(actual,reserved)),0) FROM reservations').fetchone()[0]
             limit = self.db.execute('SELECT limit_microusd FROM budget WHERE id=1').fetchone()[0]
             if used + reserve_microusd > limit:

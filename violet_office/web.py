@@ -18,6 +18,7 @@ from . import web_views as views
 from . import growth_views
 from . import learning_views
 from . import phase9_views
+from . import portfolio_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -47,7 +48,7 @@ class OfficeApp:
     def handle(self,method,target,headers,body=b''):
         if headers.get('Host') not in self.hosts:
             return self.response(403,'接続先を確認してください。')
-        if len(target)>2048 or len(body)>131072:
+        if len(target)>2048 or len(body)>(3*1024*1024 if target=='/business-photo-upload' else 131072):
             return self.response(413,'リクエストが大きすぎます。')
         if method not in ('GET','POST'):
             return self.response(405,'許可されていない操作です。')
@@ -80,12 +81,16 @@ class OfficeApp:
             if method=='POST':
                 if headers.get('Origin')!='http://'+headers['Host'] or headers.get('Sec-Fetch-Site')=='cross-site':
                     return self.response(403,'送信元を確認してください。')
-                if headers.get('Content-Type','').split(';')[0]!='application/x-www-form-urlencoded':
-                    return self.response(415,'フォーム形式を確認してください。')
-                data=parse_qs(body.decode('utf-8'),keep_blank_values=True,max_num_fields=40)
-                if any(len(v)!=1 for v in data.values()):
-                    return self.response(400,'重複した入力です。')
-                data={k:v[0] for k,v in data.items()}
+                if path=='/business-photo-upload':
+                    from .portfolio_upload import parse
+                    if not headers.get('Content-Type','').startswith('multipart/form-data;'): return self.response(415,'写真フォームを確認してください。')
+                    data=parse(headers['Content-Type'],body)
+                else:
+                    if headers.get('Content-Type','').split(';')[0]!='application/x-www-form-urlencoded':
+                        return self.response(415,'フォーム形式を確認してください。')
+                    data=parse_qs(body.decode('utf-8'),keep_blank_values=True,max_num_fields=40)
+                    if any(len(v)!=1 for v in data.values()): return self.response(400,'重複した入力です。')
+                    data={k:v[0] for k,v in data.items()}
                 if not session or not hmac.compare_digest(data.get('csrf',''),session['csrf']):
                     office.audit('anonymous','csrf_rejected')
                     return self.response(403,'セッションまたは送信の確認に失敗しました。再ログインしてください。')
@@ -102,6 +107,9 @@ class OfficeApp:
                     office.audit(session['username'],'logout')
                     office.logout(token)
                     return self.response(303,extra={'Location':'/login','Set-Cookie':self.cookie('',True)})
+                if path=='/business-photo-upload':
+                    result=office.commands(session,data.pop('nonce',''),'portfolio_photo',{k:v for k,v in data.items() if k!='csrf'})
+                    return self.response(303,extra={'Location':result})
                 if path.startswith('/actions/'):
                     action=path[len('/actions/'):]
                     result=office.commands(session,data.pop('nonce',''),action,{k:v for k,v in data.items() if k!='csrf'})
@@ -118,11 +126,20 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path!='/seminars':
                 return self.response(303,extra={'Location':'/seminars'})
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo'):
+                return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
                 raise ValueError('Duplicate parameter')
             ref=params.get('id',[None])[0]
+            if path=='/business-photo':
+                from .integrations.adapters import Principal
+                mime,blob=office.portfolio.photo_bytes(Principal(session['role'],session['username']),params.get('business',[''])[0],ref)
+                return self.response(200,blob,{'Content-Disposition':'attachment; filename="photo.'+('png' if mime=='image/png' else 'jpg')+'"'},content_type=mime)
             pages={
+                '/businesses':('統合経営ダッシュボード',lambda:portfolio_views.home(office,session,params)),
+                '/business':('事業別管理',lambda:portfolio_views.business(office,session,params)),
+                '/business-reports':('AI経営会議',lambda:portfolio_views.reports(office,session)),
                 '/selection':('AI社員の能力評価・選抜',lambda:phase9_views.selection(office,session)),
                 '/seminar-admin':('代表専用セミナー管理',lambda:phase9_views.admin(office,session,params)),
                 '/seminars':('セミナーのご案内',lambda:phase9_views.portal(office,session,ref)),
@@ -211,7 +228,7 @@ def make_server(db_path,port=8765):
                 self.send_error(400)
                 return
             length=self.headers.get('Content-Length','0')
-            if self.headers.get('Transfer-Encoding') or not length.isdigit() or int(length)>131072:
+            if self.headers.get('Transfer-Encoding') or not length.isdigit() or int(length)>(3*1024*1024 if self.path=='/business-photo-upload' else 131072):
                 self.send_error(413)
                 return
             try:

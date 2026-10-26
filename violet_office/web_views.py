@@ -40,12 +40,13 @@ def card(title,value,note=''):
 
 
 def layout(title,body,session=None,path=''):
-    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理')]
+    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理'),('/businesses','複数事業'),('/business-reports','経営会議')]
     if session and session.get('role')=='participant': nav=[('/seminars','セミナー') ]
+    if session and session.get('role')=='business_operator': nav=[('/businesses','担当事業')]
     navigation='<nav>'+''.join(f'<a href="{url}"'+(' aria-current="page"' if path==url else '')+'>'+name+'</a>' for url,name in nav)+'</nav>' if session and session.get('username') else ''
     logout=''
     if session and session.get('username'):
-        logout=f'<div>{e(session["username"])} / {e("代表" if session["role"]=="representative" else "参加者" if session["role"]=="participant" else "閲覧者")}<form method="post" action="/logout">'+fields({'csrf':session['csrf']})+'<button class="secondary">ログアウト</button></form></div>'
+        logout=f'<div>{e(session["username"])} / {e("代表" if session["role"]=="representative" else "参加者" if session["role"]=="participant" else "事業担当" if session["role"]=="business_operator" else "閲覧者")}<form method="post" action="/logout">'+fields({'csrf':session['csrf']})+'<button class="secondary">ログアウト</button></form></div>'
     return '<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+e(title)+' | VIOLET AI OFFICE</title><link rel="stylesheet" href="/assets/office.css"></head><body><header><div class="brand">VIOLET AI OFFICE<small>バイオレット ｜ AI社長室</small></div>'+logout+'</header>'+navigation+'<main><h1>'+e(title)+'</h1>'+body+'</main><footer class="footer">ローカル専用 · 外部送信なし · 有料API未接続 · 時刻は日本時間</footer></body></html>'
 
 
@@ -102,6 +103,8 @@ def employees(office,session,agent_id=None):
                     controls+='<button disabled>依頼全体の再作成が必要</button>'
             if task['status']=='running':
                 controls+=form(session,'result','<label>匿名化した成果物（手動登録）</label><textarea name="content" required maxlength="10000"></textarea>',{'id':task['id']},'成果物を登録')
+            scoped=office.db.execute('SELECT business_id FROM portfolio_tasks WHERE task_id=?',(task['id'],)).fetchone()
+            if scoped: controls='<a href="/business?business='+e(scoped[0])+'">事業別画面で管理</a>' if session['role']=='representative' else '事業別の権限付き画面で管理'
             payload=json.loads(task['payload'])
             summary=payload.get('instruction',payload.get('brief',payload.get('purpose','ローカル作業'))) if isinstance(payload,dict) else 'ローカル作業'
             rows.append([e(task['id']),e(summary if session['role']=='representative' else '詳細は代表のみ'),e(label(task['status'])),e(task['priority'] or '未設定'),dt(task['updated_at']),dt(task['planned_due']) if task.get('planned_due') else '未設定',controls or '操作対象なし'])
