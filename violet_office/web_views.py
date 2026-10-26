@@ -40,16 +40,17 @@ def card(title,value,note=''):
 
 
 def layout(title,body,session=None,path=''):
-    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善')]
+    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理')]
+    if session and session.get('role')=='participant': nav=[('/seminars','セミナー') ]
     navigation='<nav>'+''.join(f'<a href="{url}"'+(' aria-current="page"' if path==url else '')+'>'+name+'</a>' for url,name in nav)+'</nav>' if session and session.get('username') else ''
     logout=''
     if session and session.get('username'):
-        logout=f'<div>{e(session["username"])} / {e("代表" if session["role"]=="representative" else "閲覧者")}<form method="post" action="/logout">'+fields({'csrf':session['csrf']})+'<button class="secondary">ログアウト</button></form></div>'
+        logout=f'<div>{e(session["username"])} / {e("代表" if session["role"]=="representative" else "参加者" if session["role"]=="participant" else "閲覧者")}<form method="post" action="/logout">'+fields({'csrf':session['csrf']})+'<button class="secondary">ログアウト</button></form></div>'
     return '<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+e(title)+' | VIOLET AI OFFICE</title><link rel="stylesheet" href="/assets/office.css"></head><body><header><div class="brand">VIOLET AI OFFICE<small>バイオレット ｜ AI社長室</small></div>'+logout+'</header>'+navigation+'<main><h1>'+e(title)+'</h1>'+body+'</main><footer class="footer">ローカル専用 · 外部送信なし · 有料API未接続 · 時刻は日本時間</footer></body></html>'
 
 
 def login(session,message=''):
-    return layout('社長室にログイン','<div class="panel login"><h2>おかえりなさい</h2><p class="muted">代表または閲覧者のアカウントでログインしてください。</p>'+('<p class="error">'+e(message)+'</p>' if message else '')+'<form method="post" action="/login">'+fields({'csrf':session['csrf']})+'<label for="username">ユーザー名</label><input id="username" name="username" autocomplete="username" required maxlength="40"><label for="password">パスワード</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button>ログイン</button></form></div>')
+    return layout('社長室にログイン','<div class="panel login"><h2>おかえりなさい</h2><p class="muted">代表・閲覧者・参加者のアカウントでログインしてください。</p>'+('<p class="error">'+e(message)+'</p>' if message else '')+'<form method="post" action="/login">'+fields({'csrf':session['csrf']})+'<label for="username">ユーザー名</label><input id="username" name="username" autocomplete="username" required maxlength="40"><label for="password">パスワード</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"><button>ログイン</button></form></div>')
 
 
 def home(office,session):

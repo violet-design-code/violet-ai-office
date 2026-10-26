@@ -160,6 +160,12 @@ def restore(snapshot,destination):
                 counts['growth_plans_reapproval']=db.execute("UPDATE growth_runs SET decision='approval_pending' WHERE decision='approve'").rowcount
             if 'growth_proposals' in known:
                 counts['growth_proposals_held']=db.execute("UPDATE growth_proposals SET status='approval_pending' WHERE status='approved_local'").rowcount
+            if 'seminar_scheduler' in known:
+                counts['seminar_scheduler_paused']=db.execute("UPDATE seminar_scheduler SET enabled=0,state='recovery_hold'").rowcount
+                counts['seminar_reminders_held']=db.execute("UPDATE seminar_reminders SET status='cancelled' WHERE status IN ('approval_pending','approved','retry_wait')").rowcount
+                counts['seminar_registrations_recheck']=db.execute("UPDATE seminar_registrations SET status='approval_pending',revision=revision+1 WHERE status='approved'").rowcount
+            if 'selection_settings' in known:
+                counts['selection_paused']=db.execute('UPDATE selection_settings SET enabled=0').rowcount
             if 'learning_knowledge' in known:
                 counts['knowledge_recheck']=db.execute("UPDATE learning_knowledge SET status='approval_pending' WHERE status='approved'").rowcount
             if 'learning_feedback' in known:

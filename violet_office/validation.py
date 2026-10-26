@@ -30,8 +30,8 @@ REQUIRED_TESTS={
 
 def source_fingerprint(root=ROOT):
     files=[]
-    for directory in ('violet_office','tests','config','scripts'):
-        files.extend(p for p in (root/directory).rglob('*') if p.is_file() and p.suffix in ('.py','.json','.css','.sh','.bat'))
+    for directory in ('violet_office','tests','config','scripts','migrations'):
+        files.extend(p for p in (root/directory).rglob('*') if p.is_file() and p.suffix in ('.py','.json','.css','.sh','.bat','.sql'))
     aggregate=hashlib.sha256()
     for path in sorted(files):
         aggregate.update(path.relative_to(root).as_posix().encode()+b'\0'+path.read_bytes()+b'\0')
@@ -60,6 +60,21 @@ REQUIRED_TESTS.update({
         'test_28_employee_evaluation_insufficient_data_and_no_ranking',
         'test_api_budget_and_permissions_are_unchanged',
         'test_recovery_copy_requires_knowledge_feedback_and_style_reapproval',
+    )
+})
+
+
+REQUIRED_TESTS.update({
+    'tests.test_phase9.Phase9Tests.'+name for name in (
+        'test_every_segment_server_side_access_matrix',
+        'test_card_is_hashed_and_manual_approval_required',
+        'test_parallel_last_seat_never_double_books',
+        'test_three_day_drafts_yes_maybe_unanswered_excludes_no',
+        'test_preparation_and_dispatch_deduplicated',
+        'test_stop_and_reconsent_never_revive_old_approval',
+        'test_selection_quality_multiple_metrics_and_manual_override',
+        'test_upgrade_actual_phase8_schema_preserves_old_rows',
+        'test_restore_pauses_scheduler_selection_and_invalidates_approvals',
     )
 })
 
@@ -108,7 +123,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

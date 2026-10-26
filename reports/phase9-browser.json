@@ -1,0 +1,15 @@
+{
+  "mode": "synthetic_temporary_database",
+  "owner_identity_account_creation": "passed",
+  "initial_registration_manual_approval": "passed",
+  "participant_response_changes": "passed",
+  "representative_counts_history": "passed",
+  "three_day_preparation_approval_no_dispatch": "passed",
+  "selection_override": "passed",
+  "desktop_routes": 5,
+  "mobile_routes": 5,
+  "participant_desktop_mobile": "passed",
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested",
+  "production_started": false
+}
