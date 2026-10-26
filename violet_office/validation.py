@@ -172,6 +172,22 @@ REQUIRED_TESTS.update({
 })
 
 
+REQUIRED_TESTS.update({
+    'tests.test_business_operations.BusinessOperationsTests.'+name for name in (
+        'test_policy_unconfirmed_does_not_add_two_revenue_ledgers',
+        'test_scm_partial_payment_unpaid_and_cash_not_revenue',
+        'test_full_refund_and_unpaid_cancellation_do_not_leave_sales_or_unpaid',
+        'test_period_boundaries_jst_exclusive_end_and_prior_invoices',
+        'test_custom_kpi_requires_rule_and_complete_period',
+        'test_global_totals_same_basis_and_partial_or_mixed_data',
+        'test_global_has_no_customer_pii_and_nonrepresentative_is_denied',
+        'test_authenticated_task_context_uses_server_employee_and_assignment',
+        'test_migration_keeps_all_prior_data_and_is_repeatable',
+        'test_restore_preserves_reporting_settings_and_revokes_ai_assignment',
+    )
+})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -216,7 +232,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

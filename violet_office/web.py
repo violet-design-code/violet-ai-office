@@ -2,6 +2,7 @@
 import argparse
 import getpass
 import hmac
+import json
 import os
 import sqlite3
 import threading
@@ -131,12 +132,21 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path not in ('/seminars','/seminar-participation'):
                 return self.response(303,extra={'Location':'/seminars'})
-            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation'):
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis'):
                 return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
                 raise ValueError('Duplicate parameter')
             ref=params.get('id',[None])[0]
+            if path in ('/business-operations-data','/business-task-kpis'):
+                from .integrations.adapters import Principal
+                allowed={'task','start','end'} if path=='/business-task-kpis' else {'business','start','end'}
+                if set(params)-allowed: raise ValueError('Unknown aggregate query field')
+                actor=Principal(session['role'],session['username']); start=params.get('start',[''])[0]; end=params.get('end',[''])[0]
+                if path=='/business-task-kpis': result=office.business_operations.for_task(actor,params.get('task',[''])[0],start,end)
+                elif params.get('business'): result=office.business_operations.summary(actor,params['business'][0],start,end)
+                else: result=office.business_operations.global_summary(actor,start,end)
+                return self.response(200,json.dumps(result,ensure_ascii=False),content_type='application/json; charset=utf-8')
             if path=='/business-photo':
                 from .integrations.adapters import Principal
                 mime,blob=office.portfolio.photo_bytes(Principal(session['role'],session['username']),params.get('business',[''])[0],ref)
@@ -178,6 +188,9 @@ class OfficeApp:
         except PermissionError:
             if office:
                 office.audit('authenticated','permission_denied')
+                if path.startswith('/actions/ops_') and session and session.get('username'):
+                    from .integrations.adapters import Principal
+                    office.business_operations.audit(Principal(session['role'],session['username']),data.get('business'),'operations_command','denied')
             return self.response(403,'この操作の権限がありません。')
         except (ValueError,KeyError,TypeError,UnicodeError,CookieError,RecursionError):
             if office:

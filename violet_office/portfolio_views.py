@@ -55,8 +55,11 @@ def home(o,s,params):
         return '<p>許可された事業だけ表示します。</p>'+table(['事業','状態'],[[f'<a href="/business?business={e(r["id"])}">'+e(r['name'])+'</a>',e(STATES[r['status']])] for r in rows])
     start,end=periods(params); data=o.portfolio.dashboard(p,start,end)
     body='<div class="notice">共通AI社員28人を利用します。旧LINE・セミナー・顧客データは未配賦で、事業へ自動コピーしません。金額は円、API料金はUSD別管理。未計測を0とみなしません。</div>'
+    from .business_operations_views import global_section
     body+=pf(s,'portfolio_seed',caption='確認済みの初期6事業を登録（既存IDは維持）')
     body+='<form method="get">'+inp('start','集計開始日（JST）',start,'date')+inp('end','集計終了日（含まない）',end,'date')+'<button>同じ期間で集計</button></form>'
+    body+=global_section(o,s,start,end)
+    body+='<h2>従来台帳の集計（互換表示・SCMと合算しない）</h2>'
     body+='<div class="grid">'+card('全事業の記録済み売上（円）',data['revenue_yen'])+card('全事業の記録済み経費（円）',data['expense_yen'])+card('記録済み差額（円、API費別）',data['profit_yen'])+'</div><p>'+e(data['total_note'])+'</p>'
     body+='<div class="business-grid">'
     for b in data['businesses']:
@@ -84,6 +87,8 @@ def business(o,s,params):
     data=service.summary(p,bid,start,end); hidden={'business':bid}
     body='<div class="notice">事業ID '+e(bid)+' / '+e(b['name'])+'。この事業の顧客・原稿・規則だけを表示します。秘密値・センシティブな相談本文は入力しないでください。</div>'
     body+='<form method="get">'+fields({'business':bid})+inp('start','集計開始日（JST）',start,'date')+inp('end','集計終了日（含まない）',end,'date')+'<button>この期間で集計</button></form>'
+    from .business_operations_views import section
+    body+=section(o,s,bid,start,end)
     body+='<p>状態：'+e(STATES[b['status']])+' / 優先度 '+str(b['priority'])+'</p><pre>'+e({'サービス':b['services'] or '未設定','料金':b['pricing'] or '未設定','対象':b['audience'] or '未設定','地域':b['region'] or '未設定'})+'</pre>'
     if owner:
         body+='<details class="panel"><summary>事業設定・提供状況・優先度</summary>'+pf(s,'portfolio_update',inp('name','事業名',b['name'])+'<label>状態</label>'+opts('status',STATES,b['status'])+''.join(inp(k,label,b[k],required=False) for k,label in [('services','サービス内容'),('pricing','料金（未確定部分は明記）'),('audience','対象顧客'),('region','対応地域')])+inp('priority','事業優先度1〜5',b['priority'],'number')+'<label><input type="checkbox" name="confirmed" value="1">提供状況・料金・地域の確認済み部分を代表が確認</label>',{**hidden,'revision':b['revision']},'設定を更新')+'</details>'
