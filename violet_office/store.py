@@ -11,7 +11,7 @@ from uuid import uuid4
 
 from .registry import load_agents
 
-ACTIONS = {'internal', 'sns_post', 'line_send', 'customer_contact', 'booking_confirm', 'contract_guidance'}
+ACTIONS = {'internal', 'sns_post', 'line_send', 'customer_contact', 'booking_confirm', 'contract_guidance', 'management_decision'}
 SCHEMA = '''
 CREATE TABLE IF NOT EXISTS tasks (
  id TEXT PRIMARY KEY, dedupe_key TEXT UNIQUE NOT NULL, fingerprint TEXT NOT NULL,
@@ -32,6 +32,17 @@ CREATE TABLE IF NOT EXISTS approvals (
  decision TEXT NOT NULL, actor TEXT NOT NULL, created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS events (
  id INTEGER PRIMARY KEY, task_id TEXT NOT NULL REFERENCES tasks(id), event TEXT NOT NULL, created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS requests (
+ id TEXT PRIMARY KEY, request_key TEXT UNIQUE NOT NULL, instruction TEXT NOT NULL,
+ status TEXT NOT NULL, created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS request_tasks (
+ request_id TEXT NOT NULL REFERENCES requests(id), task_id TEXT UNIQUE NOT NULL REFERENCES tasks(id),
+ kind TEXT NOT NULL, PRIMARY KEY(request_id,task_id));
+CREATE TABLE IF NOT EXISTS request_options (
+ request_id TEXT PRIMARY KEY REFERENCES requests(id), priority INTEGER NOT NULL CHECK(priority BETWEEN 1 AND 5));
+CREATE TABLE IF NOT EXISTS dependencies (
+ task_id TEXT NOT NULL REFERENCES tasks(id), prerequisite TEXT NOT NULL REFERENCES tasks(id),
+ PRIMARY KEY(task_id,prerequisite), CHECK(task_id != prerequisite));
 CREATE TABLE IF NOT EXISTS budget (
  id INTEGER PRIMARY KEY CHECK(id=1), limit_microusd INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS reservations (
@@ -62,6 +73,8 @@ class Store:
         self.db.execute('INSERT INTO events(task_id,event,created_at) VALUES (?,?,?)', (task, event, now().isoformat()))
 
     def _transaction(self, fn):
+        if self.db.in_transaction:
+            return fn()
         self.db.execute('BEGIN IMMEDIATE')
         try:
             result = fn()
@@ -98,6 +111,11 @@ class Store:
             row = self.db.execute('SELECT * FROM tasks WHERE id=?', (task,)).fetchone()
             if not row or row['status'] != 'pending' or row['attempts'] >= row['max_attempts']:
                 raise ValueError('Task unavailable')
+            blocked = self.db.execute(
+                "SELECT 1 FROM dependencies d JOIN tasks t ON t.id=d.prerequisite WHERE d.task_id=? AND t.status NOT IN ('completed','approval_pending','manual_execution_pending') LIMIT 1",
+                (task,)).fetchone()
+            if blocked:
+                raise ValueError('Dependencies require passed review')
             used = self.db.execute('SELECT COALESCE(SUM(COALESCE(actual,reserved)),0) FROM reservations').fetchone()[0]
             limit = self.db.execute('SELECT limit_microusd FROM budget WHERE id=1').fetchone()[0]
             if used + reserve_microusd > limit:
@@ -171,6 +189,10 @@ class Store:
             row = self.db.execute('SELECT a.task_id,t.status FROM artifacts a JOIN tasks t ON t.id=a.task_id WHERE a.id=?', (artifact,)).fetchone()
             if not row or row['status'] != 'approval_pending':
                 raise ValueError('Reviewed artifact required')
+            if decision == 'approve' and self.db.execute(
+                "SELECT 1 FROM dependencies d JOIN tasks t ON t.id=d.prerequisite WHERE d.task_id=? AND t.status NOT IN ('completed','approval_pending','manual_execution_pending') LIMIT 1",
+                (row['task_id'],)).fetchone():
+                raise ValueError('A prerequisite is no longer accepted')
             self.db.execute('INSERT INTO approvals VALUES (?,?,?,?,?,?)', (uuid4().hex,row['task_id'],artifact,decision,actor,now().isoformat()))
             status = 'manual_execution_pending' if decision=='approve' else 'rejected'
             self.db.execute('UPDATE tasks SET status=? WHERE id=?', (status,row['task_id']))
