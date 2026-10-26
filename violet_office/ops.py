@@ -160,6 +160,11 @@ def restore(snapshot,destination):
                 counts['growth_plans_reapproval']=db.execute("UPDATE growth_runs SET decision='approval_pending' WHERE decision='approve'").rowcount
             if 'growth_proposals' in known:
                 counts['growth_proposals_held']=db.execute("UPDATE growth_proposals SET status='approval_pending' WHERE status='approved_local'").rowcount
+            if 's14_work' in known:
+                counts['s14_paused']=db.execute('UPDATE s14_work SET paused=1,approved_by=NULL').rowcount
+                counts['s14_task_recheck']=db.execute("UPDATE tasks SET status='review_pending' WHERE id IN(SELECT task_id FROM s14_work WHERE artifact_id IS NOT NULL) AND status IN ('manual_execution_pending','approval_pending')").rowcount
+                counts['s14_drafts_recheck']=db.execute("UPDATE s14_drafts SET status='approval_pending',approved_by=NULL,next_at=NULL WHERE status IN ('send_waiting_no_api','retry_wait')").rowcount
+                db.execute('UPDATE s14_scheduler SET enabled=0')
             if 'wf_tasks' in known:
                 counts['workflow_paused']=db.execute('UPDATE wf_tasks SET paused=1,approved_by=NULL').rowcount
                 counts['workflow_tasks_recheck']=db.execute("UPDATE tasks SET status='review_pending' WHERE id IN(SELECT task_id FROM wf_tasks WHERE artifact_id IS NOT NULL) AND status IN ('manual_execution_pending','approval_pending')").rowcount

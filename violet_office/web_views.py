@@ -40,9 +40,9 @@ def card(title,value,note=''):
 
 
 def layout(title,body,session=None,path=''):
-    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理'),('/businesses','複数事業'),('/business-reports','経営会議'),('/development','新規事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援')]
-    if session and session.get('role')=='participant': nav=[('/seminars','セミナー') ]
-    if session and session.get('role')=='business_operator': nav=[('/businesses','担当事業'),('/development','事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援')]
+    nav=[('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理'),('/businesses','複数事業'),('/business-reports','経営会議'),('/development','新規事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営')]
+    if session and session.get('role')=='participant': nav=[('/seminars','初回登録・セミナー'),('/seminar-participation','申込・参加希望') ]
+    if session and session.get('role')=='business_operator': nav=[('/businesses','担当事業'),('/development','事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営')]
     navigation='<nav>'+''.join(f'<a href="{url}"'+(' aria-current="page"' if path==url else '')+'>'+name+'</a>' for url,name in nav)+'</nav>' if session and session.get('username') else ''
     logout=''
     if session and session.get('username'):
@@ -106,7 +106,9 @@ def employees(office,session,agent_id=None):
             scoped=office.db.execute('SELECT business_id FROM portfolio_tasks WHERE task_id=?',(task['id'],)).fetchone()
             bd=office.db.execute('SELECT p.idea_id FROM bd_tasks t JOIN bd_plans p ON p.id=t.plan_id WHERE t.task_id=?',(task['id'],)).fetchone()
             scm=office.db.execute('SELECT business_id,deal_id FROM scm_work WHERE task_id=?',(task['id'],)).fetchone()
-            if scm: controls='<a href="/sales-deal?business='+e(scm[0])+'&amp;id='+e(scm[1])+'">営業画面で管理</a>' if session['role']=='representative' else '権限付き営業画面で管理'
+            seminar_task=office.db.execute('SELECT business_id FROM s14_work WHERE task_id=?',(task['id'],)).fetchone()
+            if seminar_task: controls='<a href="/seminar-office?business='+e(seminar_task[0])+'">セミナー運営画面で管理</a>' if session['role']=='representative' else '事業権限付きセミナー画面で管理'
+            elif scm: controls='<a href="/sales-deal?business='+e(scm[0])+'&amp;id='+e(scm[1])+'">営業画面で管理</a>' if session['role']=='representative' else '権限付き営業画面で管理'
             elif bd: controls='<a href="/development-idea?id='+e(bd[0])+'">事業開発画面で管理</a>' if session['role']=='representative' else '権限付き事業開発画面で管理'
             elif scoped: controls='<a href="/business?business='+e(scoped[0])+'">事業別画面で管理</a>' if session['role']=='representative' else '事業別の権限付き画面で管理'
             payload=json.loads(task['payload'])

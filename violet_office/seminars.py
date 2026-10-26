@@ -136,12 +136,14 @@ class Seminars:
     def visible(self,username,identifier):
         reg=self.member(username,True)
         seminar=self.get(identifier)
-        if seminar['audience'] not in ACCESS[reg['segment']]: raise PermissionError('Audience denied')
+        from .seminar_support import target_allowed
+        if seminar['audience'] not in ACCESS[reg['segment']] or not target_allowed(self.db,identifier,reg['segment']): raise PermissionError('Audience denied')
         return seminar
 
     def listing(self,username):
         reg=self.member(username,True)
-        return [dict(r) for r in self.db.execute('SELECT * FROM seminars ORDER BY start_at LIMIT 500') if r['audience'] in ACCESS[reg['segment']]]
+        from .seminar_support import target_allowed
+        return [dict(r) for r in self.db.execute('SELECT * FROM seminars ORDER BY start_at LIMIT 500') if r['audience'] in ACCESS[reg['segment']] and target_allowed(self.db,r['id'],reg['segment'])]
 
     def respond(self,username,identifier,answer):
         if answer not in {'yes','no','maybe'}: raise ValueError('Explicit response required')
@@ -157,6 +159,18 @@ class Seminars:
             self.db.execute("UPDATE seminar_reminders SET status='cancelled' WHERE seminar_id=? AND username=? AND status IN ('approval_pending','approved','retry_wait')",(identifier,username))
             self.event(username,'response_changed',identifier,{'before':old['answer'] if old else 'unanswered','after':answer,'revision':revision})
         return self.store._transaction(op)
+
+    def withdraw(self,username,identifier):
+        """Explicit participant cancellation even after deadline; never creates a booking."""
+        self.member(username)
+        def op():
+            old=self.db.execute('SELECT * FROM seminar_responses WHERE seminar_id=? AND username=?',(identifier,username)).fetchone()
+            if not old: raise ValueError('Existing response required')
+            if old['answer']=='no': return
+            self.db.execute("UPDATE seminar_responses SET answer='no',answered_at=?,revision=revision+1 WHERE seminar_id=? AND username=?",(now().isoformat(),identifier,username))
+            self.db.execute("UPDATE seminar_reminders SET status='cancelled' WHERE seminar_id=? AND username=? AND status IN ('approval_pending','approved','retry_wait')",(identifier,username))
+            self.event(username,'response_changed',identifier,{'before':old['answer'],'after':'no','revision':old['revision']+1,'reason':'explicit_cancellation'})
+        self.store._transaction(op)
 
     def consent(self,username,granted):
         self.member(username)
@@ -178,7 +192,8 @@ class Seminars:
         result=[]
         for row in rows:
             item=dict(row); item['answer']=item['answer'] or 'unanswered'
-            if seminar['audience'] in ACCESS[row['segment']] and (not segment or row['segment']==segment) and (not answer or item['answer']==answer):
+            from .seminar_support import target_allowed
+            if seminar['audience'] in ACCESS[row['segment']] and target_allowed(self.db,identifier,row['segment']) and (not segment or row['segment']==segment) and (not answer or item['answer']==answer):
                 result.append(item)
         return result
 
@@ -202,7 +217,8 @@ class Seminars:
                 for recipient in self.recipients(principal,seminar['id']):
                     if prepared>=500: break
                     consent=self.latest_consent(recipient['username'])
-                    if recipient['answer']=='no' or not consent or not consent['granted']: continue
+                    from .seminar_support import legacy_reminder_allowed
+                    if recipient['answer']=='no' or not consent or not consent['granted'] or not legacy_reminder_allowed(self.db,seminar['id'],recipient['username']): continue
                     if self.db.execute('SELECT 1 FROM seminar_reminders WHERE seminar_id=? AND username=?',(seminar['id'],recipient['username'])).fetchone(): continue
                     text=('参加予定のリマインドです。' if recipient['answer']=='yes' else 'ご希望の場合のみ参加可否をお知らせください。')
                     body=seminar['title']+'\n'+seminar['start_at']+' 〜 '+seminar['end_at']+'\n'+seminar['location']+'\n'+seminar['description']+'\n参加費 '+str(seminar['fee_yen'])+'円\n'+text
@@ -220,7 +236,8 @@ class Seminars:
         response=self.db.execute('SELECT * FROM seminar_responses WHERE seminar_id=? AND username=?',(row['seminar_id'],row['username'])).fetchone()
         consent=self.latest_consent(row['username'])
         day=now().astimezone(JST).date()
-        return bool(seminar['status'] in ('open','closed') and seminar['revision']==row['seminar_revision'] and reg['revision']==row['registration_revision'] and (response['revision'] if response else 0)==row['response_revision'] and (not response or response['answer']!='no') and consent and consent['granted'] and consent['id']==row['consent_id'] and digest(row['body'])==row['digest'] and datetime.fromisoformat(seminar['start_at']).astimezone(JST).date()-timedelta(days=3)==day)
+        from .seminar_support import legacy_reminder_allowed
+        return bool(legacy_reminder_allowed(self.db,row['seminar_id'],row['username']) and seminar['status'] in ('open','closed') and seminar['revision']==row['seminar_revision'] and reg['revision']==row['registration_revision'] and (response['revision'] if response else 0)==row['response_revision'] and (not response or response['answer']!='no') and consent and consent['granted'] and consent['id']==row['consent_id'] and digest(row['body'])==row['digest'] and datetime.fromisoformat(seminar['start_at']).astimezone(JST).date()-timedelta(days=3)==day)
 
     def reprepare(self,principal,identifier):
         """Explicit regeneration only when no delivery attempt ever occurred."""
@@ -277,6 +294,7 @@ class Seminars:
         return self.store._transaction(op)
 
     def prepare_work(self,principal,identifier):
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='s14_meta'").fetchone() and self.db.execute('SELECT 1 FROM s14_meta WHERE seminar_id=?',(identifier,)).fetchone(): raise ValueError('Use business-scoped seminar extension tasks')
         require(principal,True)
         def op():
             seminar=self.get(identifier)

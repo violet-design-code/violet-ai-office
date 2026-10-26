@@ -112,6 +112,9 @@ class Office:
         from .workflow import migrate as migrate_workflow,Workflow
         migrate_workflow(store)
         self.workflow=Workflow(self)
+        from .seminar_support import migrate as migrate_seminar_support,SeminarSupport
+        migrate_seminar_support(store)
+        self.seminar_support=SeminarSupport(self)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -218,10 +221,15 @@ class Office:
             if action=='seminar_member_register': self.seminars.register(username,data['segment'],data.get('card',''))
             elif action=='seminar_member_response': self.seminars.respond(username,data['id'],data['answer'])
             elif action=='seminar_member_consent': self.seminars.consent(username,data['granted']=='1')
+            elif action=='s14_member_consent': self.seminar_support.consent(Principal('participant',username),data['id'],data['purpose'],data['granted']=='1')
+            elif action=='s14_member_preferences': self.seminar_support.preferences(Principal('participant',username),data['id'],[k for k in ('health','beauty','work','connection','other') if data.get('interest_'+k)=='1'])
+            elif action=='s14_member_response': self.seminar_support.response(Principal('participant',username),data['id'],data['answer'])
+            elif action=='s14_member_interview': self.seminar_support.request_interview(Principal('participant',username),data['id'])
             else: raise PermissionError('Participant action denied')
-            self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,username,fingerprint,'/seminars'))
+            result='/seminar-participation' if action.startswith('s14_') else '/seminars'
+            self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,username,fingerprint,result))
             self.audit(username,action)
-            return '/seminars'
+            return result
         return self.store._transaction(op)
 
     def session_by_snapshot(self,session):
@@ -257,7 +265,7 @@ class Office:
         return '/selection' if action.startswith('selection_') else '/seminar-admin'
 
     def portfolio_commands(self,session,nonce,action,data):
-        if not action.startswith(('portfolio_','bd_','scm_','wf_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
+        if not action.startswith(('portfolio_','bd_','scm_','wf_','s14_')) or not re.fullmatch(r'[a-f0-9]{32}',nonce): raise PermissionError('Scoped operation required')
         def op():
             current=self.session_by_snapshot(session)
             if not current or current['role']!='business_operator': raise PermissionError('Scoped session expired')
@@ -269,7 +277,7 @@ class Office:
                 if action.startswith('bd_'): self.development.access(Principal(session['role'],session['username']),data.get('idea'),True)
                 else: self.portfolio.access(Principal(session['role'],session['username']),data.get('business'),True)
                 return old['result']
-            result=self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
+            result=self.seminar_support_command(session,action,data) if action.startswith('s14_') else self.workflow_command(session,action,data) if action.startswith('wf_') else self.sales_command(session,action,data) if action.startswith('scm_') else self.development_command(session,action,data) if action.startswith('bd_') else self.portfolio_command(session,action,data)
             self.db.execute('INSERT INTO office_commands VALUES(?,?,?,?)',(nonce,session['username'],fingerprint,result))
             return result
         return self.store._transaction(op)
@@ -395,7 +403,38 @@ class Office:
         else: raise ValueError('Unknown workflow command')
         return '/workflow?business='+b
 
+    def seminar_support_command(self,session,action,data):
+        service=self.seminar_support; p=Principal(session['role'],session['username']); b=data['business']; sid=data.get('seminar')
+        if action=='s14_save':
+            values=dict(data)
+            for key in ('start_at','end_at','deadline'):
+                parsed=datetime.fromisoformat(data[key]); values[key]=(parsed if parsed.tzinfo else parsed.replace(tzinfo=JST)).isoformat()
+            sid=service.save(p,b,values,[k for k in ('dealer','subdealer','user','cast') if data.get('target_'+k)=='1'],data.get('online',''),data['mode'],data.get('lead_hours',24),data.get('clock','09:00'),sid or None,data.get('revision'))
+        elif action=='s14_adopt': service.adopt(p,b,sid,data['mode'])
+        elif action=='s14_state': service.state(p,b,sid,data['state'])
+        elif action=='s14_engagement':
+            when=data.get('when')
+            if when:
+                parsed=datetime.fromisoformat(when); when=(parsed if parsed.tzinfo else parsed.replace(tzinfo=JST)).isoformat()
+            service.engagement(p,b,sid,data['username'],data['state'],data['evidence'],when)
+        elif action=='s14_prepare': service.prepare(p,b,sid,data['username'],data['kind'])
+        elif action=='s14_bulk': service.bulk(p,b,sid,data['kind'])
+        elif action=='s14_decide': service.decide(p,b,data['id'],data['decision'],data.get('checked')=='1')
+        elif action=='s14_revise': service.revise(p,b,data['id'],data['body'])
+        elif action=='s14_mock': service.mock(p,b,data['id'],data.get('outcome','success'))
+        elif action=='s14_schedule': service.scheduler(p,b,data['enabled']=='1')
+        elif action=='s14_tick': service.tick(p,b)
+        elif action=='s14_work': service.work(p,b,sid,data['activity'],data['key'],data.get('agent') or None)
+        elif action=='s14_run': service.run(p,b,data['task'])
+        elif action=='s14_control': service.control(p,b,data['task'],data['control'])
+        elif action=='s14_unattribute': service.unattribute(p,b,data['id'],data.get('checked')=='1')
+        elif action=='s14_attribute': service.attribute(p,b,sid,data['kind'],data['source'],data['evidence'])
+        else: raise ValueError('Unknown seminar extension action')
+        return '/seminar-office?business='+b
+
     def _command(self,session,action,data):
+        if action.startswith('s14_'):
+            return self.seminar_support_command(session,action,data)
         if action.startswith('wf_'):
             return self.workflow_command(session,action,data)
         if action.startswith('scm_'):
