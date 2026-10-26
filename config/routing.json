@@ -1,0 +1,213 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "agent": "AI02",
+      "keywords": [
+        "経営戦略",
+        "事業戦略"
+      ],
+      "category": "経営戦略"
+    },
+    {
+      "agent": "AI03",
+      "keywords": [
+        "市場調査"
+      ],
+      "category": "経営戦略"
+    },
+    {
+      "agent": "AI04",
+      "keywords": [
+        "競合"
+      ],
+      "category": "経営戦略"
+    },
+    {
+      "agent": "AI05",
+      "keywords": [
+        "ターゲット",
+        "顧客像"
+      ],
+      "category": "経営戦略"
+    },
+    {
+      "agent": "AI06",
+      "keywords": [
+        "事業改善"
+      ],
+      "category": "経営戦略"
+    },
+    {
+      "agent": "AI07",
+      "keywords": [
+        "マーケティング戦略"
+      ],
+      "category": "マーケティング"
+    },
+    {
+      "agent": "AI08",
+      "keywords": [
+        "SNS企画",
+        "SNS",
+        "ＳＮＳ"
+      ],
+      "category": "マーケティング"
+    },
+    {
+      "agent": "AI09",
+      "keywords": [
+        "投稿文",
+        "投稿文章"
+      ],
+      "category": "マーケティング"
+    },
+    {
+      "agent": "AI10",
+      "keywords": [
+        "画像"
+      ],
+      "category": "マーケティング"
+    },
+    {
+      "agent": "AI11",
+      "keywords": [
+        "動画台本"
+      ],
+      "category": "マーケティング"
+    },
+    {
+      "agent": "AI12",
+      "keywords": [
+        "動画編集"
+      ],
+      "category": "マーケティング"
+    },
+    {
+      "agent": "AI13",
+      "keywords": [
+        "投稿予定",
+        "投稿スケジュール"
+      ],
+      "category": "マーケティング"
+    },
+    {
+      "agent": "AI14",
+      "keywords": [
+        "営業戦略"
+      ],
+      "category": "営業・紹介"
+    },
+    {
+      "agent": "AI15",
+      "keywords": [
+        "紹介制度"
+      ],
+      "category": "営業・紹介"
+    },
+    {
+      "agent": "AI16",
+      "keywords": [
+        "紹介文"
+      ],
+      "category": "営業・紹介"
+    },
+    {
+      "agent": "AI17",
+      "keywords": [
+        "問い合わせ返信",
+        "見込み客対応"
+      ],
+      "category": "営業・紹介"
+    },
+    {
+      "agent": "AI18",
+      "keywords": [
+        "面談誘導",
+        "面談案内"
+      ],
+      "category": "営業・紹介"
+    },
+    {
+      "agent": "AI19",
+      "keywords": [
+        "営業トーク"
+      ],
+      "category": "営業・紹介"
+    },
+    {
+      "agent": "AI20",
+      "keywords": [
+        "サポート方針"
+      ],
+      "category": "顧客サポート"
+    },
+    {
+      "agent": "AI21",
+      "keywords": [
+        "LINE",
+        "ＬＩＮＥ",
+        "自動応答"
+      ],
+      "category": "顧客サポート"
+    },
+    {
+      "agent": "AI22",
+      "keywords": [
+        "7日",
+        "７日",
+        "ステップ配信"
+      ],
+      "category": "顧客サポート"
+    },
+    {
+      "agent": "AI23",
+      "keywords": [
+        "予約"
+      ],
+      "category": "顧客サポート"
+    },
+    {
+      "agent": "AI24",
+      "keywords": [
+        "既存顧客",
+        "フォロー"
+      ],
+      "category": "顧客サポート"
+    },
+    {
+      "agent": "AI25",
+      "keywords": [
+        "システム設計"
+      ],
+      "category": "システム・分析・監査"
+    },
+    {
+      "agent": "AI26",
+      "keywords": [
+        "API",
+        "開発",
+        "実装"
+      ],
+      "category": "システム・分析・監査"
+    },
+    {
+      "agent": "AI27",
+      "keywords": [
+        "KPI",
+        "数値分析",
+        "レポート"
+      ],
+      "category": "システム・分析・監査"
+    },
+    {
+      "agent": "AI28",
+      "keywords": [
+        "監査",
+        "法令",
+        "個人情報"
+      ],
+      "category": "システム・分析・監査"
+    }
+  ]
+}
