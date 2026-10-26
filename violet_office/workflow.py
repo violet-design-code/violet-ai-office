@@ -134,6 +134,7 @@ class Workflow:
         return self.o.seminars.visible(username,seminar)
     def seminar_snapshot(self,p,b,d,seminar,username,kind):
         self.pf.writable(p,b); s=self.seminar_link(p,b,d,seminar,username); deal=self.sales.row(p,b,'scm_deals',d)
+        if kind in ('invite','absence') and self.db.execute("SELECT 1 FROM sqlite_master WHERE name='s14_meta'").fetchone() and self.db.execute('SELECT 1 FROM s14_meta WHERE seminar_id=?',(seminar,)).fetchone(): raise ValueError('Use purpose-scoped seminar extension drafts')
         reg=self.o.seminars.member(username,True); consent=self.o.seminars.latest_consent(username)
         answer=self.db.execute('SELECT * FROM seminar_responses WHERE seminar_id=? AND username=?',(seminar,username)).fetchone()
         attendance=self.db.execute('SELECT * FROM wf_attendance WHERE seminar_id=? AND username=? AND mode=?',(seminar,username,deal['mode'])).fetchone()
@@ -153,6 +154,7 @@ class Workflow:
         return digest(inputs),s,reg,response
     def draft(self,p,b,d,seminar,username,kind):
         def op():
+            if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='s14_drafts'").fetchone() and self.db.execute("SELECT 1 FROM s14_drafts WHERE seminar_id=? AND username=? AND kind=? AND status IN ('approval_pending','send_waiting_no_api','retry_wait','mock_sent')",(seminar,username,kind)).fetchone(): raise ValueError('Use existing seminar extension draft; do not duplicate delivery')
             snapshot,s,reg,response=self.seminar_snapshot(p,b,d,seminar,username,kind)
             old=self.db.execute('SELECT id FROM wf_drafts WHERE business_id=? AND deal_id=? AND seminar_id=? AND username=? AND kind=? AND snapshot=?',(b,d,seminar,username,kind,snapshot)).fetchone()
             if old: return old[0]

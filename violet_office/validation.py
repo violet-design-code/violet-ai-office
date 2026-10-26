@@ -140,6 +140,22 @@ REQUIRED_TESTS.update({
 })
 
 
+REQUIRED_TESTS.update({
+    'tests.test_seminar_support.SeminarSupportTests.'+name for name in (
+        'test_exact_target_segment_enforced_on_old_and_new_portals',
+        'test_duplicate_application_capacity_and_cancellation_after_deadline',
+        'test_separate_purpose_consent_and_global_stop_gate',
+        'test_existing_workflow_draft_cannot_bypass_new_purpose_consent',
+        'test_mock_success_once_and_parallel_no_double_execution',
+        'test_deadline_previous_day_event_day_due_dates_and_scheduling',
+        'test_real_metrics_denominators_cancel_and_interview',
+        'test_financial_attribution_uses_existing_sources_only_and_no_double_count',
+        'test_restore_holds_schedule_approvals_and_preserves_rsvp',
+        'test_migration_preserves_phase13_rows_and_digital_product_plan',
+    )
+})
+
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -184,7 +200,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

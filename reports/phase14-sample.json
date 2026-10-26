@@ -1,0 +1,48 @@
+{
+  "mode": "synthetic_temporary_database_not_real_business_results",
+  "registered_agents": 28,
+  "seminar_mode": "mock",
+  "invitation_state": "mock_sent",
+  "reminder_state": "approval_pending",
+  "local_task": "AI17 / fixed_template / representative_review_pending",
+  "metrics": {
+    "mode": "mock",
+    "actual": {
+      "applicants": null,
+      "planned": null,
+      "cancelled": null,
+      "attended": null,
+      "absent": null,
+      "interview_requested": null,
+      "interview_completed": null,
+      "attendance_percent": null,
+      "cancellation_percent": null,
+      "interview_percent": null
+    },
+    "mock_preview": {
+      "applicants": 1,
+      "planned": 1,
+      "cancelled": 0,
+      "attended": 0,
+      "absent": 0,
+      "interview_requested": 1,
+      "interview_completed": 0,
+      "attendance_percent": 0.0,
+      "cancellation_percent": 0.0,
+      "interview_percent": null
+    },
+    "sales_net_yen": null,
+    "cash_yen": null,
+    "expense_yen": null,
+    "denominators": "セミナー全期間の一度でも参加申込した本人。取消率は現在不参加の既申込者。面談化率は実参加者中の明示的面談希望者。",
+    "finance_definition": "代表が根拠付きで明示配賦した既存請求/経費のみ。予測・モック・参加費×人数は売上にしない。税抜請求−全額取消、入金−返金。外部照合は未接続。"
+  },
+  "scheduler_started": false,
+  "real_booking_records": 0,
+  "invoice_records": 0,
+  "external_send_attempts": 0,
+  "actual_external_services": [],
+  "paid_api_calls": 0,
+  "production_started": false,
+  "foreign_key_violations": 0
+}

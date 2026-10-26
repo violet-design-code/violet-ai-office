@@ -84,3 +84,10 @@ python3 -m violet_office.growth_cli tick
 - [第13段階：操作、28役の対応、移行・復旧、テスト、未接続機能](docs/phase-13.md)
 
 `python3 -m violet_office.workflow_demo` は一時DBだけの合成確認です。通常のローカル起動後は `http://127.0.0.1:8765/workflow`。実LINE/決済/外部AIは未接続で、実データ適用前にはバックアップと復元コピーでの確認が必要です。
+
+第14段階「セミナー運営」では、既存セミナーを事業別に拡張し、JSTカレンダー、厳密な対象区分、本人申込/取消、目的別同意、案内/予定/代表承認、実参加/面談確認、根拠付き収支を管理します。追加の予定処理は初期停止・手動準備で、実LINE/予約/決済/LLMは未接続です。
+
+- [今回の要求と従来第14段階計画との差分](docs/phase-14-requirements.md)
+- [画面操作・28役分担・移行/復旧・検証・未実装](docs/phase-14.md)
+
+ローカル起動後は代表が `/seminar-office`、本人が `/seminar-participation`。`python3 -m violet_office.seminar_support_demo` は一時DBだけの合成確認です。既存DBへの適用前にバックアップと復元コピーで確認してください。第13.5段階の商品計画は保持し、商品制作は開始していません。
