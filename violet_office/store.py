@@ -120,10 +120,22 @@ class Store:
             limit = self.db.execute('SELECT limit_microusd FROM budget WHERE id=1').fetchone()[0]
             if used + reserve_microusd > limit:
                 raise ValueError('Budget exceeded')
+            # Additive office accounting guard; older non-office DBs keep existing behavior.
+            office_month = None
+            if self.db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='office_budgets'").fetchone():
+                from zoneinfo import ZoneInfo
+                office_month = now().astimezone(ZoneInfo('Asia/Tokyo')).strftime('%Y-%m')
+                cap = self.db.execute('SELECT limit_microusd FROM office_budgets WHERE month=?',(office_month,)).fetchone()
+                monthly_reserved = self.db.execute('SELECT COALESCE(SUM(amount),0) FROM office_month_reservations WHERE month=?',(office_month,)).fetchone()[0]
+                accounted = self.db.execute("SELECT COALESCE(SUM(amount),0) FROM office_costs WHERE substr(incurred_date,1,7)=? AND mode='manual'",(office_month,)).fetchone()[0]
+                if reserve_microusd > 0 and monthly_reserved + accounted + reserve_microusd > (cap[0] if cap else 0):
+                    raise ValueError('Monthly budget exceeded')
             run = uuid4().hex
             deadline = (now() + timedelta(seconds=row['timeout_seconds'])).isoformat()
             self.db.execute('INSERT INTO runs VALUES (?,?,?, ?,NULL)', (run,task,'running',deadline))
             self.db.execute('INSERT INTO reservations VALUES (?,?,NULL)', (run,reserve_microusd))
+            if office_month:
+                self.db.execute('INSERT INTO office_month_reservations VALUES (?,?,?)',(run,office_month,reserve_microusd))
             self.db.execute("UPDATE tasks SET status='running', attempts=attempts+1 WHERE id=?", (task,))
             self._event(task, 'claimed')
             return run
