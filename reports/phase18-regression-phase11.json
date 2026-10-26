@@ -1,0 +1,15 @@
+{
+  "mode": "synthetic_temporary_database",
+  "idea_creation": "passed",
+  "explicit_assumption_simulation": "passed",
+  "proposal_approval_before_tasks": "passed",
+  "internal_plan_only": "passed",
+  "comparison_missing_data_unranked": "passed",
+  "actuals_separated_from_mock_forecast": "passed",
+  "cross_business_access": "denied",
+  "desktop_routes": 5,
+  "mobile_routes": 5,
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested",
+  "evidence_context": "Phase18 regression on synthetic temporary DB; loopback Chromium only; not production"
+}

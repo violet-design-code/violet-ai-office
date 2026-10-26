@@ -46,12 +46,16 @@ def eligible(store,business,candidates):
 
 
 def guard_task(store,task):
+    from .workflow_collaboration import guard_task as guard_collaboration
+    guard_collaboration(store,task)
     if not store.db.execute("SELECT 1 FROM sqlite_master WHERE name='portfolio_tasks'").fetchone(): return
     row=store.db.execute('SELECT p.business_id,t.agent FROM portfolio_tasks p JOIN tasks t ON t.id=p.task_id WHERE p.task_id=?',(task,)).fetchone()
     if row: require_work(store,row['agent'],row['business_id'])
 
 
 def guard_reviewer(store,task,reviewer):
+    from .workflow_collaboration import guard_task as guard_collaboration
+    guard_collaboration(store,task,reviewer)
     row=store.db.execute('SELECT business_id FROM portfolio_tasks WHERE task_id=?',(task,)).fetchone() if store.db.execute("SELECT 1 FROM sqlite_master WHERE name='portfolio_tasks'").fetchone() else None
     if row: require_work(store,reviewer,row[0])
 

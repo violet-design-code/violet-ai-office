@@ -88,6 +88,7 @@ class Workflow:
             if action in ('pause','resume'):
                 self.db.execute('UPDATE wf_tasks SET paused=? WHERE task_id=?',(int(action=='pause'),task))
             elif action=='assign':
+                if self.db.execute('SELECT 1 FROM aw_tasks WHERE task_id=?',(task,)).fetchone():raise ValueError('Use explicit scoped handoff for collaboration tasks')
                 if row['status'] not in ('pending','paused') or value not in WORK or value not in self.store.agents: raise ValueError('Unstarted task and existing role required')
                 from .business_foundation import require_work
                 require_work(self.store,value,b)
@@ -102,6 +103,8 @@ class Workflow:
         self.pf.writable(p,b)
         def op():
             row=self.task(p,b,task)
+            from .workflow_collaboration import guard_task
+            guard_task(self.store,task)
             self.o.customer_journey.check_task(p,b,task)
             if row['paused']: raise ValueError('Paused work cannot run')
             if row['artifact_id']: return row['artifact_id']

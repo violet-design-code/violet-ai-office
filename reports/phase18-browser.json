@@ -1,0 +1,17 @@
+{
+  "mode": "synthetic_temporary_database",
+  "job_submission_and_role_routing": "passed",
+  "same_business_handoff": "passed",
+  "local_template_only": "passed",
+  "representative_approval_before_internal_scope_apply": "passed",
+  "external_approval_no_execution": "passed",
+  "28_existing_employee_read_api": "passed",
+  "no_customer_pii_in_work_api": "passed",
+  "human_acl": "passed",
+  "desktop_routes": 7,
+  "mobile_routes": 7,
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested",
+  "actual_external_services": [],
+  "production_started": false
+}

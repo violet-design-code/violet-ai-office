@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "max_attempts": 3,
+  "max_handoffs": 5,
+  "kinds": {
+    "inquiry": {"label":"問い合わせ分類・返信下書き", "purpose":"contact", "candidates":["AI17","AI20"]},
+    "consult": {"label":"本人希望の相談・面談導線", "purpose":"schedule", "candidates":["AI18","AI14"]},
+    "candidate": {"label":"面談候補整理", "purpose":"schedule", "candidates":["AI23"]},
+    "booking_check": {"label":"予約の確認案（確定しない）", "purpose":"schedule", "candidates":["AI23"]},
+    "followup": {"label":"同意範囲のフォロー案", "purpose":"followup", "candidates":["AI24","AI20"]}
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "mode": "synthetic_temporary_database",
+  "manual_seminar_registration_calendar": "passed",
+  "participant_application_interests_purpose_consents": "passed",
+  "interview_request_no_booking": "passed",
+  "representative_approval_no_send": "passed",
+  "mock_once": "passed",
+  "local_role_work": "passed",
+  "cancellation": "passed",
+  "cross_business_access": "denied",
+  "participant_pii_to_staff": "denied",
+  "desktop_routes": 7,
+  "mobile_routes": 7,
+  "participant_mobile": "passed",
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested",
+  "actual_external_services": [],
+  "production_started": false,
+  "evidence_context": "Phase18 regression on synthetic temporary DB; loopback Chromium only; not production"
+}

@@ -26,6 +26,7 @@ from . import workflow_views
 from . import seminar_support_views
 from . import business_foundation_views
 from . import customer_journey_views
+from . import workflow_collaboration_views
 
 COOKIE='violet_office_session'
 SECURITY={
@@ -133,7 +134,7 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path not in ('/seminars','/seminar-participation'):
                 return self.response(303,extra={'Location':'/seminars'})
-            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis','/customer-journey'):
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis','/customer-journey','/ai-workflow','/ai-workflow-data'):
                 return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
@@ -147,6 +148,12 @@ class OfficeApp:
                 if path=='/business-task-kpis': result=office.business_operations.for_task(actor,params.get('task',[''])[0],start,end)
                 elif params.get('business'): result=office.business_operations.summary(actor,params['business'][0],start,end)
                 else: result=office.business_operations.global_summary(actor,start,end)
+                return self.response(200,json.dumps(result,ensure_ascii=False),content_type='application/json; charset=utf-8')
+            if path=='/ai-workflow-data':
+                from .integrations.adapters import Principal
+                if set(params)-{'business'} or not params.get('business'):raise ValueError('Explicit business scope required')
+                actor=Principal(session['role'],session['username']);b=params['business'][0];office.collaboration.access(actor,b)
+                result={'jobs':office.collaboration.listing(actor,b),'capabilities':[dict(r) for r in office.db.execute('SELECT * FROM aw_capabilities WHERE business_id=?',(b,))],'handoffs':office.collaboration.handoffs(actor,b),'approval_requests':office.collaboration.changes(actor,b),'employees':office.collaboration.employees(actor,b),'routing_kinds':office.collaboration.cfg['kinds'],'external_execution':False}
                 return self.response(200,json.dumps(result,ensure_ascii=False),content_type='application/json; charset=utf-8')
             if path=='/business-photo':
                 from .integrations.adapters import Principal
@@ -163,6 +170,7 @@ class OfficeApp:
                 '/development':('新規事業開発',lambda:development_views.home(office,session)),
                 '/development-idea':('事業アイデア・検証',lambda:development_views.detail(office,session,ref)),
                 '/development-compare':('事業候補の比較',lambda:development_views.comparison(office,session,ref)),
+                '/ai-workflow':('AI社員の業務・引き継ぎ',lambda:workflow_collaboration_views.home(office,session,params)),
                 '/customer-journey':('事業別案内・問い合わせ導線',lambda:customer_journey_views.home(office,session,params)),
                 '/businesses':('統合経営ダッシュボード',lambda:portfolio_views.home(office,session,params)),
                 '/business':('事業別管理',lambda:portfolio_views.business(office,session,params)),
@@ -190,7 +198,7 @@ class OfficeApp:
         except PermissionError:
             if office:
                 office.audit('authenticated','permission_denied')
-                if path.startswith(('/actions/ops_','/actions/cj_')) and session and session.get('username'):
+                if path.startswith(('/actions/ops_','/actions/cj_','/actions/aw_')) and session and session.get('username'):
                     from .integrations.adapters import Principal
                     office.business_operations.audit(Principal(session['role'],session['username']),data.get('business'),'operations_command','denied')
             return self.response(403,'この操作の権限がありません。')

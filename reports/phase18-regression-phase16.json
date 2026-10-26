@@ -1,0 +1,17 @@
+{
+  "mode": "synthetic_temporary_database_not_real_transactions",
+  "existing_business_ui_period_filter": "passed",
+  "custom_kpi_rule_target_achievement": "passed",
+  "selected_profit_and_global_same_basis_totals": "passed",
+  "global_pii": "not_exposed",
+  "authenticated_task_bound_kpi_api": "passed",
+  "agent_spoofing": "rejected",
+  "human_acl_and_owner_only_settings": "passed",
+  "desktop_routes": 7,
+  "mobile_routes": 7,
+  "external_browser_requests": "blocked",
+  "real_iphone": "not_tested",
+  "actual_external_services": [],
+  "production_started": false,
+  "evidence_context": "Phase18 regression on synthetic temporary DB; loopback Chromium only; not production"
+}
