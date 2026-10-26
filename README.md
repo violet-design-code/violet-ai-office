@@ -33,3 +33,14 @@ python3 -m violet_office.ops backup --db var/office.sqlite3 --output var/backups
 ```
 
 バックアップは平文で、信頼できるアクセス制限付き保管先が必要です。復元は別の新規ファイルのみで、自動再開しません。最新CVE・既存LINE本体・実API・法令の確認は未完了で、本番運用は不可です。
+
+第7段階では「目標・定期業務」「業務レポート」を追加しました。目標未設定・未計測を保持し、日次/週次/月次のローカル集計と提案を作成できます。設定したスケジュールは初期停止で、Web起動だけでは実行しません。
+
+- [第7段階の実装範囲・手順・テスト・残課題](docs/phase-7.md)
+
+```sh
+python3 -m violet_office.growth_cli status
+python3 -m violet_office.growth_cli tick
+```
+
+常駐ワーカーは必要な場合だけ `python3 -m violet_office.growth_cli watch --interval 30` で明示起動します。計画承認と外部送信承認は別で、実モデル・外部APIは未接続です。

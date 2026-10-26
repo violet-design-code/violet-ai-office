@@ -1,0 +1,1041 @@
+{
+  "environment": "一時DBの合成サンプル。実ユーザーの目標・実績ではない。",
+  "mode": "local_rules_v1",
+  "actual_api_calls": 0,
+  "goals": {
+    "month": "2026-10",
+    "values": {
+      "ai_budget_microusd": null,
+      "appointments": null,
+      "contracts": null,
+      "inquiries": null,
+      "line_registrations": null,
+      "owner_minutes": null,
+      "referrals": null,
+      "sns_posts": null
+    },
+    "revision": 1
+  },
+  "schedules": [
+    {
+      "id": "70d2552e47fa4968be57e61c1a3fee6e",
+      "schedule_key": "sample-daily",
+      "cadence": "daily",
+      "period_mode": "current",
+      "anchor": "2026-10-26T02:50:18.039750+00:00",
+      "next_due": "2026-10-27T02:50:18+00:00",
+      "prepare_draft": 1,
+      "enabled": 0,
+      "state": "paused",
+      "created_at": "2026-10-26T02:51:18.040186+00:00"
+    },
+    {
+      "id": "9152585f96094dfd9585a9e8ef333a0a",
+      "schedule_key": "sample-weekly",
+      "cadence": "weekly",
+      "period_mode": "current",
+      "anchor": "2026-10-26T02:50:18.039750+00:00",
+      "next_due": "2026-11-02T02:50:18+00:00",
+      "prepare_draft": 0,
+      "enabled": 0,
+      "state": "paused",
+      "created_at": "2026-10-26T02:51:18.040296+00:00"
+    },
+    {
+      "id": "83ec9c87ce5e4eb2b64f05f88e629fcc",
+      "schedule_key": "sample-monthly",
+      "cadence": "monthly",
+      "period_mode": "current",
+      "anchor": "2026-10-26T02:50:18.039750+00:00",
+      "next_due": "2026-11-26T02:50:18+00:00",
+      "prepare_draft": 0,
+      "enabled": 0,
+      "state": "paused",
+      "created_at": "2026-10-26T02:51:18.040355+00:00"
+    }
+  ],
+  "reports": [
+    {
+      "id": "93122ab2a82b46d390f8f43001ab659c",
+      "status": "succeeded_local",
+      "decision": "approval_pending",
+      "report": {
+        "actions_executed": false,
+        "completed_local_steps": [
+          {
+            "agent": "AI27",
+            "artifact_id": "74bffad6973c4eb3a01147151e550dd3",
+            "task_id": "dc6844815f2a42b4806bf87b1c5dd837"
+          },
+          {
+            "agent": "AI01",
+            "artifact_id": "5c85af49b43d4589873653e26b3d9d80",
+            "task_id": "b083a0c628d84db1afb036b215ad4f41"
+          },
+          {
+            "agent": "AI08",
+            "artifact_id": "56b191d0f6794592bf937c1ae16af79a",
+            "task_id": "ced492670f084f5a9e85049f13ae9552"
+          },
+          {
+            "agent": "AI09",
+            "artifact_id": "624a167bfa2a4b17991d33494dc6c100",
+            "task_id": "210b7b709b2d44c99cec5480904e71c8"
+          },
+          {
+            "agent": "AI28",
+            "artifact_id": "ed63ffe6147e4f9ba9dbc8701f7bdb31",
+            "task_id": "1d3ba7f49f4c44f1be8165c64d3ed1fa"
+          }
+        ],
+        "context": {
+          "attribution": "施策別の流入・顧客コホートが未接続のため、成功施策/因果関係は未評価。",
+          "conversions": {
+            "SNS流入→LINE登録": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            },
+            "問い合わせ→面談予約": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            },
+            "面談予約→契約": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            }
+          },
+          "cost_microusd": {
+            "confirmed": null,
+            "estimated": null
+          },
+          "cost_source": "手動記帳のみ。API請求自動取得は未接続、モックを除外。",
+          "instruction": null,
+          "intent": "report",
+          "kpis": {
+            "appointment_requests": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "面談希望",
+              "value": null
+            },
+            "appointments": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "面談予約",
+              "value": null
+            },
+            "contracts": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "契約",
+              "value": null
+            },
+            "inquiries": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "問い合わせ",
+              "value": null
+            },
+            "line_registrations": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "LINE登録",
+              "value": null
+            },
+            "referrals": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "紹介",
+              "value": null
+            },
+            "sns_posts": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS投稿",
+              "value": null
+            },
+            "sns_reactions": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS反応",
+              "value": null
+            },
+            "sns_visits": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS流入",
+              "value": null
+            }
+          },
+          "local_tasks": {
+            "approval_pending": 0,
+            "completed_task_count": 0,
+            "completed_task_ids": [],
+            "error_task_count": 0,
+            "errors": [],
+            "local_report_failures": 0,
+            "mock_api_failures": 0,
+            "reference_ids_limit": 1000,
+            "running": [],
+            "running_task_count": 0
+          },
+          "monthly_goals": {
+            "month": "2026-10",
+            "revision": 1,
+            "values": {
+              "ai_budget_microusd": null,
+              "appointments": null,
+              "contracts": null,
+              "inquiries": null,
+              "line_registrations": null,
+              "owner_minutes": null,
+              "referrals": null,
+              "sns_posts": null
+            }
+          },
+          "monthly_progress": {
+            "appointments": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "contracts": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "inquiries": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "line_registrations": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "referrals": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "sns_posts": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            }
+          },
+          "owner_month_minutes": {
+            "estimated": null,
+            "measured": null
+          },
+          "period": {
+            "as_of": "2026-10-26T11:51:18.039750+09:00",
+            "cadence": "daily",
+            "coverage_end_exclusive": "2026-10-27",
+            "end_exclusive": "2026-10-27",
+            "mode": "current",
+            "period_key": "2026-10-26",
+            "start": "2026-10-26"
+          },
+          "prepare_draft": true,
+          "schedule_revision": 1
+        },
+        "draft_content_id": "c81a09f326454dc4991864d7138e29da",
+        "mode": "local_rules_v1",
+        "notice": "ローカル計算・固定テンプレート。AIモデル/外部API未接続。機械的引継ぎと人のレビューを区別。",
+        "plan": {
+          "budget_goal_microusd": null,
+          "experiment": "代表承認後に対象・期間・指標を定めて比較し、選定偏りや季節要因を記録。実際の連絡・公開は別の承認と接続が必要。",
+          "hypotheses": [
+            "導線・原稿・反応を計測して比較する。施策の効果を断定しない。"
+          ],
+          "items": [
+            {
+              "agent": "AI27",
+              "approval_required": true,
+              "priority": 1,
+              "reason": "未計測/部分計測を0と扱わない",
+              "work": "実測データの根拠と施策別の計測方法を整理"
+            }
+          ],
+          "next_period": {
+            "end_exclusive": "2026-10-28",
+            "start": "2026-10-27"
+          },
+          "next_priority": "未設定目標・未計測データ・承認待ちを先に確認。",
+          "owner_capacity_reached": false,
+          "paid_api_allowed": false,
+          "targets_confirmed_by_system": false
+        },
+        "proposal_tasks": [
+          {
+            "agent": "AI27",
+            "due_at": "2026-10-27T15:00:00+00:00",
+            "priority": 1,
+            "status": "approval_pending",
+            "task_id": "8eb5bba8e97f4d0cbe156e1e33157e73"
+          }
+        ],
+        "runtime_limits": {
+          "actual_api_calls": 0,
+          "current_owner_capacity_allows_draft": true,
+          "paid_api_allowed": false
+        },
+        "status_ja": "代表承認待ち・改善案未実行",
+        "title": "日次業務報告"
+      }
+    },
+    {
+      "id": "10321d588d324ac5bacb1481c8276a19",
+      "status": "succeeded_local",
+      "decision": "approval_pending",
+      "report": {
+        "actions_executed": false,
+        "completed_local_steps": [
+          {
+            "agent": "AI27",
+            "artifact_id": "4e67910d4ba74035ac7fd9ea84d4da11",
+            "task_id": "f40279b5ace0474eb0e1ea7dd1b5950c"
+          },
+          {
+            "agent": "AI01",
+            "artifact_id": "8047726f596d44dfb534c1bf546f3fb2",
+            "task_id": "83832f523ac74f5e840efd154f2c7f90"
+          },
+          {
+            "agent": "AI28",
+            "artifact_id": "8ccee118ebe742fe8681e8261eb41a4b",
+            "task_id": "b498aa2f421d4bbb930e593ef387cc39"
+          }
+        ],
+        "context": {
+          "attribution": "施策別の流入・顧客コホートが未接続のため、成功施策/因果関係は未評価。",
+          "conversions": {
+            "SNS流入→LINE登録": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            },
+            "問い合わせ→面談予約": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            },
+            "面談予約→契約": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            }
+          },
+          "cost_microusd": {
+            "confirmed": null,
+            "estimated": null
+          },
+          "cost_source": "手動記帳のみ。API請求自動取得は未接続、モックを除外。",
+          "instruction": null,
+          "intent": "report",
+          "kpis": {
+            "appointment_requests": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "面談希望",
+              "value": null
+            },
+            "appointments": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "面談予約",
+              "value": null
+            },
+            "contracts": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "契約",
+              "value": null
+            },
+            "inquiries": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "問い合わせ",
+              "value": null
+            },
+            "line_registrations": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "LINE登録",
+              "value": null
+            },
+            "referrals": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "紹介",
+              "value": null
+            },
+            "sns_posts": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS投稿",
+              "value": null
+            },
+            "sns_reactions": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS反応",
+              "value": null
+            },
+            "sns_visits": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 1,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS流入",
+              "value": null
+            }
+          },
+          "local_tasks": {
+            "approval_pending": 2,
+            "completed_task_count": 0,
+            "completed_task_ids": [],
+            "error_task_count": 0,
+            "errors": [],
+            "local_report_failures": 0,
+            "mock_api_failures": 0,
+            "reference_ids_limit": 1000,
+            "running": [],
+            "running_task_count": 0
+          },
+          "monthly_goals": {
+            "month": "2026-10",
+            "revision": 1,
+            "values": {
+              "ai_budget_microusd": null,
+              "appointments": null,
+              "contracts": null,
+              "inquiries": null,
+              "line_registrations": null,
+              "owner_minutes": null,
+              "referrals": null,
+              "sns_posts": null
+            }
+          },
+          "monthly_progress": {
+            "appointments": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "contracts": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "inquiries": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "line_registrations": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "referrals": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "sns_posts": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            }
+          },
+          "owner_month_minutes": {
+            "estimated": null,
+            "measured": null
+          },
+          "period": {
+            "as_of": "2026-10-26T11:51:18.039750+09:00",
+            "cadence": "weekly",
+            "coverage_end_exclusive": "2026-10-27",
+            "end_exclusive": "2026-11-02",
+            "mode": "current",
+            "period_key": "2026-W44",
+            "start": "2026-10-26"
+          },
+          "prepare_draft": false,
+          "schedule_revision": 1
+        },
+        "draft_content_id": null,
+        "mode": "local_rules_v1",
+        "notice": "ローカル計算・固定テンプレート。AIモデル/外部API未接続。機械的引継ぎと人のレビューを区別。",
+        "plan": {
+          "budget_goal_microusd": null,
+          "experiment": "代表承認後に対象・期間・指標を定めて比較し、選定偏りや季節要因を記録。実際の連絡・公開は別の承認と接続が必要。",
+          "hypotheses": [
+            "導線・原稿・反応を計測して比較する。施策の効果を断定しない。"
+          ],
+          "items": [
+            {
+              "agent": "AI27",
+              "approval_required": true,
+              "priority": 1,
+              "reason": "未計測/部分計測を0と扱わない",
+              "work": "実測データの根拠と施策別の計測方法を整理"
+            }
+          ],
+          "next_period": {
+            "end_exclusive": "2026-11-09",
+            "start": "2026-11-02"
+          },
+          "next_priority": "未設定目標・未計測データ・承認待ちを先に確認。",
+          "owner_capacity_reached": false,
+          "paid_api_allowed": false,
+          "targets_confirmed_by_system": false
+        },
+        "proposal_tasks": [
+          {
+            "agent": "AI27",
+            "due_at": "2026-11-08T15:00:00+00:00",
+            "priority": 1,
+            "status": "approval_pending",
+            "task_id": "ef06b2aa023049f4a2036a0b80099c4a"
+          }
+        ],
+        "runtime_limits": {
+          "actual_api_calls": 0,
+          "current_owner_capacity_allows_draft": true,
+          "paid_api_allowed": false
+        },
+        "status_ja": "代表承認待ち・改善案未実行",
+        "title": "週次業務報告"
+      }
+    },
+    {
+      "id": "e6c03919501a4e1a8b78930d218038ca",
+      "status": "succeeded_local",
+      "decision": "approval_pending",
+      "report": {
+        "actions_executed": false,
+        "completed_local_steps": [
+          {
+            "agent": "AI27",
+            "artifact_id": "6afda7e137c949668c9873f08fae0908",
+            "task_id": "28599a2ca5e24d0a8f12c4bba703ecec"
+          },
+          {
+            "agent": "AI01",
+            "artifact_id": "87c0b19e89e74a5d817a094c70d527a6",
+            "task_id": "e8bb2b4c4a824f2b90f9cf39010e7dda"
+          },
+          {
+            "agent": "AI28",
+            "artifact_id": "c5c9d5a641fe4fa9818b0793c11d76b2",
+            "task_id": "93bc92ee551e49408a0b1804a2f2d419"
+          }
+        ],
+        "context": {
+          "attribution": "施策別の流入・顧客コホートが未接続のため、成功施策/因果関係は未評価。",
+          "conversions": {
+            "SNS流入→LINE登録": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            },
+            "問い合わせ→面談予約": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            },
+            "面談予約→契約": {
+              "note": "分母/分子未計測・部分計測・分母0のため未計測",
+              "percent": null,
+              "period_count_ratio_percent": null
+            }
+          },
+          "cost_microusd": {
+            "confirmed": null,
+            "estimated": null
+          },
+          "cost_source": "手動記帳のみ。API請求自動取得は未接続、モックを除外。",
+          "instruction": null,
+          "intent": "report",
+          "kpis": {
+            "appointment_requests": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "面談希望",
+              "value": null
+            },
+            "appointments": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "面談予約",
+              "value": null
+            },
+            "contracts": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "契約",
+              "value": null
+            },
+            "inquiries": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "問い合わせ",
+              "value": null
+            },
+            "line_registrations": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "LINE登録",
+              "value": null
+            },
+            "referrals": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "紹介",
+              "value": null
+            },
+            "sns_posts": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS投稿",
+              "value": null
+            },
+            "sns_reactions": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS反応",
+              "value": null
+            },
+            "sns_visits": {
+              "complete": false,
+              "coverage_days": 0,
+              "estimated": null,
+              "expected_days": 26,
+              "mock_excluded": true,
+              "source_ids": [],
+              "source_mode": "manual",
+              "status": "未計測",
+              "title": "SNS流入",
+              "value": null
+            }
+          },
+          "local_tasks": {
+            "approval_pending": 3,
+            "completed_task_count": 0,
+            "completed_task_ids": [],
+            "error_task_count": 0,
+            "errors": [],
+            "local_report_failures": 0,
+            "mock_api_failures": 0,
+            "reference_ids_limit": 1000,
+            "running": [],
+            "running_task_count": 0
+          },
+          "monthly_goals": {
+            "month": "2026-10",
+            "revision": 1,
+            "values": {
+              "ai_budget_microusd": null,
+              "appointments": null,
+              "contracts": null,
+              "inquiries": null,
+              "line_registrations": null,
+              "owner_minutes": null,
+              "referrals": null,
+              "sns_posts": null
+            }
+          },
+          "monthly_progress": {
+            "appointments": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "contracts": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "inquiries": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "line_registrations": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "referrals": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            },
+            "sns_posts": {
+              "achievement_percent": null,
+              "actual": null,
+              "gap": null,
+              "goal": null,
+              "status": "未計測"
+            }
+          },
+          "owner_month_minutes": {
+            "estimated": null,
+            "measured": null
+          },
+          "period": {
+            "as_of": "2026-10-26T11:51:18.039750+09:00",
+            "cadence": "monthly",
+            "coverage_end_exclusive": "2026-10-27",
+            "end_exclusive": "2026-11-01",
+            "mode": "current",
+            "period_key": "2026-10",
+            "start": "2026-10-01"
+          },
+          "prepare_draft": false,
+          "schedule_revision": 1
+        },
+        "draft_content_id": null,
+        "mode": "local_rules_v1",
+        "notice": "ローカル計算・固定テンプレート。AIモデル/外部API未接続。機械的引継ぎと人のレビューを区別。",
+        "plan": {
+          "budget_goal_microusd": null,
+          "experiment": "代表承認後に対象・期間・指標を定めて比較し、選定偏りや季節要因を記録。実際の連絡・公開は別の承認と接続が必要。",
+          "hypotheses": [
+            "導線・原稿・反応を計測して比較する。施策の効果を断定しない。"
+          ],
+          "items": [
+            {
+              "agent": "AI27",
+              "approval_required": true,
+              "priority": 1,
+              "reason": "未計測/部分計測を0と扱わない",
+              "work": "実測データの根拠と施策別の計測方法を整理"
+            }
+          ],
+          "next_period": {
+            "end_exclusive": "2026-12-01",
+            "start": "2026-11-01"
+          },
+          "next_priority": "未設定目標・未計測データ・承認待ちを先に確認。",
+          "owner_capacity_reached": false,
+          "paid_api_allowed": false,
+          "targets_confirmed_by_system": false
+        },
+        "proposal_tasks": [
+          {
+            "agent": "AI27",
+            "due_at": "2026-11-30T15:00:00+00:00",
+            "priority": 1,
+            "status": "approval_pending",
+            "task_id": "99b96895a5f446e49c64284ce313adbd"
+          }
+        ],
+        "runtime_limits": {
+          "actual_api_calls": 0,
+          "current_owner_capacity_allows_draft": true,
+          "paid_api_allowed": false
+        },
+        "status_ja": "代表承認待ち・改善案未実行",
+        "title": "月次業務報告"
+      }
+    }
+  ],
+  "local_work": [
+    {
+      "step": "analysis",
+      "agent": "AI27",
+      "state": "succeeded_local",
+      "due_at": "2026-10-26T15:00:00+00:00",
+      "output_digest": "12cfc458bb7658be0b17c54ccaf9ad8d861c50e35ab62d00b61f0b2d993260a2"
+    },
+    {
+      "step": "plan",
+      "agent": "AI01",
+      "state": "succeeded_local",
+      "due_at": "2026-10-26T15:00:00+00:00",
+      "output_digest": "d242d1d368c5dffeec0a0cb5ce09f9ac844ca9b5d66f1410f1b087fbfecd8e93"
+    },
+    {
+      "step": "content_plan",
+      "agent": "AI08",
+      "state": "succeeded_local",
+      "due_at": "2026-10-26T15:00:00+00:00",
+      "output_digest": "e06d78dce63f931876f572981857e916aa3a8721cf0ae7af070c278afeca2050"
+    },
+    {
+      "step": "copy",
+      "agent": "AI09",
+      "state": "succeeded_local",
+      "due_at": "2026-10-26T15:00:00+00:00",
+      "output_digest": "666168dbec9dd012ceac53a68c10b59b45a1d9bcbd0e9d18e251c9540bf62ecc"
+    },
+    {
+      "step": "quality",
+      "agent": "AI28",
+      "state": "succeeded_local",
+      "due_at": "2026-10-26T15:00:00+00:00",
+      "output_digest": "9e00809cdb6e69824cb9e49882a362d57a8b053b0012d81349c68ba460f1ffc7"
+    },
+    {
+      "step": "report",
+      "agent": "AI01",
+      "state": "succeeded_local",
+      "due_at": "2026-10-26T15:00:00+00:00",
+      "output_digest": "fa7c128df17b6316ee496b8c0c4abddc10caf46f4c03b9744008cd098955df86"
+    },
+    {
+      "step": "analysis",
+      "agent": "AI27",
+      "state": "succeeded_local",
+      "due_at": "2026-11-01T15:00:00+00:00",
+      "output_digest": "edf1c71837852a5bad3c29051bd6dbfeb632b850b57ad55e369a77841a56f935"
+    },
+    {
+      "step": "plan",
+      "agent": "AI01",
+      "state": "succeeded_local",
+      "due_at": "2026-11-01T15:00:00+00:00",
+      "output_digest": "0918777a8c2d62fca7fe5c551c5cd9d70471e907f7388c344e67ddc4d7ad3ca0"
+    },
+    {
+      "step": "quality",
+      "agent": "AI28",
+      "state": "succeeded_local",
+      "due_at": "2026-11-01T15:00:00+00:00",
+      "output_digest": "fe7772839a40a0e63c230b10963f4357e6f1a17dc6d98167044283ad35c5c132"
+    },
+    {
+      "step": "report",
+      "agent": "AI01",
+      "state": "succeeded_local",
+      "due_at": "2026-11-01T15:00:00+00:00",
+      "output_digest": "cff80684c51254acd21e045dbdb73adf68b4eda951832859888d8eea01bf3e6d"
+    },
+    {
+      "step": "analysis",
+      "agent": "AI27",
+      "state": "succeeded_local",
+      "due_at": "2026-10-31T15:00:00+00:00",
+      "output_digest": "6522aba2010908808fb81b76292481a7ba990fd1c7315287d57855eaa8922f6f"
+    },
+    {
+      "step": "plan",
+      "agent": "AI01",
+      "state": "succeeded_local",
+      "due_at": "2026-10-31T15:00:00+00:00",
+      "output_digest": "a133b72793a25f66fc450b21fff8f680a998146af4f37d6e7f6cd8a02e879b67"
+    },
+    {
+      "step": "quality",
+      "agent": "AI28",
+      "state": "succeeded_local",
+      "due_at": "2026-10-31T15:00:00+00:00",
+      "output_digest": "fe7772839a40a0e63c230b10963f4357e6f1a17dc6d98167044283ad35c5c132"
+    },
+    {
+      "step": "report",
+      "agent": "AI01",
+      "state": "succeeded_local",
+      "due_at": "2026-10-31T15:00:00+00:00",
+      "output_digest": "be4fc2c4bd9d33b6592090b106738dec647346c115b39514ac9908bd8a7ff893"
+    }
+  ],
+  "actual_external_services": [],
+  "production_started": false
+}

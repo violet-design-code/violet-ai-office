@@ -11,6 +11,7 @@ from uuid import uuid4
 from zoneinfo import ZoneInfo
 
 from .store import Store, now
+from .growth import Growth,GOALS,usd
 from .registry import load_agents
 from .coordinator import Coordinator
 from .content import ContentOffice, CHECKS, safe_input, encode, digest
@@ -89,6 +90,7 @@ class Office:
         self.db.executescript(IX_SCHEMA)
         self.db.executescript(SCHEMA)
         self.db.execute('INSERT OR IGNORE INTO office_budgets VALUES (?,0)',(now().astimezone(JST).strftime('%Y-%m'),))
+        self.growth=Growth(store)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))
@@ -178,6 +180,46 @@ class Office:
 
     def _command(self,session,action,data):
         ref=data.get('id','')
+        if action=='growth_goals':
+            values={key:None if data.get(key,'').strip()=='' else int(data[key]) for key in GOALS if key!='ai_budget_microusd'}
+            values['ai_budget_microusd']=None if not data.get('ai_budget_usd','').strip() else usd(data['ai_budget_usd'])
+            self.growth.set_goals(data['month'],values,session['username'])
+            return '/growth?month='+data['month']
+        if action=='growth_measure':
+            self.growth.record_metric(data['key'],data['metric'],data['day'],int(data['value']),data['quality'],data['mode'],data['source'],data['evidence'],session['username'],data.get('replace_id') or None)
+            return '/growth'
+        if action=='growth_time':
+            self.growth.record_time(data['key'],data['day'],int(data['minutes']),data['quality'],data['mode'],data['evidence'],session['username'])
+            return '/growth'
+        if action=='growth_schedule':
+            first=datetime.fromisoformat(data['first_due'])
+            if first.tzinfo is None:
+                first=first.replace(tzinfo=JST)
+            self.growth.create_schedule(data['key'],data['cadence'],first,data['period_mode'],data.get('prepare_draft')=='1',session['username'])
+            return '/growth'
+        if action=='growth_schedule_edit':
+            first=datetime.fromisoformat(data['first_due'])
+            if first.tzinfo is None:
+                first=first.replace(tzinfo=JST)
+            self.growth.edit_schedule(ref,first,data['period_mode'],data.get('prepare_draft')=='1',session['username'])
+            return '/growth'
+        if action=='growth_state':
+            if data['enabled'] not in ('0','1'):
+                raise ValueError('Invalid schedule state')
+            self.growth.schedule_state(ref,data['enabled']=='1',session['username'])
+            return '/growth'
+        if action=='growth_tick':
+            self.growth.tick(actor=session['username'])
+            return '/growth'
+        if action=='growth_instruction':
+            run=self.growth.instruction(data['key'],data['instruction'],session['username'])
+            return '/reports?id='+run
+        if action=='growth_report':
+            run=self.growth.run(data['key'],data['cadence'],mode=data['period_mode'],actor=session['username'])
+            return '/reports?id='+run
+        if action=='growth_decide':
+            self.growth.decide(ref,data['decision'],session['username'])
+            return '/reports?id='+ref
         if action=='submit':
             safe_input(data['instruction'])
             request=self.coordinator.submit(data['key'],data['instruction'],int(data.get('priority','3')))
@@ -188,6 +230,8 @@ class Office:
             campaign=self.content.generate(data['key'],data['instruction'],int(data['days']),data['platform'],data['start_date'])
             return '/approvals?campaign='+campaign
         if action in ('start','stop','retry'):
+            if self.db.execute('SELECT 1 FROM growth_work WHERE task_id=?',(ref,)).fetchone():
+                raise ValueError('Use the local scheduler controls for generated work')
             row=self.db.execute('SELECT * FROM tasks WHERE id=?',(ref,)).fetchone()
             if not row:
                 raise ValueError('Unknown task')
@@ -214,6 +258,7 @@ class Office:
                 self.db.execute('UPDATE dependencies SET prerequisite=? WHERE prerequisite=?',(new,ref))
                 self.db.execute('UPDATE dependencies SET task_id=? WHERE task_id=?',(new,ref))
                 self.db.execute('INSERT INTO office_task_links VALUES (?,?,?)',(ref,new,now().isoformat()))
+                self.db.execute('UPDATE growth_proposals SET task_id=? WHERE task_id=?',(new,ref))
                 self.db.execute("UPDATE tasks SET status='superseded' WHERE id=?",(ref,))
             return '/employees?id='+row['agent']
         if action=='priority':
@@ -316,7 +361,7 @@ class Office:
             raise ValueError('Invalid USD value')
 
     def tasks(self):
-        return [dict(r) for r in self.db.execute('SELECT t.*,MAX(e.created_at) AS updated_at,rt.request_id,o.priority FROM tasks t LEFT JOIN events e ON e.task_id=t.id LEFT JOIN request_tasks rt ON rt.task_id=t.id LEFT JOIN request_options o ON o.request_id=rt.request_id GROUP BY t.id ORDER BY COALESCE(o.priority,3),updated_at DESC')]
+        return [dict(r) for r in self.db.execute('SELECT t.*,MAX(e.created_at) AS updated_at,rt.request_id,COALESCE(o.priority,g.priority) AS priority,COALESCE(g.due_at,w.due_at) AS planned_due FROM tasks t LEFT JOIN events e ON e.task_id=t.id LEFT JOIN request_tasks rt ON rt.task_id=t.id LEFT JOIN request_options o ON o.request_id=rt.request_id LEFT JOIN growth_proposals g ON g.task_id=t.id LEFT JOIN growth_work w ON w.task_id=t.id GROUP BY t.id ORDER BY COALESCE(o.priority,g.priority,3),updated_at DESC')]
 
     def costs(self):
         entries=[dict(r) for r in self.db.execute('SELECT * FROM office_costs ORDER BY incurred_date DESC')]
@@ -335,14 +380,22 @@ class Office:
         created={r[0]:r[1] for r in self.db.execute("SELECT task_id,MIN(created_at) FROM events WHERE event='created' GROUP BY task_id")}
         todays=sum(datetime.fromisoformat(value).astimezone(JST).date().isoformat()==today for value in created.values())
         pending=self.db.execute("SELECT COUNT(*) FROM content_versions WHERE status='approval_pending'").fetchone()[0]+sum(t['status']=='approval_pending' for t in tasks)+self.db.execute("SELECT COUNT(*) FROM ix_operations WHERE status='approval_pending'").fetchone()[0]
-        return {'local':{'本日のローカルタスク':todays if tasks else None,'完了タスク':sum(t['status']=='completed' for t in tasks) if tasks else None,'承認待ち':pending,'タスクエラー':sum(t['status']=='failed' for t in tasks)},
-            'business':{k:None for k in ['今月の問い合わせ','今月の面談予約','紹介件数','契約件数','SNS投稿数','LINE登録数','SNSからの流入','面談希望数','問い合わせ→面談転換率','面談→契約転換率']},
+        pending+=self.db.execute("SELECT COUNT(*) FROM growth_runs WHERE status='succeeded_local' AND decision='approval_pending'").fetchone()[0]
+        manual=self.growth.metrics(today[:7]+'-01',(now().astimezone(JST).date()+timedelta(days=1)).isoformat())
+        mapping={'今月の問い合わせ':'inquiries','今月の面談予約':'appointments','紹介件数':'referrals','契約件数':'contracts','SNS投稿数':'sns_posts','LINE登録数':'line_registrations','SNSからの流入':'sns_visits','面談希望数':'appointment_requests'}
+        business={title:manual[key]['value'] if manual[key]['complete'] else None for title,key in mapping.items()}
+        business.update({'問い合わせ→面談転換率':None,'面談→契約転換率':None})
+        return {'manual_business':manual,'local':{'本日のローカルタスク':todays if tasks else None,'完了タスク':sum(t['status']=='completed' for t in tasks) if tasks else None,'定期ローカル処理完了':self.db.execute("SELECT COUNT(*) FROM growth_runs WHERE status='succeeded_local'").fetchone()[0],'承認待ち':pending,'タスクエラー':sum(t['status']=='failed' for t in tasks)},
+            'business':business,
             'mock':{'LINE仮名登録':self.db.execute('SELECT COUNT(*) FROM ix_customers').fetchone()[0], '問い合わせ':self.db.execute('SELECT COUNT(*) FROM ix_inquiries').fetchone()[0], '予約確定':self.db.execute("SELECT COUNT(*) FROM ix_bookings WHERE status='confirmed'").fetchone()[0]},
             'month':today[:7]}
 
     def alerts(self):
         alerts=[]
         for label,query in [
+            ('定期処理の期限切れ',"SELECT COUNT(*) FROM growth_runs WHERE status='running' AND deadline<=?"),
+            ('定期スケジュールの自動停止',"SELECT COUNT(*) FROM growth_schedules WHERE state IN ('auto_paused','attempt_limit')"),
+            ('定期ローカル処理の失敗・確認待ち',"SELECT COUNT(*) FROM growth_runs WHERE status='failed' OR status='paused' AND error_code IN ('lease_expired','recovery_hold')"),
             ('失敗タスク',"SELECT COUNT(*) FROM tasks WHERE status='failed'"),
             ('モックAPI失敗/結果不明',"SELECT COUNT(*) FROM ix_operations WHERE status IN ('failed','manual_reconciliation')"),
             ('期限切れの実行',"SELECT COUNT(*) FROM runs WHERE status='running' AND deadline<=?"),
