@@ -1,0 +1,427 @@
+{
+  "campaign": {
+    "id": "7bf62a74864845c3aa273da9dde6fca3",
+    "campaign_key": "violet-phase3-example-v1",
+    "fingerprint": "ec789f37d50459c7cd599ccc10a5cd6614b72b06f3c1553b2711722fb479f4c6",
+    "brief": "バイオレットの認知を広げ、ベネシードディーラーに関心を持つ人との接点を増やすため、40代〜60代向けのInstagram投稿を7日分作成し、LINE登録から面談予約につながる導線を提案してください",
+    "days": 7,
+    "platform": "Instagram",
+    "start_date": "2026-10-26",
+    "mode": "offline_template_v1",
+    "created_at": "2026-10-26T00:43:40.492589+00:00"
+  },
+  "contents": [
+    {
+      "id": "7ecd46efa6fb4dfeaa6a4c247c8e113f",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "creative",
+      "version": 1,
+      "kind": "creative",
+      "scheduled_date": null,
+      "body": {
+        "generation_api": "未接続・制作指示書のみ",
+        "image": "落ち着いた紫を基調に、暮らしの風景と読みやすい見出しを配置。人物写真は許諾済み素材のみ。効能や収益の図示、ビフォーアフターは禁止。",
+        "video": "15〜30秒。問いかけ→日常の風景→任意の情報登録案内。字幕を付け、健康効果・成功実績を捏造しない。"
+      },
+      "digest": "a6541772945704e9246d6de566de29ade15cc3240f639d02930ce53f24d6d49a",
+      "status": "approval_pending",
+      "task_id": "867d6884af9c4d939d3093914d27a98c"
+    },
+    {
+      "id": "1e923d5b685c4e66b9037f01aecef7cf",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "line-1",
+      "version": 1,
+      "kind": "line",
+      "scheduled_date": null,
+      "body": {
+        "body": "バイオレットです。今日は「暮らしで大切にしたいこと」についての情報案内です。知りたい内容があれば、ご希望の範囲をお知らせください。",
+        "cta": "面談を希望する場合のみ候補日時をご相談ください。停止・再同意・予約確定時停止は既存システムの判断を優先します。",
+        "day": 1,
+        "delivery": "送信禁止・既存7日間配信への取込未接続",
+        "purpose": "本人が希望する情報の提供",
+        "topic": "暮らしで大切にしたいこと"
+      },
+      "digest": "c9fa60c64b9dbcd8430a0c8688e782d97fc860017a46dc9e2dd10c4edf839b35",
+      "status": "approval_pending",
+      "task_id": "4ba20c3b79dd4c28896641479c1bbe75"
+    },
+    {
+      "id": "2f7379a7e6214dcba7c977e085363aaa",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "line-2",
+      "version": 1,
+      "kind": "line",
+      "scheduled_date": null,
+      "body": {
+        "body": "バイオレットです。今日は「自分のペースの健康習慣」についての情報案内です。知りたい内容があれば、ご希望の範囲をお知らせください。",
+        "cta": "面談を希望する場合のみ候補日時をご相談ください。停止・再同意・予約確定時停止は既存システムの判断を優先します。",
+        "day": 2,
+        "delivery": "送信禁止・既存7日間配信への取込未接続",
+        "purpose": "本人が希望する情報の提供",
+        "topic": "自分のペースの健康習慣"
+      },
+      "digest": "cd93d9ed3d5b8a4d563f37dbc4b30a46f775e663cc3ec30e54f4956c1cdf93da",
+      "status": "approval_pending",
+      "task_id": "4ba20c3b79dd4c28896641479c1bbe75"
+    },
+    {
+      "id": "bb52674e7df1417392f6bd42f802f3b8",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "line-3",
+      "version": 1,
+      "kind": "line",
+      "scheduled_date": null,
+      "body": {
+        "body": "バイオレットです。今日は「美容について知りたいこと」についての情報案内です。知りたい内容があれば、ご希望の範囲をお知らせください。",
+        "cta": "面談を希望する場合のみ候補日時をご相談ください。停止・再同意・予約確定時停止は既存システムの判断を優先します。",
+        "day": 3,
+        "delivery": "送信禁止・既存7日間配信への取込未接続",
+        "purpose": "本人が希望する情報の提供",
+        "topic": "美容について知りたいこと"
+      },
+      "digest": "befe4f98c82c3c8bc6ff3f10bb56c734b688bcdedfab4494865753c1e05f304e",
+      "status": "approval_pending",
+      "task_id": "4ba20c3b79dd4c28896641479c1bbe75"
+    },
+    {
+      "id": "e7255488cccf4d6485e4bf3bcda34f9b",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "line-4",
+      "version": 1,
+      "kind": "line",
+      "scheduled_date": null,
+      "body": {
+        "body": "バイオレットです。今日は「人とのつながり」についての情報案内です。知りたい内容があれば、ご希望の範囲をお知らせください。",
+        "cta": "面談を希望する場合のみ候補日時をご相談ください。停止・再同意・予約確定時停止は既存システムの判断を優先します。",
+        "day": 4,
+        "delivery": "送信禁止・既存7日間配信への取込未接続",
+        "purpose": "本人が希望する情報の提供",
+        "topic": "人とのつながり"
+      },
+      "digest": "c8525da2efdfaa3036b2366fcd340b694d626a8d84b43e84c9c4749f36c2758d",
+      "status": "approval_pending",
+      "task_id": "4ba20c3b79dd4c28896641479c1bbe75"
+    },
+    {
+      "id": "bbb48a782c1343cb981dc5b1e897e79a",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "line-5",
+      "version": 1,
+      "kind": "line",
+      "scheduled_date": null,
+      "body": {
+        "body": "バイオレットです。今日は「新しい働き方の情報整理」についての情報案内です。知りたい内容があれば、ご希望の範囲をお知らせください。",
+        "cta": "面談を希望する場合のみ候補日時をご相談ください。停止・再同意・予約確定時停止は既存システムの判断を優先します。",
+        "day": 5,
+        "delivery": "送信禁止・既存7日間配信への取込未接続",
+        "purpose": "本人が希望する情報の提供",
+        "topic": "新しい働き方の情報整理"
+      },
+      "digest": "5ac2c281f9615daf73382b1f33d850bb1b9f753fefdaf6fdb7874e57644f72e8",
+      "status": "approval_pending",
+      "task_id": "4ba20c3b79dd4c28896641479c1bbe75"
+    },
+    {
+      "id": "de1efe2d49794e1fbd4799fa27b6d118",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "line-6",
+      "version": 1,
+      "kind": "line",
+      "scheduled_date": null,
+      "body": {
+        "body": "バイオレットです。今日は「バイオレットの活動紹介」についての情報案内です。知りたい内容があれば、ご希望の範囲をお知らせください。",
+        "cta": "面談を希望する場合のみ候補日時をご相談ください。停止・再同意・予約確定時停止は既存システムの判断を優先します。",
+        "day": 6,
+        "delivery": "送信禁止・既存7日間配信への取込未接続",
+        "purpose": "本人が希望する情報の提供",
+        "topic": "バイオレットの活動紹介"
+      },
+      "digest": "072ea31cee9d8798bdc68c8e00e0e549824d129808b206c439d93c659f7bc4e4",
+      "status": "approval_pending",
+      "task_id": "4ba20c3b79dd4c28896641479c1bbe75"
+    },
+    {
+      "id": "e172f28dcfb5430a8a1fe6cd1b863b74",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "line-7",
+      "version": 1,
+      "kind": "line",
+      "scheduled_date": null,
+      "body": {
+        "body": "バイオレットです。今日は「希望する方への相談のご案内」についての情報案内です。知りたい内容があれば、ご希望の範囲をお知らせください。",
+        "cta": "面談を希望する場合のみ候補日時をご相談ください。停止・再同意・予約確定時停止は既存システムの判断を優先します。",
+        "day": 7,
+        "delivery": "送信禁止・既存7日間配信への取込未接続",
+        "purpose": "本人が希望する情報の提供",
+        "topic": "希望する方への相談のご案内"
+      },
+      "digest": "d6a65228b10cadf28a17fac406a0b0643f9cde7a5572511d0ded0ca683e623f6",
+      "status": "approval_pending",
+      "task_id": "4ba20c3b79dd4c28896641479c1bbe75"
+    },
+    {
+      "id": "920bf9f810d6487e9f41d44dc88586bd",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "post-1",
+      "version": 1,
+      "kind": "sns",
+      "scheduled_date": "2026-10-26",
+      "body": {
+        "body": "バイオレットから、暮らしで大切にしたいことについて考えるきっかけをお届けします。関心や生活のペースは一人ひとり異なります。ご自身が知りたいことを大切にしてください。",
+        "cta": "関心のある成人の方へ。プロフィールの公式LINE案内（登録先は代表確認後に設定）から、希望する情報と利用目的を確認のうえ任意で登録できます。面談は希望者のみ候補日時をご相談ください。",
+        "day": 1,
+        "disclosure": "事業活動の案内・下書き",
+        "hashtags": [
+          "#バイオレット",
+          "#暮らしを考える",
+          "#人とのつながり"
+        ],
+        "platform": "Instagram",
+        "title": "暮らしで大切にしたいこと"
+      },
+      "digest": "d2b6d2eab8e4e10ccaf3a7c4acbbe749c8e8866dbf656591d5d6fd194b65316e",
+      "status": "approval_pending",
+      "task_id": "334e7f2c49ed4d76a110978f2998f127"
+    },
+    {
+      "id": "ef7fefa144c94c3bb630d75673a51c70",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "post-2",
+      "version": 1,
+      "kind": "sns",
+      "scheduled_date": "2026-10-27",
+      "body": {
+        "body": "バイオレットから、自分のペースの健康習慣について考えるきっかけをお届けします。関心や生活のペースは一人ひとり異なります。ご自身が知りたいことを大切にしてください。",
+        "cta": "関心のある成人の方へ。プロフィールの公式LINE案内（登録先は代表確認後に設定）から、希望する情報と利用目的を確認のうえ任意で登録できます。面談は希望者のみ候補日時をご相談ください。",
+        "day": 2,
+        "disclosure": "事業活動の案内・下書き",
+        "hashtags": [
+          "#バイオレット",
+          "#暮らしを考える",
+          "#人とのつながり"
+        ],
+        "platform": "Instagram",
+        "title": "自分のペースの健康習慣"
+      },
+      "digest": "f7cf9b142d257a880a9a7591a6552c2e5d70b7f08ff9b75856df4fd70ee198a4",
+      "status": "approval_pending",
+      "task_id": "334e7f2c49ed4d76a110978f2998f127"
+    },
+    {
+      "id": "27b8d5a666644d37b2ebf409522b0ba0",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "post-3",
+      "version": 1,
+      "kind": "sns",
+      "scheduled_date": "2026-10-28",
+      "body": {
+        "body": "バイオレットから、美容について知りたいことについて考えるきっかけをお届けします。関心や生活のペースは一人ひとり異なります。ご自身が知りたいことを大切にしてください。",
+        "cta": "関心のある成人の方へ。プロフィールの公式LINE案内（登録先は代表確認後に設定）から、希望する情報と利用目的を確認のうえ任意で登録できます。面談は希望者のみ候補日時をご相談ください。",
+        "day": 3,
+        "disclosure": "事業活動の案内・下書き",
+        "hashtags": [
+          "#バイオレット",
+          "#暮らしを考える",
+          "#人とのつながり"
+        ],
+        "platform": "Instagram",
+        "title": "美容について知りたいこと"
+      },
+      "digest": "080fc4965d668fc7184d00ef209df84678959010db20013f99ccb938eef90d3d",
+      "status": "approval_pending",
+      "task_id": "334e7f2c49ed4d76a110978f2998f127"
+    },
+    {
+      "id": "867fb0e679e249adba7bb98ef9958242",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "post-4",
+      "version": 1,
+      "kind": "sns",
+      "scheduled_date": "2026-10-29",
+      "body": {
+        "body": "バイオレットから、人とのつながりについて考えるきっかけをお届けします。関心や生活のペースは一人ひとり異なります。ご自身が知りたいことを大切にしてください。",
+        "cta": "関心のある成人の方へ。プロフィールの公式LINE案内（登録先は代表確認後に設定）から、希望する情報と利用目的を確認のうえ任意で登録できます。面談は希望者のみ候補日時をご相談ください。",
+        "day": 4,
+        "disclosure": "事業活動の案内・下書き",
+        "hashtags": [
+          "#バイオレット",
+          "#暮らしを考える",
+          "#人とのつながり"
+        ],
+        "platform": "Instagram",
+        "title": "人とのつながり"
+      },
+      "digest": "0a0e41ab0140e712a03ecb0aab98308876655c46c73c3ff5cc4a94f661e8316d",
+      "status": "approval_pending",
+      "task_id": "334e7f2c49ed4d76a110978f2998f127"
+    },
+    {
+      "id": "ddb942ef122949b7aeef5d49b9916117",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "post-5",
+      "version": 1,
+      "kind": "sns",
+      "scheduled_date": "2026-10-30",
+      "body": {
+        "body": "バイオレットから、新しい働き方の情報整理について考えるきっかけをお届けします。関心や生活のペースは一人ひとり異なります。ご自身が知りたいことを大切にしてください。",
+        "cta": "関心のある成人の方へ。プロフィールの公式LINE案内（登録先は代表確認後に設定）から、希望する情報と利用目的を確認のうえ任意で登録できます。面談は希望者のみ候補日時をご相談ください。",
+        "day": 5,
+        "disclosure": "事業活動の案内・下書き",
+        "hashtags": [
+          "#バイオレット",
+          "#暮らしを考える",
+          "#人とのつながり"
+        ],
+        "platform": "Instagram",
+        "title": "新しい働き方の情報整理"
+      },
+      "digest": "dd570b9fdfbd8584720b3f30c58abad47b5bb5333f1d490474c319f06e41e546",
+      "status": "approval_pending",
+      "task_id": "334e7f2c49ed4d76a110978f2998f127"
+    },
+    {
+      "id": "7dea054716274a74af63836eca718c32",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "post-6",
+      "version": 1,
+      "kind": "sns",
+      "scheduled_date": "2026-10-31",
+      "body": {
+        "body": "バイオレットから、バイオレットの活動紹介について考えるきっかけをお届けします。関心や生活のペースは一人ひとり異なります。ご自身が知りたいことを大切にしてください。 ベネシードディーラーについて知りたい方向けの案内を準備しています。具体的な条件・費用・制度は公式資料の確認後にご説明します。",
+        "cta": "関心のある成人の方へ。プロフィールの公式LINE案内（登録先は代表確認後に設定）から、希望する情報と利用目的を確認のうえ任意で登録できます。面談は希望者のみ候補日時をご相談ください。",
+        "day": 6,
+        "disclosure": "事業活動の案内・下書き",
+        "hashtags": [
+          "#バイオレット",
+          "#暮らしを考える",
+          "#人とのつながり"
+        ],
+        "platform": "Instagram",
+        "title": "バイオレットの活動紹介"
+      },
+      "digest": "af8c209f3d6a60a0f56729b779858ab5ec276c7d132b3b9d2ffc5ac4983a5549",
+      "status": "approval_pending",
+      "task_id": "334e7f2c49ed4d76a110978f2998f127"
+    },
+    {
+      "id": "74c59dc2ae814acea2765c9ac8a75d0e",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "post-7",
+      "version": 1,
+      "kind": "sns",
+      "scheduled_date": "2026-11-01",
+      "body": {
+        "body": "バイオレットから、希望する方への相談のご案内について考えるきっかけをお届けします。関心や生活のペースは一人ひとり異なります。ご自身が知りたいことを大切にしてください。",
+        "cta": "関心のある成人の方へ。プロフィールの公式LINE案内（登録先は代表確認後に設定）から、希望する情報と利用目的を確認のうえ任意で登録できます。面談は希望者のみ候補日時をご相談ください。",
+        "day": 7,
+        "disclosure": "事業活動の案内・下書き",
+        "hashtags": [
+          "#バイオレット",
+          "#暮らしを考える",
+          "#人とのつながり"
+        ],
+        "platform": "Instagram",
+        "title": "希望する方への相談のご案内"
+      },
+      "digest": "607675da261ddad3a9c4e8697155c824c034c6ca56a073ae1030959bd93f1191",
+      "status": "approval_pending",
+      "task_id": "334e7f2c49ed4d76a110978f2998f127"
+    },
+    {
+      "id": "5f63e5abe69145f081b75bbdff2baace",
+      "campaign_id": "7bf62a74864845c3aa273da9dde6fca3",
+      "logical_key": "referral",
+      "version": 1,
+      "kind": "referral",
+      "scheduled_date": null,
+      "body": {
+        "初めて知る方へ": "バイオレットでは、ベネシードディーラーについて関心をお持ちの成人の方向けに情報案内を準備しています。契約条件・費用・制度は公式資料で確認してから判断してください。",
+        "報酬・特典": "公式規約未確認のため金額・条件・特典の記載なし。",
+        "知人への紹介依頼": "もし関心がありそうな成人のお知り合いがいて、ご自身が紹介したいと感じた場合のみ、案内文をご共有いただけます。相手の連絡先をこちらへ渡す必要はありません。",
+        "第三者へ渡す案内": "バイオレットの活動について、知りたい場合だけ公式案内をご確認ください。登録や面談は任意です。紹介者から個人情報は受け取りません。",
+        "紹介ページ": "事業活動の案内／運営者情報・問い合わせ先（要設定）／目的・同意／公式資料／任意の登録／停止方法。公開先未設定。",
+        "興味を示した方への返信": "ご関心をお寄せいただきありがとうございます。どのような情報をご希望でしょうか。ご希望の範囲で、確認済みの資料からご案内します。",
+        "面談導線": "案内を読む→利用目的と同意を確認→本人がLINE登録→希望内容を選択→面談希望を確認→候補日時を調整→代表承認と本人確認後に予約確定。"
+      },
+      "digest": "3751730c0bde06f74902d1b0a3b10df5e614d327ec87840b9e472e5fb78b6199",
+      "status": "approval_pending",
+      "task_id": "0937a221f0e54e7195dc7f18f0041ec7"
+    }
+  ],
+  "work": [
+    {
+      "agent": "AI01",
+      "task_id": "55ad8ef6a82d45fab63b86a8e13d0402",
+      "status": "review_pending"
+    },
+    {
+      "agent": "AI03",
+      "task_id": "a37a924783c04a37bfb125dca18fe082",
+      "status": "review_pending"
+    },
+    {
+      "agent": "AI08",
+      "task_id": "425da73be30b46d5aeaa0f5aad1342b8",
+      "status": "review_pending"
+    },
+    {
+      "agent": "AI09",
+      "task_id": "334e7f2c49ed4d76a110978f2998f127",
+      "status": "review_pending"
+    },
+    {
+      "agent": "AI10",
+      "task_id": "867d6884af9c4d939d3093914d27a98c",
+      "status": "review_pending"
+    },
+    {
+      "agent": "AI16",
+      "task_id": "0937a221f0e54e7195dc7f18f0041ec7",
+      "status": "review_pending"
+    },
+    {
+      "agent": "AI22",
+      "task_id": "4ba20c3b79dd4c28896641479c1bbe75",
+      "status": "review_pending"
+    },
+    {
+      "agent": "AI28",
+      "task_id": "2f6518fc698f4e8894f51b6e62a11d8d",
+      "status": "review_pending"
+    }
+  ],
+  "cost": {
+    "actual_api_microusd": 0,
+    "mode": "offline_template_v1",
+    "paid_api": "未接続"
+  },
+  "sources": [
+    {
+      "name": "消費者庁 特定商取引法ガイド",
+      "url": "https://www.no-trouble.caa.go.jp/",
+      "status": "未取得・要確認"
+    },
+    {
+      "name": "消費者庁",
+      "url": "https://www.caa.go.jp/",
+      "status": "未取得・要確認"
+    },
+    {
+      "name": "個人情報保護委員会",
+      "url": "https://www.ppc.go.jp/",
+      "status": "未取得・要確認"
+    },
+    {
+      "name": "厚生労働省",
+      "url": "https://www.mhlw.go.jp/",
+      "status": "未取得・要確認"
+    },
+    {
+      "name": "ベネシード公式規約",
+      "url": null,
+      "status": "代表から正規の最新版提供が必要"
+    }
+  ],
+  "recorded_research": []
+}
