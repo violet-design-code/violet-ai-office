@@ -144,6 +144,8 @@ class Store:
                 cap = self.db.execute('SELECT limit_microusd FROM office_budgets WHERE month=?',(office_month,)).fetchone()
                 monthly_reserved = self.db.execute('SELECT COALESCE(SUM(amount),0) FROM office_month_reservations WHERE month=?',(office_month,)).fetchone()[0]
                 accounted = self.db.execute("SELECT COALESCE(SUM(amount),0) FROM office_costs WHERE substr(incurred_date,1,7)=? AND mode='manual'",(office_month,)).fetchone()[0]
+                if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='lp_calls'").fetchone():
+                    monthly_reserved+=self.db.execute("SELECT COALESCE(SUM(reserved_microusd),0) FROM lp_calls WHERE month=? AND provider='openai' AND state IN ('running','unknown')",(office_month,)).fetchone()[0]
                 if reserve_microusd > 0 and monthly_reserved + accounted + reserve_microusd > (cap[0] if cap else 0):
                     raise ValueError('Monthly budget exceeded')
             run = uuid4().hex
@@ -211,6 +213,8 @@ class Store:
             row = self.db.execute('SELECT a.*, t.status FROM artifacts a JOIN tasks t ON t.id=a.task_id WHERE a.id=?', (artifact,)).fetchone()
             if not row or row['status'] != 'review_pending' or reviewer != self.agents[row['author']]['reviewer']:
                 raise ValueError('Independent assigned reviewer required')
+            from .llm_pilot import core_guard
+            core_guard(self,row['task_id'],decision=True)
             from .business_foundation import guard_reviewer
             guard_reviewer(self,row['task_id'],reviewer)
             self.db.execute('INSERT INTO reviews VALUES (?,?,?,?,?)', (uuid4().hex,artifact,reviewer,verdict,note))
@@ -228,6 +232,8 @@ class Store:
             row = self.db.execute('SELECT a.task_id,t.status FROM artifacts a JOIN tasks t ON t.id=a.task_id WHERE a.id=?', (artifact,)).fetchone()
             if not row or row['status'] != 'approval_pending':
                 raise ValueError('Reviewed artifact required')
+            from .llm_pilot import core_guard
+            core_guard(self,row['task_id'],decision=True)
             if decision == 'approve' and self.db.execute(
                 "SELECT 1 FROM dependencies d JOIN tasks t ON t.id=d.prerequisite WHERE d.task_id=? AND t.status NOT IN ('completed','approval_pending','manual_execution_pending') LIMIT 1",
                 (row['task_id'],)).fetchone():

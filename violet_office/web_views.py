@@ -40,14 +40,14 @@ def card(title,value,note=''):
 
 
 def layout(title,body,session=None,path=''):
-    nav=[('/schedule','スケジュール管理'),('/business-management','事業管理'),('/ai-management','AI社員管理'),('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理'),('/businesses','複数事業'),('/business-reports','経営会議'),('/development','新規事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営'),('/business-foundation','事業基盤'),('/customer-journey','事業別案内・導線'),('/ai-workflow','AI業務・引き継ぎ'),('/business-readiness','事業・担当の完成準備')]
+    nav=[('/llm-pilot','生成AI下書き試験'),('/schedule','スケジュール管理'),('/business-management','事業管理'),('/ai-management','AI社員管理'),('/','社長室'),('/employees','AI社員28人'),('/instructions','統括へ指示'),('/approvals','承認センター'),('/analytics','集客・営業'),('/costs','AI経費'),('/monitor','システム監視'),('/growth','目標・定期業務'),('/reports','業務レポート'),('/learning','知識・改善'),('/selection','評価・選抜'),('/seminar-admin','セミナー管理'),('/businesses','複数事業'),('/business-reports','経営会議'),('/development','新規事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営'),('/business-foundation','事業基盤'),('/customer-journey','事業別案内・導線'),('/ai-workflow','AI業務・引き継ぎ'),('/business-readiness','事業・担当の完成準備')]
     if session and session.get('role')=='participant': nav=[('/seminars','初回登録・セミナー'),('/seminar-participation','申込・参加希望') ]
     if session and session.get('role')=='business_operator': nav=[('/businesses','担当事業'),('/development','事業開発'),('/sales','営業・顧客管理'),('/sales-dashboard','営業実績'),('/workflow','業務・営業支援'),('/seminar-office','セミナー運営'),('/business-foundation','事業基盤'),('/customer-journey','事業別案内・導線'),('/ai-workflow','AI業務・引き継ぎ'),('/business-readiness','事業・担当の完成準備')]
     navigation='<nav>'+''.join(f'<a href="{url}"'+(' aria-current="page"' if path==url else '')+'>'+name+'</a>' for url,name in nav)+'</nav>' if session and session.get('username') else ''
     logout=''
     if session and session.get('username'):
         logout=f'<div>{e(session["username"])} / {e("代表" if session["role"]=="representative" else "参加者" if session["role"]=="participant" else "事業担当" if session["role"]=="business_operator" else "閲覧者")}<form method="post" action="/logout">'+fields({'csrf':session['csrf']})+'<button class="secondary">ログアウト</button></form></div>'
-    return '<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+e(title)+' | VIOLET AI OFFICE</title><link rel="stylesheet" href="/assets/office.css"></head><body><header><div class="brand">VIOLET AI OFFICE<small>バイオレット ｜ AI社長室</small></div>'+logout+'</header>'+navigation+'<main><h1>'+e(title)+'</h1>'+body+'</main><footer class="footer">ローカル専用 · 外部送信なし · 有料API未接続 · 時刻は日本時間</footer></body></html>'
+    return '<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+e(title)+' | VIOLET AI OFFICE</title><link rel="stylesheet" href="/assets/office.css"></head><body><header><div class="brand">VIOLET AI OFFICE<small>バイオレット ｜ AI社長室</small></div>'+logout+'</header>'+navigation+'<main><h1>'+e(title)+'</h1>'+body+'</main><footer class="footer">ローカル専用 · 投稿・配信なし · モデルAPIは個別許可制 · 時刻は日本時間</footer></body></html>'
 
 
 def login(session,message=''):
@@ -165,6 +165,7 @@ def decisions(session,action,ref):
 
 def approvals(office,session,campaign=None):
     body='<div class="notice">承認だけでは送信・公開・実予約確定しません。外部実行はすべて未接続。自動チェックは法令適合を保証しません。原稿承認には全確認項目の根拠記録が必要です。</div>'
+    body+='<p><a href="/llm-pilot">事業別の生成AI下書き・AI01報告・代表承認を確認</a></p>'
     query='SELECT * FROM content_versions WHERE status!=\'superseded\''
     rows=office.db.execute(query+(' AND campaign_id=?' if campaign else '')+' ORDER BY rowid DESC', (campaign,) if campaign else ()).fetchall()
     reports=office.db.execute("SELECT COUNT(*) FROM growth_runs WHERE status='succeeded_local' AND decision='approval_pending'").fetchone()[0]
@@ -223,7 +224,7 @@ def analytics(office,session):
 def costs(office,session):
     data=office.costs()
     month=now().astimezone(JST).strftime('%Y-%m')
-    body='<div class="notice">有料API未接続。請求自動取得は未計測です。以下は手動記帳・モック・タスク費用予約を分離した管理です。通貨はUSD。入力しても支払いは発生しません。</div>'
+    body='<div class="notice">モデルAPIは個別許可制。請求自動取得は未計測です。以下は使用量由来の推定・手動記帳・モック・タスク費用予約を分離した管理です。通貨はUSD。入力しても支払いは発生しません。</div>'
     budget_rows=[]
     for r in data['budgets']:
         accounted=sum(c['amount'] for c in data['entries'] if c['mode']=='manual' and c['incurred_date'].startswith(r['month']))
@@ -242,7 +243,9 @@ def costs(office,session):
 def monitor(office,session):
     db=office.db
     okay=db.execute('PRAGMA quick_check').fetchone()[0]=='ok'
-    services=[['LINE API','未接続'],['既存LINE7日間配信','別リポジトリ・未接続・未検証'],['予約サービス','未選定・モックのみ'],['Instagram / Facebook','未接続'],['AIモデルAPI','未接続'],['SQLite','正常（quick_check）' if okay else '要確認'],['Webhook','本番入口なし・署名検証はモック試験済み']]
+    llm_last=db.execute("SELECT MAX(finished_at) FROM lp_calls WHERE provider='openai' AND state='succeeded'").fetchone()[0]
+    llm_state='実API応答の保存記録あり（現在の疎通は未検証）' if llm_last else '未接続・実API検証なし（モックは別記録）'
+    services=[['LINE API','未接続'],['既存LINE7日間配信','別リポジトリ・未接続・未検証'],['予約サービス','未選定・モックのみ'],['Instagram / Facebook','未接続'],['AIモデルAPI',llm_state],['SQLite','正常（quick_check）' if okay else '要確認'],['Webhook','本番入口なし・署名検証はモック試験済み']]
     from .validation import saved_assessment
     readiness=saved_assessment()
     body='<div class="notice">本番移行不可。外部接続・実LINE回帰・セキュリティ確認・代表承認が未完了です。</div>'+table(['対象','状態'],[[e(k),e(v)] for k,v in services])
@@ -257,7 +260,7 @@ def monitor(office,session):
     webhook_last=db.execute('SELECT MAX(processed_at) FROM ix_webhooks').fetchone()[0]
     rejected=db.execute("SELECT COUNT(*) FROM ix_audit WHERE event='webhook_rejected'").fetchone()[0]
     body+='<h2>Webhookモック処理</h2>'+table(['受理済みイベント','拒否記録','最終受理'],[[e(webhook_count),e(rejected),dt(webhook_last) if webhook_last else '未実行']])
-    body+='<h2>最終正常処理</h2>'+table(['範囲','日時（日本時間）'],[['ローカル成果物保存',dt(success) if success else '未実行'],['モックAPI成功',dt(mock_success) if mock_success else '未実行'],['本番API成功','未接続・未計測']])
+    body+='<h2>最終正常処理</h2>'+table(['範囲','日時（日本時間）'],[['ローカル成果物保存',dt(success) if success else '未実行'],['モックAPI成功',dt(mock_success) if mock_success else '未実行'],['モデルAPI応答記録',dt(llm_last) if llm_last else '未接続・未計測'],['投稿/送信API成功','未接続・未計測']])
     errors=[dict(r) for r in db.execute("SELECT task_id,error_code,deadline FROM runs WHERE error_code IS NOT NULL ORDER BY rowid DESC")]
     body+='<h2>エラー履歴</h2>'+table(['タスク','コード','期限（日本時間）'],[[e(r['task_id']),e(r['error_code']),dt(r['deadline'])] for r in errors])
     body+='<h2>モックAPIエラー</h2>'+table(['操作','結果','コード'],[[e(r[0]),e(r[1]),e(r[2])] for r in db.execute("SELECT operation_id,outcome,code FROM ix_attempts WHERE outcome!='success'")])

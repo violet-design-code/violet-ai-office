@@ -47,6 +47,8 @@ def eligible(store,business,candidates):
 
 
 def guard_task(store,task):
+    from .llm_pilot import core_guard
+    core_guard(store,task)
     from .workflow_collaboration import guard_task as guard_collaboration
     guard_collaboration(store,task)
     if not store.db.execute("SELECT 1 FROM sqlite_master WHERE name='portfolio_tasks'").fetchone(): return

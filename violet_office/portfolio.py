@@ -429,6 +429,10 @@ class Portfolio:
         data['profit_margin_percent']=round(data['profit_yen']/data['revenue_yen']*100,2) if data['profit_yen'] is not None and data['revenue_yen'] else None
         # USD is never silently added to JPY profit. No exchange rate is invented.
         data['api_microusd']={kind:self.db.execute("SELECT SUM(c.amount) FROM portfolio_cost_links l JOIN office_costs c ON c.id=l.cost_id WHERE l.business_id=? AND c.incurred_date>=? AND c.incurred_date<? AND c.kind=? AND c.mode='manual'",(business,start,end,kind)).fetchone()[0] for kind in ('confirmed','estimated')}
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE name='lp_calls'").fetchone():
+            for cost_kind in ('confirmed','estimated'):
+                extra=self.db.execute("SELECT SUM(c.amount) FROM lp_calls l JOIN lp_jobs j ON j.id=l.job_id JOIN office_costs c ON c.id=l.office_cost WHERE j.business_id=? AND c.incurred_date>=? AND c.incurred_date<? AND c.kind=? AND c.mode='manual' AND NOT EXISTS(SELECT 1 FROM portfolio_cost_links old WHERE old.cost_id=c.id)",(business,start,end,cost_kind)).fetchone()[0]
+                if extra is not None:data['api_microusd'][cost_kind]=(data['api_microusd'][cost_kind] or 0)+extra
         lower=datetime.combine(a,datetime.min.time(),JST).astimezone(timezone.utc).isoformat()
         upper=datetime.combine(b,datetime.min.time(),JST).astimezone(timezone.utc).isoformat()
         data['local_processing_seconds']=self.db.execute('SELECT SUM(elapsed_seconds) FROM portfolio_results WHERE business_id=? AND created_at>=? AND created_at<?',(business,lower,upper)).fetchone()[0]
@@ -537,4 +541,7 @@ def guard_claim(store,task,reserve):
     limit=cap[0] if cap else 0
     used=db.execute("SELECT COALESCE(SUM(c.amount),0) FROM portfolio_cost_links l JOIN office_costs c ON c.id=l.cost_id WHERE l.business_id=? AND substr(c.incurred_date,1,7)=? AND c.mode='manual'",(business,month)).fetchone()[0]
     held=db.execute("SELECT COALESCE(SUM(COALESCE(r.actual,r.reserved)),0) FROM reservations r JOIN runs u ON u.id=r.run_id JOIN portfolio_tasks p ON p.task_id=u.task_id JOIN office_month_reservations m ON m.run_id=u.id WHERE p.business_id=? AND m.month=?",(business,month)).fetchone()[0]
+    if db.execute("SELECT 1 FROM sqlite_master WHERE name='lp_calls'").fetchone():
+        held+=db.execute("SELECT COALESCE(SUM(c.reserved_microusd),0) FROM lp_calls c JOIN lp_jobs j ON j.id=c.job_id WHERE j.business_id=? AND c.month=? AND c.provider='openai' AND c.state IN ('running','unknown')",(business,month)).fetchone()[0]
+        used+=db.execute("SELECT COALESCE(SUM(c.amount),0) FROM lp_calls l JOIN lp_jobs j ON j.id=l.job_id JOIN office_costs c ON c.id=l.office_cost WHERE j.business_id=? AND c.mode='manual' AND substr(c.incurred_date,1,7)=? AND NOT EXISTS(SELECT 1 FROM portfolio_cost_links old WHERE old.cost_id=c.id)",(business,month)).fetchone()[0]
     if reserve+used+held>limit or used+held>=limit and used+held>0: raise ValueError('Business API budget reached')

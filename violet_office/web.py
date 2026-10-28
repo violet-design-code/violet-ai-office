@@ -27,6 +27,7 @@ from . import seminar_support_views
 from . import business_foundation_views
 from . import customer_journey_views
 from . import workflow_collaboration_views
+from . import llm_views
 from . import schedule_views
 from . import business_management_views
 from . import business_readiness_views
@@ -129,6 +130,11 @@ class OfficeApp:
                 if path=='/business-photo-upload':
                     result=office.commands(session,data.pop('nonce',''),'portfolio_photo',{k:v for k,v in data.items() if k!='csrf'})
                     return self.response(303,extra={'Location':result})
+                if path=='/llm-pilot-action':
+                    from .llm_provider import ModelError
+                    try:result=llm_views.action(office,session,data)
+                    except ModelError:return self.response(400,'モデル名・価格・実行許可などの設定が未完了です。秘密値を表示せず停止しました。')
+                    return self.response(303,extra={'Location':result})
                 if path=='/schedule-action':
                     from .integrations.adapters import Principal
                     if data.get('action')=='calendar':
@@ -164,7 +170,7 @@ class OfficeApp:
                 return self.response(303,extra={'Location':'/login'})
             if session['role']=='participant' and path not in ('/seminars','/seminar-participation'):
                 return self.response(303,extra={'Location':'/seminars'})
-            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis','/customer-journey','/ai-workflow','/ai-workflow-data','/business-readiness','/business-readiness-data','/business-management','/ai-management'):
+            if session['role']=='business_operator' and path not in ('/businesses','/business','/business-photo','/development','/development-idea','/sales','/sales-deal','/sales-dashboard','/workflow','/seminar-office','/business-foundation','/business-operations-data','/business-task-kpis','/customer-journey','/ai-workflow','/ai-workflow-data','/business-readiness','/business-readiness-data','/business-management','/ai-management','/llm-pilot'):
                 return self.response(303,extra={'Location':'/businesses'})
             params=parse_qs(parsed.query,max_num_fields=10)
             if any(len(v)!=1 for v in params.values()):
@@ -198,6 +204,7 @@ class OfficeApp:
             if path=='/schedule':
                 return self.schedule_response(views.layout('スケジュール管理',schedule_views.home(office,session,params),session,path))
             pages={
+                '/llm-pilot':('生成AI・Instagram下書き試験',lambda:llm_views.home(office,session,params)),
                 '/business-management':('事業管理',lambda:business_management_views.home(office,session,params)),
                 '/ai-management':('AI社員管理',lambda:business_management_views.employees(office,session,params)),
                 '/business-foundation':('事業拡張の基盤設定',lambda:business_foundation_views.home(office,session,params)),
@@ -342,6 +349,9 @@ def main():
     path=Path(args.db)
     if args.command=='serve' and not path.is_file():
         parser.error('先にinitで代表アカウントを作成してください')
+    from .llm_pilot import backup_before_start
+    try:backup_before_start(path)
+    except Exception:parser.error('起動前バックアップに失敗しました。既存DBを変更せず停止します。保存先と空き容量を確認してください')
     path.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
     store=Store(path)
     try:

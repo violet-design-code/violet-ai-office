@@ -266,6 +266,21 @@ REQUIRED_TESTS.update({
     )
 })
 
+REQUIRED_TESTS.update({
+    'tests.test_llm_pilot.PilotTests.'+name for name in (
+        'test_28_definitions_business_data_and_customer_preserved',
+        'test_exact_four_stages_only_three_employees',
+        'test_missing_assignment_does_not_create_job_or_grant_rights',
+        'test_cross_business_id_cannot_access_existing_job',
+        'test_live_disabled_without_network_even_if_key_present',
+        'test_missing_or_zero_budget_blocks_before_provider',
+        'test_unknown_result_never_retried_and_budget_remains_held',
+        'test_representative_approval_records_existing_approval_and_no_send',
+        'test_migration_backup_exists_and_migration_repeats',
+        'test_core_controls_cannot_bypass_scoped_pilot',
+    )
+})
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -310,7 +325,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('schedule-validation.json','phase20-validation.json','phase19-validation.json','phase18-validation.json','phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('llm-pilot-validation.json','schedule-validation.json','phase20-validation.json','phase19-validation.json','phase18-validation.json','phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

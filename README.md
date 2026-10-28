@@ -139,3 +139,9 @@ python3 -m violet_office.growth_cli tick
 メニュー「スケジュール管理」(`/schedule`) に、本人の予定登録・確認・変更・論理キャンセル、日本語指示の候補確認、空き時間検索を追加しました。担当は既存AI23、統括候補はAI01で、28人の定義は維持しています。前日21時・60分前の処理は初期停止の**ローカルモック**です。実iPhone通知・Google同期・実音声の動作は未検証です。
 
 [初心者向け起動・操作手順](docs/schedule-user-guide.md) / [設計・変更ファイル・未接続事項](docs/schedule-design.md) / [テスト](reports/schedule-validation.json) / [画面検証](reports/schedule-browser.json)。経理自動化にはまだ着手していません。
+
+### 生成AI連携・第1弾：Instagram下書き試験
+
+「生成AI下書き試験」(`/llm-pilot`) で既存事業を選び、AI01→AI07→AI09→AI01の4工程を保存できます。3人の既存事業担当権限が必須で、自動付与しません。既定はモック、実API用コードは環境設定・全体/事業予算・代表の個別許可と実行操作が必要です。今回は実API・課金・投稿・配信を行っていません。
+
+[バックアップ・操作・必要設定・制限](docs/llm-pilot.md) / [自動テスト](reports/llm-pilot-validation.json) / [画面確認](reports/llm-pilot-browser.json)。下書き承認後も公開・送信しません。Windows側の正しい事業DBが未確認の場合は、データ調査を先に完了してください。
