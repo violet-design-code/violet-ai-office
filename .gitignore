@@ -13,3 +13,6 @@ var/
 *.db-*
 *.sqlite3-*
 *.backup.json
+
+# Local repair trial databases contain operational data.
+/repair-trials/
