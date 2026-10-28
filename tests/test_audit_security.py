@@ -124,7 +124,8 @@ class AuditSecurityTests(unittest.TestCase):
                 self.assertTrue(server._workers.acquire(blocking=False))
             blocked=http.client.HTTPConnection('127.0.0.1',server.server_port,timeout=3)
             blocked.request('GET','/login')
-            with self.assertRaises((http.client.RemoteDisconnected,ConnectionResetError)):
+            # An intentional close can surface as WSAECONNABORTED on Windows.
+            with self.assertRaises((http.client.RemoteDisconnected,ConnectionResetError,ConnectionAbortedError)):
                 blocked.getresponse()
             blocked.close()
             for _ in range(server.max_workers):
