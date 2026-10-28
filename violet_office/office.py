@@ -132,6 +132,9 @@ class Office:
         self.readiness=BusinessReadiness(self)
         from .business_management import migrate as migrate_management
         migrate_management(store)
+        from .schedule import migrate as migrate_schedule,Schedule
+        migrate_schedule(store)
+        self.schedule=Schedule(self)
 
     def audit(self,actor,action,ref=''):
         self.db.execute('INSERT INTO office_audit(actor,action,ref,created_at) VALUES (?,?,?,?)',(actor,action,ref,now().isoformat()))

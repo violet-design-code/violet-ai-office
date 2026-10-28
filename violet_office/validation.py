@@ -31,7 +31,7 @@ REQUIRED_TESTS={
 def source_fingerprint(root=ROOT):
     files=[]
     for directory in ('violet_office','tests','config','scripts','migrations'):
-        files.extend(p for p in (root/directory).rglob('*') if p.is_file() and p.suffix in ('.py','.json','.css','.sh','.bat','.sql'))
+        files.extend(p for p in (root/directory).rglob('*') if p.is_file() and p.suffix in ('.py','.json','.css','.sh','.bat','.sql','.js'))
     aggregate=hashlib.sha256()
     for path in sorted(files):
         aggregate.update(path.relative_to(root).as_posix().encode()+b'\0'+path.read_bytes()+b'\0')
@@ -251,6 +251,21 @@ REQUIRED_TESTS.update({
     )
 })
 
+REQUIRED_TESTS.update({
+    'tests.test_schedule.ScheduleTests.'+name for name in (
+        'test_registry_and_existing_business_rows_unchanged',
+        'test_other_representative_cannot_read_or_modify_event',
+        'test_missing_end_no_false_success',
+        'test_overlap_rejected_across_businesses',
+        'test_daily_jst_21_not_before_and_only_one_digest',
+        'test_hourly_exactly_60_minutes_not_30',
+        'test_parallel_ticks_never_double_process',
+        'test_edit_after_hour_notification_does_not_send_twice',
+        'test_cancel_before_due_prevents_reminder',
+        'test_restore_keeps_calendar_but_stops_notifications',
+    )
+})
+
 def dependency_inventory():
     external=set()
     for path in (ROOT/'violet_office').rglob('*.py'):
@@ -295,7 +310,7 @@ def assess(evidence=None):
 
 def saved_assessment():
     try:
-        report=next((ROOT/'reports'/name for name in ('phase20-validation.json','phase19-validation.json','phase18-validation.json','phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
+        report=next((ROOT/'reports'/name for name in ('schedule-validation.json','phase20-validation.json','phase19-validation.json','phase18-validation.json','phase17-validation.json','phase16-validation.json','phase15-validation.json','phase14-validation.json','phase13-validation.json','phase12-validation.json','phase11-validation.json','phase10-validation.json','phase9-validation.json','phase8-validation.json','phase7-validation.json','phase6-validation.json') if (ROOT/'reports'/name).is_file()),ROOT/'reports'/'missing.json')
         evidence=json.loads(report.read_text())
         return assess(evidence)
     except (OSError,ValueError,TypeError,KeyError):

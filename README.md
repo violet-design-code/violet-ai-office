@@ -133,3 +133,9 @@ python3 -m violet_office.growth_cli tick
 「事業管理」(`/business-management`) から「＋ 新規事業を追加」、編集・停止・再開、事業・対象月別の目標設定ができます。「AI社員管理」(`/ai-management`) は既存28人の担当・兼務・解除を扱います。設定変更は確認→代表承認→別適用。責任者の選択で権限は増えません。目標空欄は未設定で実績に加算しません。
 
 [操作・移行・PC/iPhone共通構成と未対応事項](docs/phase-20.md) / [自動テスト結果](reports/phase20-validation.json) / [画面検証](reports/phase20-browser.json)。現行はローカル専用でiPhone実接続・外部公開・実送信は未実施です。
+
+### 追加機能：代表専用スケジュール管理
+
+メニュー「スケジュール管理」(`/schedule`) に、本人の予定登録・確認・変更・論理キャンセル、日本語指示の候補確認、空き時間検索を追加しました。担当は既存AI23、統括候補はAI01で、28人の定義は維持しています。前日21時・60分前の処理は初期停止の**ローカルモック**です。実iPhone通知・Google同期・実音声の動作は未検証です。
+
+[初心者向け起動・操作手順](docs/schedule-user-guide.md) / [設計・変更ファイル・未接続事項](docs/schedule-design.md) / [テスト](reports/schedule-validation.json) / [画面検証](reports/schedule-browser.json)。経理自動化にはまだ着手していません。

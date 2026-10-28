@@ -1,0 +1,278 @@
+{
+  "date_jst": "2026-10-28",
+  "new_schedule": {
+    "mode": "synthetic_temporary_database",
+    "checks": [
+      {
+        "width": 1440,
+        "check": "voice-candidate-mocked",
+        "state": "passed"
+      },
+      {
+        "width": 1440,
+        "check": "saved-and-spoken-mocked",
+        "state": "passed"
+      },
+      {
+        "width": 1440,
+        "check": "updated",
+        "state": "passed"
+      },
+      {
+        "width": 1440,
+        "check": "settings-mock-only",
+        "state": "passed"
+      },
+      {
+        "width": 1440,
+        "check": "cancelled",
+        "state": "passed"
+      },
+      {
+        "width": 390,
+        "check": "voice-candidate-mocked",
+        "state": "passed"
+      },
+      {
+        "width": 390,
+        "check": "saved-and-spoken-mocked",
+        "state": "passed"
+      },
+      {
+        "width": 390,
+        "check": "updated",
+        "state": "passed"
+      },
+      {
+        "width": 390,
+        "check": "settings-mock-only",
+        "state": "passed"
+      },
+      {
+        "width": 390,
+        "check": "cancelled",
+        "state": "passed"
+      }
+    ],
+    "voice_api_logic": "explicit_browser_mock",
+    "actual_browser_voice_status": "端末内の日本語認識は未対応・未準備です。文字入力をご利用ください。外部認識へは切り替えません。",
+    "actual_microphone_audio": "not_tested",
+    "actual_audio_output": "not_tested",
+    "real_iphone": "not_tested",
+    "actual_external_notifications": false
+  },
+  "existing_regressions": [
+    {
+      "phase": 9,
+      "mode": "synthetic_temporary_database",
+      "owner_identity_account_creation": "passed",
+      "initial_registration_manual_approval": "passed",
+      "participant_response_changes": "passed",
+      "representative_counts_history": "passed",
+      "three_day_preparation_approval_no_dispatch": "passed",
+      "selection_override": "passed",
+      "desktop_routes": 5,
+      "mobile_routes": 5,
+      "participant_desktop_mobile": "passed",
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested",
+      "production_started": false
+    },
+    {
+      "phase": 10,
+      "mode": "synthetic_temporary_database",
+      "initial_businesses": 6,
+      "contact_consent_inquiry_estimate_approval_pending": "passed",
+      "private_photo_multipart_upload_download": "passed",
+      "scoped_tasks_and_revenue_expense_records": "passed",
+      "meeting_report": "approval_pending",
+      "operator_cross_business_access": "denied",
+      "desktop_routes": 5,
+      "mobile_routes": 5,
+      "external_browser_requests": "blocked",
+      "actual_external_services": [],
+      "real_iphone": "not_tested"
+    },
+    {
+      "phase": 11,
+      "mode": "synthetic_temporary_database",
+      "idea_creation": "passed",
+      "explicit_assumption_simulation": "passed",
+      "proposal_approval_before_tasks": "passed",
+      "internal_plan_only": "passed",
+      "comparison_missing_data_unranked": "passed",
+      "actuals_separated_from_mock_forecast": "passed",
+      "cross_business_access": "denied",
+      "desktop_routes": 5,
+      "mobile_routes": 5,
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested"
+    },
+    {
+      "phase": 12,
+      "mode": "synthetic_temporary_database",
+      "customer_consent_deal": "passed",
+      "unknown_tax_blocks_approval": "passed",
+      "tax_settings_quote_revision_approval": "passed",
+      "ai_template_not_actual_send": "passed",
+      "approval_no_automatic_execution": "passed",
+      "mock_send_only": "passed",
+      "cross_business_access": "denied",
+      "desktop_routes": 7,
+      "mobile_routes": 7,
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested"
+    },
+    {
+      "phase": 13,
+      "mode": "synthetic_temporary_database",
+      "attach_and_manual_progress": "passed",
+      "assignment_pause_resume_local_template": "passed",
+      "representative_approval_no_execution": "passed",
+      "seminar_queue_and_decline_invalidation": "passed",
+      "cross_business_access": "denied",
+      "desktop_routes": 7,
+      "mobile_routes": 7,
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested",
+      "actual_external_services": [],
+      "production_started": false
+    },
+    {
+      "phase": 14,
+      "mode": "synthetic_temporary_database",
+      "manual_seminar_registration_calendar": "passed",
+      "participant_application_interests_purpose_consents": "passed",
+      "interview_request_no_booking": "passed",
+      "representative_approval_no_send": "passed",
+      "mock_once": "passed",
+      "local_role_work": "passed",
+      "cancellation": "passed",
+      "cross_business_access": "denied",
+      "participant_pii_to_staff": "denied",
+      "desktop_routes": 7,
+      "mobile_routes": 7,
+      "participant_mobile": "passed",
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested",
+      "actual_external_services": [],
+      "production_started": false
+    },
+    {
+      "phase": 15,
+      "mode": "synthetic_temporary_database",
+      "business_registration_update_disable_enable": "passed",
+      "authenticated_assignment_api": "passed",
+      "no_phase20_allocation_console": "passed",
+      "scoped_ai_metadata": "passed",
+      "human_scope_and_owner_only_settings": "passed",
+      "desktop_routes": 7,
+      "mobile_routes": 7,
+      "external_browser_requests": "blocked",
+      "actual_external_services": [],
+      "real_iphone": "not_tested",
+      "production_started": false
+    },
+    {
+      "phase": 16,
+      "mode": "synthetic_temporary_database_not_real_transactions",
+      "existing_business_ui_period_filter": "passed",
+      "custom_kpi_rule_target_achievement": "passed",
+      "selected_profit_and_global_same_basis_totals": "passed",
+      "global_pii": "not_exposed",
+      "authenticated_task_bound_kpi_api": "passed",
+      "agent_spoofing": "rejected",
+      "human_acl_and_owner_only_settings": "passed",
+      "desktop_routes": 7,
+      "mobile_routes": 7,
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested",
+      "actual_external_services": [],
+      "production_started": false
+    },
+    {
+      "phase": 17,
+      "mode": "synthetic_temporary_database",
+      "assisted_interest_intake": "passed",
+      "purpose_specific_consent_forms": "passed",
+      "existing_three_role_routing": "passed",
+      "local_template_and_provenance": "passed",
+      "interview_candidate_no_confirmation": "passed",
+      "profile_revision_reapproval": "passed",
+      "human_business_acl": "passed",
+      "desktop_routes": 7,
+      "mobile_routes": 7,
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested",
+      "actual_external_services": [],
+      "production_started": false
+    },
+    {
+      "phase": 18,
+      "mode": "synthetic_temporary_database",
+      "job_submission_and_role_routing": "passed",
+      "same_business_handoff": "passed",
+      "local_template_only": "passed",
+      "representative_approval_before_internal_scope_apply": "passed",
+      "external_approval_no_execution": "passed",
+      "28_existing_employee_read_api": "passed",
+      "no_customer_pii_in_work_api": "passed",
+      "human_acl": "passed",
+      "desktop_routes": 7,
+      "mobile_routes": 7,
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested",
+      "actual_external_services": [],
+      "production_started": false
+    },
+    {
+      "phase": 19,
+      "mode": "synthetic_temporary_database",
+      "stateless_preview": "passed",
+      "representative_review_then_separate_apply": "passed",
+      "business_creation_list_reflection": "passed",
+      "business_pause_reactivate": "passed",
+      "one_employee_two_businesses": "passed",
+      "release_is_logical_and_scoped": "passed",
+      "28_existing_employee_api": "passed",
+      "owner_only_mutations": "passed",
+      "final_phase20_editors": "not_implemented_by_design",
+      "desktop_routes": 7,
+      "mobile_routes": 7,
+      "external_browser_requests": "blocked",
+      "real_iphone": "not_tested",
+      "actual_external_services": [],
+      "production_started": false
+    }
+  ],
+  "office_regression": {
+    "login": "passed",
+    "browser_form_operations": [
+      "task_assignment",
+      "manual_start",
+      "pause",
+      "content_rejection"
+    ],
+    "learning_forms": "passed",
+    "learning_data": "synthetic_temporary_database",
+    "growth_forms": "passed",
+    "desktop_pages": 11,
+    "mobile_pages_without_horizontal_overflow": 11,
+    "external_browser_requests": "blocked",
+    "screenshots": [
+      "/tmp/schedule-regression-smoke/desktop.png",
+      "/tmp/schedule-regression-smoke/mobile.png"
+    ]
+  },
+  "phase20_regression": {
+    "passed": 16,
+    "failed": 0,
+    "real_iphone_tested": false
+  },
+  "render_checks": {
+    "new_schedule": 10,
+    "existing": 180
+  },
+  "actual_external_notifications": false,
+  "production_started": false
+}

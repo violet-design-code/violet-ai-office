@@ -13,7 +13,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit, parse_qs
 
-from .store import Store
+from .store import Store,now
 from .office import Office
 from . import web_views as views
 from . import growth_views
@@ -27,6 +27,7 @@ from . import seminar_support_views
 from . import business_foundation_views
 from . import customer_journey_views
 from . import workflow_collaboration_views
+from . import schedule_views
 from . import business_management_views
 from . import business_readiness_views
 
@@ -50,6 +51,12 @@ class OfficeApp:
     def response(self,status,body='',extra=None,content_type='text/html; charset=utf-8'):
         raw=body.encode() if isinstance(body,str) else body
         return status,{**SECURITY,'Content-Type':content_type,**(extra or {})},raw
+
+    def schedule_response(self,body):
+        result=self.response(200,body)
+        result[1]['Content-Security-Policy']=SECURITY['Content-Security-Policy'].replace("script-src 'none'", "script-src 'self'")
+        result[1]['Permissions-Policy']='camera=(), microphone=(self), geolocation=()'
+        return result
 
     @staticmethod
     def cookie(token,clear=False):
@@ -76,6 +83,8 @@ class OfficeApp:
         if parsed.scheme or parsed.netloc:
             return self.response(400,'入力を確認してください。')
         path=parsed.path
+        if method=='GET' and path=='/assets/schedule.js':
+            return self.response(200,Path(__file__).with_name('web_assets').joinpath('schedule.js').read_bytes(),content_type='text/javascript; charset=utf-8')
         if method=='GET' and path=='/assets/office.css':
             css=Path(__file__).with_name('web_assets').joinpath('office.css').read_bytes()
             return self.response(200,css,content_type='text/css; charset=utf-8')
@@ -120,6 +129,16 @@ class OfficeApp:
                 if path=='/business-photo-upload':
                     result=office.commands(session,data.pop('nonce',''),'portfolio_photo',{k:v for k,v in data.items() if k!='csrf'})
                     return self.response(303,extra={'Location':result})
+                if path=='/schedule-action':
+                    from .integrations.adapters import Principal
+                    if data.get('action')=='calendar':
+                        from .schedule_calendar import export
+                        from datetime import timedelta
+                        current=now()
+                        blob=export(office.schedule,Principal(session['role'],session['username']),data.get('checked')=='1',current,current+timedelta(days=31))
+                        return self.response(200,blob,{'Content-Disposition':'attachment; filename="violet-private-schedule.ics"'},content_type='text/calendar; charset=utf-8')
+                    result=schedule_views.action(office,session,data)
+                    return self.schedule_response(views.layout('スケジュール管理',schedule_views.home(office,session,{},result),session))
                 if path=='/business-management-confirm':
                     result=business_management_views.confirm(office,session,data)
                     return self.response(200,views.layout('保存前の確認',result,session))
@@ -176,6 +195,8 @@ class OfficeApp:
                 from .integrations.adapters import Principal
                 mime,blob=office.portfolio.photo_bytes(Principal(session['role'],session['username']),params.get('business',[''])[0],ref)
                 return self.response(200,blob,{'Content-Disposition':'attachment; filename="photo.'+('png' if mime=='image/png' else 'jpg')+'"'},content_type=mime)
+            if path=='/schedule':
+                return self.schedule_response(views.layout('スケジュール管理',schedule_views.home(office,session,params),session,path))
             pages={
                 '/business-management':('事業管理',lambda:business_management_views.home(office,session,params)),
                 '/ai-management':('AI社員管理',lambda:business_management_views.employees(office,session,params)),
@@ -354,11 +375,14 @@ def main():
     if args.open_browser:
         import threading,webbrowser
         threading.Timer(0.3,lambda:webbrowser.open(f'http://127.0.0.1:{args.port}')).start()
+    from .schedule_worker import start as start_schedule_worker
+    schedule_stop,schedule_thread=start_schedule_worker(path)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
+        schedule_stop.set();schedule_thread.join(timeout=5)
         server.server_close()
 
 
