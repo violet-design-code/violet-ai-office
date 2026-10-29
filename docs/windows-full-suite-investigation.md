@@ -6,7 +6,7 @@
 
 ## 確認した事実と未確定事項
 
-Windows Python3.12の報告は925件（成功916、失敗1、エラー7、skip1）。関連83件単独は成功。7件の詳細Tracebackは未入手であり、7件のすべてを原因特定/修正済みとは判定しない。今回の実行環境はLinux Python3.12で、Windows実機では未実行。
+Windows Python3.12の報告は925件（成功916、失敗1、エラー7、skip1）。関連83件単独は成功。初回調査時は7件の詳細Tracebackが未入手だった。添付ログ受領後の照合結果は追補に記す。Windowsで7件のすべてを修正確認済みとは判定しない。今回の実行環境はLinux Python3.12で、Windows実機では未実行。
 
 - 確認済み：発行processの初回登録待ちも通常応答用のtimeout=1秒を使用していた。Windows spawnではPython/テストモジュール/cryptographyの初期化が必要。起動とコマンド応答に同じ短期deadlineを使う問題を、起動遅延を注入した合成テストで検証した。
 - 確認済み：発行者constructorの登録待ち失敗時にprocess/pipeのcleanupがなく、setUp失敗時にtearDownも呼ばれない。残存processが後続テストへ負荷を残す可能性がある。cleanupの欠落自体はコードで確認できるが、報告された6エラーの直接原因かはTraceback未確認。
@@ -53,3 +53,33 @@ Windowsの6件の直接原因とSQLiteの1件の原因は、実機ログ/再実�
 ## 全体実行結果
 
 Linux Python3.12：933件、75.341秒、失敗0・error0・skip0。既存925件を維持し、新規8件を追加した。これはWindows再検証の結果ではない。
+
+
+## 添付925件ログ受領後の追補
+
+受領ログは基点741e26b、925件、1111.290秒、失敗1・error7・skip1。ユーザー名/実パス/HTML内のtokenを含むため、元の添付ファイルはリポジトリへ保存しない。以下はテスト名と発生段階だけを抜き出したもの。
+
+6件すべてが `setUp → SeparatedSupervisor.__init__ → IsolatedIssuer.__init__ → _reply → poll(1)` の初回登録待ちで失敗した。テスト本体の証明/権限assertionに到達した後の失敗ではない。
+
+- test_audit_connections_close_even_when_references_are_retained
+- test_business_isolation_and_normal_authorization
+- test_consumed_proof_is_denied
+- test_issuer_external_termination_keeps_reservation
+- test_private_key_is_not_exported_or_written_to_realm
+- test_review_real_legacy_hmac_proof_is_rejected
+
+したがって前回の起動専用budget・constructor失敗時回収・setUp失敗時cleanupの対策箇所は実Tracebackと一致する。ただし起動遅延の内訳（CPU、暗号初期化、OS/ファイルアクセス等）や、15秒以内になることをWindowsで実測したわけではない。1.2秒の登録遅延を注入すると旧1秒budgetで失敗し、起動15秒/通常応答1秒の分離では成功する回帰を追加した。
+
+SQLiteの1件は `test_pending_approved_revoked_and_duplicate_transitions` の初回enrollで発生。`authority.apply → external domain_update → database` のコンテキスト終了時（contextlibの通常__exit__/next）でUnavailableへ変換されている。BEGIN/登録状態検査よりも、外部DBの確定/終了段階に範囲を絞れる。元のsqlite_errorcode/OS errorは旧コードのfrom Noneによりログに残っていない。COMMITのbusy、journal I/O、close等のどれかは断定できない。OneDrive配下のリポジトリpathだけを根拠に、一時realm DBも同期対象だったとは判定しない。
+
+前回の固定カテゴリに加え、診断へphase（context/open/configure/begin/schema/operation/commit/rollback/close）と数値のsqlite_errorcode/winerror/errnoを追加した。SQL/実パス/例外本文/任意error nameは表示しない。rollback中の失敗はrollbackとして区別する。診断強化は原因特定の補助であり、未確定なI/O問題の修復ではない。
+
+合成SQLiteで外部DBに明示的なreader transactionを保持すると、enrollの外部COMMITが実際にSQLITE_BUSYとなり、元ログと同じ終了段階のUnavailableを再現できた。新診断はmock_authority:sqlite_busy、phase=commit、sqlite_errorcode=5を返し、登録履歴はrollbackされ、FAULTにより以降も拒否する。これは可能な原因を区別する回帰であり、Windowsの実エラーがbusyだった証拠ではない。runtimeのbusy timeout=5秒は変更せず、試験の制御用接続だけ0.05秒で故障を注入した。
+
+セミナー失敗のHTMLは表示月2026-10で予定articleがないことを確認した。月跨ぎの既知原因と整合し、既存の開催月明示修正で対処する。skip1件の対象名/理由はこの添付のエラー抜粋にはないため未確認。
+
+1111秒の全体所要時間だけから、すべてを6回の1秒timeoutやdeadlockに帰属させない。元ログは成功テストごとの時間/CPU/残存process/元SQLite error codeを記録していない。必要なのは修正版でのWindows全体再実行と、残存エラーの新しい診断である。
+
+新規回帰は前回8件＋今回2件＝10件。添付ログの個人情報や本番DBへアクセスするテストは追加しない。
+
+追補の検証結果：Linux Python3.12、関連165件（33.538秒）、全体935件（77.353秒）、いずれも失敗0・error0・skip0。元の925件＋累計回帰10件を維持。Windows実機では未実行で、SQLiteの実障害原因は未確定のまま。

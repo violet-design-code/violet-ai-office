@@ -3,6 +3,7 @@
 The bounded Event waits below inject a slow/unresponsive child deliberately;
 there are no retry loops or sleeps in the implementation.
 """
+from contextlib import closing
 from datetime import date
 import multiprocessing
 import os
@@ -18,6 +19,11 @@ from violet_office.synthetic_recovery import SyntheticRealm, Unavailable
 
 def delayed_issuer(connection, capability, boot):
     threading.Event().wait(0.25)  # Controlled fault: slow interpreter/crypto startup.
+    separated._issuer_process(connection, capability, boot)
+
+
+def one_second_plus_issuer(connection, capability, boot):
+    threading.Event().wait(1.2)  # Reproduce the exact old one-second deadline.
     separated._issuer_process(connection, capability, boot)
 
 
@@ -42,6 +48,14 @@ class WindowsSuiteLifecycleTests(unittest.TestCase):
             self.assertEqual(issuer.timeout,0.01)
         finally: issuer.close()
         self.assertFalse(issuer.process.is_alive())
+
+    def test_reported_one_second_startup_deadline_reproduced(self):
+        with patch.object(separated,'_issuer_process',one_second_plus_issuer):
+            with self.assertRaises(Unavailable):
+                separated.IsolatedIssuer(self.peer(),timeout=1,startup_timeout=1)
+            issuer=separated.IsolatedIssuer(self.peer(),timeout=1,startup_timeout=15)
+        try: self.assertEqual(set(issuer.registration),{'public','key_id','boot'})
+        finally: issuer.close()
 
     def test_startup_timeout_reaps_unresponsive_child(self):
         before={p.pid for p in multiprocessing.active_children()}
@@ -97,6 +111,33 @@ class WindowsSuiteLifecycleTests(unittest.TestCase):
                     with database(realm.context,realm.context.external): pass
             self.assertIn('mock_authority:sqlite_open',str(raised.exception))
             self.assertNotIn('sensitive filename',str(raised.exception))
+        finally: realm.close()
+
+    def test_external_commit_busy_reproduces_reported_exit_stage_and_stays_closed(self):
+        # A genuine SQLite reader lock, NOT evidence that Windows had this lock.
+        from violet_office.synthetic_recovery import Denied
+        realm=SyntheticRealm(); original=sqlite3.connect
+        try:
+            with closing(original(realm.context.external,isolation_level=None)) as reader:
+                reader.execute('BEGIN')
+                with closing(reader.execute('SELECT body FROM journal')) as cursor:
+                    cursor.fetchall()
+                def short_test_lock_wait(*args,**kwargs):
+                    # Shorten only this controlled reproduction; runtime stays 5s.
+                    kwargs['timeout']=0.05
+                    return original(*args,**kwargs)
+                with patch('violet_office.synthetic_recovery.sqlite3.connect',side_effect=short_test_lock_wait):
+                    with self.assertRaises(Unavailable) as raised:
+                        realm.client().enroll(realm.representative_token)
+                message=str(raised.exception)
+                self.assertIn('mock_authority:sqlite_busy',message)
+                self.assertIn('phase=commit',message)
+                self.assertIn('sqlite_errorcode=5',message)
+                reader.execute('ROLLBACK')
+            for path,expected in ((realm.context.local,0),(realm.context.external,1)):
+                with closing(original(path)) as db:
+                    self.assertEqual(db.execute('SELECT count(*) FROM journal').fetchone()[0],expected)
+            with self.assertRaises(Denied): realm.client().status()
         finally: realm.close()
 
     def test_seminar_security_assertions_survive_month_year_and_leap_boundaries(self):

@@ -156,16 +156,21 @@ def create_database(path, local_key=None):
 
 @contextmanager
 def database(ctx, path):
+    phase='context'
     try:
         ctx.validate()
         if path.is_symlink():
             raise Denied('Synthetic database unavailable')
+        phase='open'
         with closing(sqlite3.connect(path.resolve().as_uri()+'?mode=rw', uri=True,
                                      isolation_level=None, timeout=5)) as db:
+            phase='configure'
             db.execute('PRAGMA trusted_schema=OFF')
             db.execute('PRAGMA synchronous=FULL')
+            phase='begin'
             db.execute('BEGIN IMMEDIATE')
             try:
+                phase='schema'
                 objects = db.execute("SELECT type,name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' ORDER BY type,name").fetchall()
                 columns = db.execute('PRAGMA table_info(journal)').fetchall()
                 expected = [('table','authority_checkpoint'),('table','journal')] if path == ctx.local else [('table','journal')]
@@ -173,11 +178,17 @@ def database(ctx, path):
                         != [('sequence','INTEGER',0,1),('body','TEXT',1,0)]
                         or db.execute('PRAGMA integrity_check').fetchall() != [('ok',)]):
                     raise Denied('Synthetic database verification failed')
+                phase='operation'
                 yield db
+                phase='commit'
                 db.execute('COMMIT')
             except BaseException:
+                failed_phase=phase
+                phase='rollback'
                 db.execute('ROLLBACK')
+                phase=failed_phase
                 raise
+            phase='close'
     except Denied:
         raise
     except (sqlite3.Error,OSError,ValueError,TypeError,KeyError,OverflowError,IndexError,AttributeError,RecursionError) as error:
@@ -193,7 +204,14 @@ def database(ctx, path):
         else:
             category='state_format_error'
         role='local_ledger' if path==ctx.local else 'mock_authority'
-        raise Unavailable('Synthetic recovery service unavailable ['+role+':'+category+']') from None
+        # Numeric platform codes are safe; arbitrary error names/text are not.
+        codes=[]
+        for attribute in ('sqlite_errorcode','winerror','errno'):
+            value=getattr(error,attribute,None)
+            if isinstance(value,int) and 0<=value<=2147483647:
+                codes.append(attribute+'='+str(value))
+        detail=';'.join(['phase='+phase,*codes])
+        raise Unavailable('Synthetic recovery service unavailable ['+role+':'+category+';'+detail+']') from None
 
 
 def read_records(db, key):
