@@ -1,4 +1,5 @@
 """Owned synthetic abort tests. NOT Windows job/socket/IPC security guarantees."""
+from contextlib import closing
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 import json
@@ -281,7 +282,9 @@ class SyntheticAbortTests(unittest.TestCase):
         text=canonical(proof)
         self.assertNotIn(self.supervisor._secret,text); self.assertNotIn('HTTP/1.1',text)
         for path in (self.c.context.local,self.c.context.external):
-            with sqlite3.connect(path) as db: rows=str(db.execute('SELECT body FROM journal').fetchall())
+            with closing(sqlite3.connect(path)) as db:
+                with closing(db.execute('SELECT body FROM journal')) as cursor:
+                    rows=str(cursor.fetchall())
             self.assertNotIn(self.supervisor._secret,rows)
             self.assertNotIn('"amount_yen":10',rows)
 

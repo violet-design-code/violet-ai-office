@@ -1,4 +1,5 @@
 """Real Ed25519 + process isolation, MODEL identities/inventory, not Windows proof."""
+from contextlib import closing
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 import json
@@ -295,11 +296,30 @@ class SeparatedAbortTests(unittest.TestCase):
     def test_proof_does_not_contain_payload_or_ipc_secret(self):
         _,proof=self.proof(); self.client.release_abort(proof)
         for path in (self.realm.context.local,self.realm.context.external):
-            with sqlite3.connect(path) as db:
-                text=str(db.execute('SELECT body FROM journal').fetchall())
+            with closing(sqlite3.connect(path)) as db:
+                with closing(db.execute('SELECT body FROM journal')) as cursor:
+                    text=str(cursor.fetchall())
             self.assertNotIn(self.supervisor.issuer._capability,text)
             self.assertNotIn('"amount_yen":10',text)
             self.assertNotIn('HTTP/1.1',text)
+
+    def test_audit_connections_close_even_when_references_are_retained(self):
+        # SQLite's context manager ends a transaction; it does not close the
+        # connection. Retain references so GC cannot conceal a Windows lock.
+        original=sqlite3.connect; retained=[]
+        def connect(*args,**kwargs):
+            db=original(*args,**kwargs)
+            if args and isinstance(args[0],Path): retained.append(db)
+            return db
+        try:
+            with patch.object(sqlite3,'connect',side_effect=connect):
+                self.test_proof_does_not_contain_payload_or_ipc_secret()
+            self.assertEqual(len(retained),2)
+            for db in retained:
+                with self.assertRaises(sqlite3.ProgrammingError): db.execute('SELECT 1')
+        finally:
+            # Test-owned inspection only; never release reservations for cleanup.
+            for db in retained: db.close()
 
     def test_partial_write_buffer_abort_blocks_later_output(self):
         job=self.job('partial_fail')
