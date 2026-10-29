@@ -159,7 +159,8 @@ class OfficeApp:
                 if path=='/business-task-kpis': result=office.business_operations.for_task(actor,params.get('task',[''])[0],start,end)
                 elif params.get('business'): result=office.business_operations.summary(actor,params['business'][0],start,end)
                 else: result=office.business_operations.global_summary(actor,start,end)
-                return self.response(200,json.dumps(result,ensure_ascii=False),content_type='application/json; charset=utf-8')
+                extra={'X-Violet-Data-Contract':'accounting-access-v1'} if path=='/business-task-kpis' else None
+                return self.response(200,json.dumps(result,ensure_ascii=False),extra=extra,content_type='application/json; charset=utf-8')
             if path=='/business-readiness-data':
                 from .integrations.adapters import Principal
                 if set(params)-{'business'}:raise ValueError('Known readiness scope required')

@@ -150,4 +150,11 @@ class BusinessOperations:
             paused=paused or bool(state and state[0])
         if row['status'] in ('paused','rejected','failed') or paused or not ai_allowed(self.store,row['agent'],b,'finance_read') or not ai_allowed(self.store,row['agent'],b,'work'):
             self.audit(p,b,'ai_scope','denied',row['agent'],task); raise PermissionError('Current employee assignment and finance permission required')
-        result=self.summary(p,b,start,end); self.audit(p,b,'task_kpi_read','allowed',row['agent'],task); return {'task_id':task,'agent':row['agent'],'summary':result}
+        from .legacy_accounting import LegacyAccounting
+        try:
+            result=LegacyAccounting(self.o).read(p,task,start,end,require_work=True)
+        except PermissionError:
+            self.audit(p,b,'ai_scope','denied',row['agent'],task)
+            raise
+        self.audit(p,b,'task_kpi_read','allowed',row['agent'],task)
+        return result

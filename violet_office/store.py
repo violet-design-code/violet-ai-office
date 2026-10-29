@@ -166,6 +166,8 @@ class Store:
     def finish(self, run, content):
         def op():
             row = self._active(run)
+            from .legacy_accounting import deny_generic_content
+            deny_generic_content(self,row['task_id'])
             if row['deadline'] <= now().isoformat():
                 raise ValueError('Run expired; expire it before retrying')
             if self.db.execute("SELECT 1 FROM dependencies d JOIN tasks t ON t.id=d.prerequisite WHERE d.task_id=? AND t.status NOT IN ('completed','approval_pending','manual_execution_pending') LIMIT 1",(row['task_id'],)).fetchone():

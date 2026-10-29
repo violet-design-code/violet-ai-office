@@ -1,7 +1,7 @@
 """Design-only legacy bridge prototype. NOT imported by the application.
 
-Tests document the existing exposure and a proposed deny-by-default replacement.
-They do not claim existing HTTP endpoints have been protected.
+Historical prototype checks remain; the original exposure case now verifies the connected fix.
+Actual route and HTTP coverage also lives in test_legacy_accounting_enforcement.py.
 """
 from datetime import timedelta
 import json
@@ -17,7 +17,7 @@ from violet_office.store import now
 ROUTES = ('read_for_ai.finance_read', 'read_for_ai.kpi_read', 'business-task-kpis')
 SECTIONS = {'AI01':'management','AI02':'summary','AI06':'improvement',
             'AI07':'advertising','AI14':'sales','AI15':'terms','AI25':'system',
-            'AI27':'summary','AI28':'audit'}
+            'AI27':'summary'}
 
 
 def proposed_bridge(o, principal, route, task, policy, section, fields, start, end):
@@ -49,15 +49,13 @@ class LegacyProtectionDesignTests(unittest.TestCase):
         return proposed_bridge(self.o,self.owner,route,self.tasks[b,agent],policy,section,
                                fields or sorted(FIELDS[section]),self.start,self.end)
 
-    def test_existing_ai04_exposure_is_reproduced_not_silently_fixed(self):
+    def test_original_ai04_exposure_is_now_blocked_on_real_paths(self):
         self.enable_synthetic_legacy_finance()
-        body=self.o.business_foundation.read_for_ai(self.owner,'BIZ-A','AI04','finance_read',self.start,self.end)
-        self.assertIn('expense_yen',body)
-        self.assertEqual(body['expense_yen'],30)
-        old=self.o.business_operations.for_task(self.owner,self.tasks['BIZ-A','AI04'],self.start,self.end)
-        self.assertIn('profit_yen',old['summary'])
-        # The old KPI branch also admits AI04 with finance_read.
-        self.assertIsInstance(self.o.business_foundation.read_for_ai(self.owner,'BIZ-A','AI04','kpi_read',self.start,self.end),list)
+        for resource in ('finance_read','kpi_read'):
+            with self.assertRaises(PermissionError):
+                self.o.business_foundation.read_for_ai(self.owner,'BIZ-A','AI04',resource,self.start,self.end,task=self.tasks['BIZ-A','AI04'])
+        with self.assertRaises(PermissionError):
+            self.o.business_operations.for_task(self.owner,self.tasks['BIZ-A','AI04'],self.start,self.end)
 
     def test_all_28_roles_all_three_proposed_routes(self):
         self.enable_synthetic_legacy_finance()

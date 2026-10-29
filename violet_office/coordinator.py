@@ -94,6 +94,9 @@ class Coordinator:
         row = self.db.execute('SELECT * FROM requests WHERE id=?',(request,)).fetchone()
         if not row:
             raise ValueError('Unknown request')
+        from .legacy_accounting import deny_generic_content
+        for task in self.db.execute('SELECT task_id FROM request_tasks WHERE request_id=?',(request,)):
+            deny_generic_content(self.store,task[0])
         tasks = self.db.execute('''SELECT t.id,t.agent,t.status,t.action,rt.kind,
             a.id AS artifact_id,a.content FROM request_tasks rt JOIN tasks t ON t.id=rt.task_id
             LEFT JOIN artifacts a ON a.task_id=t.id WHERE rt.request_id=? ORDER BY rt.kind,t.agent''',(request,)).fetchall()

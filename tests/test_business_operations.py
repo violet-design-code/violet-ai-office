@@ -35,6 +35,18 @@ class BusinessOperationsTests(unittest.TestCase):
         a,z=self.dates(); return self.o.business_operations.summary(self.owner,b or self.b,start or a,end or z)
     def custom(self,key='new_count',unit='件'):
         f=self.o.business_foundation; f.adopt(self.owner,self.b,'合成の既存事業'); f.kpi(self.owner,self.b,key,'合成の追加指標',unit); return f
+    def approve_ai_accounting(self,b=None):
+        # Synthetic policy provisioning is explicit; production startup does not do this.
+        from violet_office.accounting_access import initialize_sandbox,AccountingAccess
+        initialize_sandbox(self.o,self.owner)
+        a,z=self.dates()
+        service=AccountingAccess(self.o)
+        policy=service.propose(self.owner,b or self.b,'AI27','summary',['revenue_yen','expense_yen','profit_yen'],a,z,'合成テスト用',(now()+timedelta(days=1)).isoformat())
+        service.decide(self.owner,policy,True)
+        for row in self.store.db.execute("SELECT p.task_id FROM portfolio_tasks p JOIN tasks t ON t.id=p.task_id WHERE p.business_id=? AND t.agent='AI27'",(b or self.b,)):
+            service.bind_task(self.owner,row[0],policy)
+        return policy
+
     def test_policy_unconfirmed_does_not_add_two_revenue_ledgers(self):
         d,q,i=self.invoiced(); self.o.portfolio.ledger(self.owner,self.b,'dup',self.day.isoformat(),'revenue',6600,'actual','合成')
         value=self.data(); self.assertIsNone(value['revenue_yen']); self.assertIsNone(value['profit_yen']); self.assertEqual(value['legacy_revenue_yen'],6600); self.assertEqual(value['scm_revenue_yen'],6000)
@@ -123,7 +135,8 @@ class BusinessOperationsTests(unittest.TestCase):
         self.assertGreaterEqual(self.store.db.execute("SELECT COUNT(*) FROM ops_audit WHERE outcome='denied'").fetchone()[0],2)
     def test_authenticated_task_context_uses_server_employee_and_assignment(self):
         f=self.o.business_foundation; f.adopt(self.owner,self.b,'合成'); f.assign(self.owner,self.b,'AI27','既存の数値分析','当該事業',['business_read','work','finance_read']); task=self.o.portfolio.task(self.owner,self.b,'ops','analysis','合成',agent='AI27'); ops=self.o.business_operations
-        data=ops.for_task(self.owner,task,*self.dates()); self.assertEqual(data['agent'],'AI27'); self.assertEqual(data['summary']['business_id'],self.b)
+        self.approve_ai_accounting()
+        data=ops.for_task(self.owner,task,*self.dates()); self.assertEqual(data['agent'],'AI27'); self.assertEqual(data['business_id'],self.b); self.assertEqual(set(data['data']),{'revenue_yen','expense_yen','profit_yen'})
         f.assign(self.owner,self.b,'AI27','合成','合成',['business_read','work'],True,1)
         with self.assertRaises(PermissionError): ops.for_task(self.owner,task,*self.dates())
         self.assertIsNotNone(self.store.db.execute("SELECT 1 FROM ops_audit WHERE event='ai_scope' AND outcome='denied'").fetchone())
@@ -131,10 +144,11 @@ class BusinessOperationsTests(unittest.TestCase):
         f=self.o.business_foundation; tasks=[]
         for b in ('BIZ-A','BIZ-B'):
             f.adopt(self.owner,b,'合成'); f.assign(self.owner,b,'AI27','合成','合成',['business_read','work','finance_read']); tasks.append(self.o.portfolio.task(self.owner,b,'ops','analysis','合成',agent='AI27'))
+        self.approve_ai_accounting('BIZ-A'); self.approve_ai_accounting('BIZ-B')
         staff=self.operator(); self.o.business_operations.for_task(staff,tasks[1],*self.dates())
         with self.assertRaises(PermissionError): self.o.business_operations.for_task(staff,tasks[0],*self.dates())
     def test_kpi_gateway_reuses_foundation_permissions_without_new_global_role(self):
-        f=self.custom(); f.assign(self.owner,self.b,'AI27','合成','合成',['business_read','work','finance_read']); self.assertTrue(f.read_for_ai(self.owner,self.b,'AI27','kpi_read',*self.dates()))
+        f=self.custom(); f.assign(self.owner,self.b,'AI27','合成','合成',['business_read','work','finance_read']); task=self.o.portfolio.task(self.owner,self.b,'kpi','analysis','合成',agent='AI27'); self.approve_ai_accounting(); self.assertEqual(f.read_for_ai(self.owner,self.b,'AI27','kpi_read',*self.dates(),task=task)['section'],'summary')
         with self.assertRaises(PermissionError): f.read_for_ai(self.owner,self.b,'AI17','kpi_read',*self.dates())
         self.assertEqual(len(self.store.agents),28)
     def test_http_scoped_aggregate_api_owner_policy_csrf_and_denial_audit(self):
@@ -169,6 +183,7 @@ class BusinessOperationsTests(unittest.TestCase):
         self.assertEqual(self.data(start=start,end=end)['counts']['interviews_completed'],1); self.assertEqual(self.data('BIZ-A',start,end)['counts']['interviews_completed'],0)
     def test_task_endpoint_rejects_spoofed_agent_fields_and_scoped_assignment_revocation(self):
         f=self.custom(); f.assign(self.owner,self.b,'AI27','合成','合成',['business_read','work','finance_read']); task=self.o.portfolio.task(self.owner,self.b,'http','analysis','合成',agent='AI27'); h,c=self.headers(); a,z=self.dates(); app=OfficeApp(self.path,8765); route='/business-task-kpis?task='+task+'&start='+a+'&end='+z
+        self.approve_ai_accounting()
         response=app.handle('GET',route,h); self.assertEqual(response[0],200); self.assertEqual(json.loads(response[2])['agent'],'AI27')
         self.assertEqual(app.handle('GET',route+'&agent=AI01',h)[0],400)
         f.assign(self.owner,self.b,'AI27','合成','合成',['business_read'],False,1); self.assertEqual(app.handle('GET',route,h)[0],403)

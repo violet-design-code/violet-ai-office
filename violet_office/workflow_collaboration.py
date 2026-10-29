@@ -110,6 +110,8 @@ class WorkflowCollaboration:
                 if [old[k] for k in ('job_id','to_agent','to_kind','reason')]!=[identifier,target,kind,reason]:raise ValueError('Handoff key conflict')
                 return old['id']
             row=self.row(p,b,identifier)
+            from .legacy_accounting import deny_generic_content
+            deny_generic_content(self.store,row['task_id'])
             if not row['task_id'] or row['state'] not in ('ready','done'):raise ValueError('Current available work required')
             guard_task(self.store,row['task_id'])
             if kind not in self.cfg['kinds'] or not available(self.store,b,target,kind) or not self.consent(p,b,row['deal_id'],kind):raise PermissionError('Target employee lacks scoped capability or consent')

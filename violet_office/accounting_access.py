@@ -1,10 +1,13 @@
-"""Opt-in accounting sandbox service. Not installed by Office or exposed over HTTP.
+"""Approved accounting projections; schema provisioning remains explicit only.
+
+Legacy AI gateways delegate limited reads here; detail/audit have no HTTP route.
 
 Only trusted server code may construct this service with an authenticated Principal.
 Do not pass its results through legacy artifacts/logs; use issue()/receive() handles.
 """
 from datetime import date, datetime, timezone
 import json
+import sqlite3
 from uuid import uuid4
 from .portfolio import period, text
 from .store import now
@@ -38,6 +41,12 @@ CREATE TABLE IF NOT EXISTS acct_handles(
  id TEXT PRIMARY KEY, business_id TEXT NOT NULL, task_id TEXT NOT NULL REFERENCES tasks(id),
  policy_id TEXT NOT NULL REFERENCES acct_policies(id), section TEXT NOT NULL,
  fields TEXT NOT NULL, start_day TEXT NOT NULL, end_day TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS acct_task_policies(
+ task_id TEXT NOT NULL REFERENCES tasks(id), policy_id TEXT NOT NULL REFERENCES acct_policies(id),
+ approved_by TEXT NOT NULL REFERENCES office_users(username), PRIMARY KEY(task_id,policy_id));
+CREATE TABLE IF NOT EXISTS acct_task_reads(
+ task_id TEXT PRIMARY KEY REFERENCES tasks(id), business_id TEXT NOT NULL,
+ policy_id TEXT NOT NULL REFERENCES acct_policies(id));
 CREATE TABLE IF NOT EXISTS acct_events(
  id TEXT PRIMARY KEY, policy_id TEXT, action TEXT NOT NULL,
  actor TEXT NOT NULL, created_at TEXT NOT NULL);
@@ -87,27 +96,68 @@ class AccountingAccess:
         return identifier
 
     def decide(self, p, identifier, approve):
-        row = self.db.execute('SELECT * FROM acct_policies WHERE id=?', (identifier,)).fetchone()
-        if not row:
-            raise PermissionError('Unknown policy')
-        self.owner(p, row['business_id'])
-        if type(approve) is not bool or row['status'] != 'pending':
-            raise ValueError('Pending policy and explicit decision required')
-        if expiry(row['expires_at']) <= now():
-            raise ValueError('Expired policy')
-        self.db.execute('UPDATE acct_policies SET status=?,approved_by=? WHERE id=?',
-                        ('approved' if approve else 'rejected', p.identity, identifier))
-        self.event(p, identifier, 'approved' if approve else 'rejected')
+        action = ('approve' if approve else 'reject') if type(approve) is bool else 'decision_invalid'
+        self._transition(p,identifier,action)
 
     def revoke(self, p, identifier):
-        row = self.db.execute('SELECT business_id FROM acct_policies WHERE id=?', (identifier,)).fetchone()
-        if not row:
-            raise PermissionError('Unknown policy')
-        self.owner(p, row[0])
-        self.db.execute("UPDATE acct_policies SET status='revoked' WHERE id=?", (identifier,))
-        self.event(p, identifier, 'revoked')
+        self._transition(p,identifier,'revoke')
+
+    def _transition(self, p, identifier, action):
+        # Store._transaction joins existing transactions; reject that mode here so
+        # a caught audit failure cannot leave an approval committed by a caller.
+        if self.db.in_transaction:
+            raise PermissionError('Accounting policy changes require an independent transaction')
+        def op():
+            # BEGIN IMMEDIATE is acquired before identity, state or expiry checks.
+            self.owner(p)
+            row=self.db.execute('SELECT * FROM acct_policies WHERE id=?',(identifier,)).fetchone()
+            if not row:
+                self.event(p,None,'policy_change_denied_unknown')
+                return PermissionError('Accounting policy unavailable')
+            self.owner(p,row['business_id'])
+            def denied(reason, message):
+                # Return the error so the denial audit commits before it is raised.
+                self.event(p,row['id'],action+'_denied_'+reason)
+                return ValueError(message)
+            if action=='decision_invalid':
+                return denied('input','Explicit boolean decision required')
+            if action=='revoke':
+                if row['status'] not in ('pending','approved'):
+                    return denied('state','Policy is not revocable')
+                changed=self.db.execute(
+                    "UPDATE acct_policies SET status='revoked' WHERE id=? AND status=?",
+                    (identifier,row['status']))
+                event='revoked'
+            else:
+                if row['status']!='pending':
+                    return denied('state','Pending accounting policy required')
+                try:
+                    expired=expiry(row['expires_at'])<=now()
+                except (TypeError,ValueError):
+                    return denied('expiry','Accounting policy expiry unavailable')
+                if expired:
+                    return denied('expired','Accounting policy expired')
+                # Check live SQLite time at UPDATE too, not only the earlier Python time.
+                changed=self.db.execute(
+                    "UPDATE acct_policies SET status=?,approved_by=? WHERE id=? AND status='pending' AND julianday(expires_at)>julianday('now')",
+                    ('approved' if action=='approve' else 'rejected',p.identity,identifier))
+                event='approved' if action=='approve' else 'rejected'
+            if changed.rowcount!=1:
+                return denied('conflict','Accounting policy state changed; request refused')
+            self.event(p,row['id'],event)
+            return None
+        try:
+            failure=self.o.store._transaction(op)
+        except sqlite3.Error:
+            # Lock/DB/audit failures must not become a grant or expose SQL/source values.
+            # With an unavailable writer even a denial audit cannot be durably written.
+            raise PermissionError('Accounting policy change unavailable') from None
+        if failure is not None:
+            raise failure
 
     def authorize(self, p, task, policy, section, fields, start, end):
+        from .legacy_accounting import require_schema
+        require_schema(self.db)
         context = self.db.execute('SELECT t.agent,t.status,p.business_id FROM tasks t JOIN portfolio_tasks p ON p.task_id=t.id WHERE t.id=?', (task,)).fetchone()
         grant = self.db.execute('SELECT * FROM acct_policies WHERE id=?', (policy,)).fetchone()
         if not context or not grant:
@@ -145,6 +195,21 @@ class AccountingAccess:
         self.db.execute('INSERT INTO acct_sources VALUES(?,?,?,?,?,?,?)',
                         (uuid4().hex, business, section, day, field, json.dumps(value), p.identity))
 
+    def bind_task(self, p, task, policy):
+        """Representative explicitly associates a task's purpose with an approved grant."""
+        return self.o.store._transaction(lambda: self._bind_task(p,task,policy))
+
+    def _bind_task(self, p, task, policy):
+        from .legacy_accounting import require_schema
+        require_schema(self.db)
+        grant=self.db.execute('SELECT * FROM acct_policies WHERE id=?',(policy,)).fetchone()
+        if not grant:
+            raise PermissionError('Approved accounting policy required')
+        self.owner(p,grant['business_id'])
+        self.authorize(p,task,policy,grant['section'],json.loads(grant['fields']),grant['start_day'],grant['end_day'])
+        self.db.execute('INSERT OR IGNORE INTO acct_task_policies VALUES(?,?,?)',(task,policy,p.identity))
+        self.event(p,policy,'task_bound')
+
     def read(self, p, task, policy, section, fields, start, end):
         return self.o.store._transaction(lambda: self._read(p, task, policy, section, fields, start, end))
 
@@ -164,6 +229,7 @@ class AccountingAccess:
                     self.o.portfolio.summary(p, business, start, end) if section == 'system' else
                     self.o.business_operations.summary(p, business, start, end))
             result = {f: data[f] for f in fields}
+        self.db.execute('INSERT OR IGNORE INTO acct_task_reads VALUES(?,?,?)',(task,business,policy))
         self.event(p, policy, 'read')
         return {'business_id': business, 'section': section, 'period': [start, end],
                 'data': result, 'source': 'legacy_actual_ledger' if section in ('detail', 'audit') else 'approved_structured_facts' if section in ('terms', 'advertising') else 'existing_manual_aggregate',
