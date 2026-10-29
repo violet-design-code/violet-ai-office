@@ -180,8 +180,20 @@ def database(ctx, path):
                 raise
     except Denied:
         raise
-    except (sqlite3.Error,OSError,ValueError,TypeError,KeyError,OverflowError,IndexError,AttributeError,RecursionError):
-        raise Unavailable('Synthetic recovery service unavailable') from None
+    except (sqlite3.Error,OSError,ValueError,TypeError,KeyError,OverflowError,IndexError,AttributeError,RecursionError) as error:
+        # Fixed categories only: never echo SQL, paths, payloads or exception text.
+        if isinstance(error,sqlite3.Error):
+            code=getattr(error,'sqlite_errorcode',None)
+            base=code & 255 if isinstance(code,int) else None
+            category={sqlite3.SQLITE_BUSY:'sqlite_busy',sqlite3.SQLITE_LOCKED:'sqlite_locked',
+                      sqlite3.SQLITE_CANTOPEN:'sqlite_open',sqlite3.SQLITE_IOERR:'sqlite_io',
+                      sqlite3.SQLITE_CORRUPT:'sqlite_corrupt',sqlite3.SQLITE_READONLY:'sqlite_readonly'}.get(base,'sqlite_error')
+        elif isinstance(error,OSError):
+            category='filesystem_in_use' if getattr(error,'winerror',None)==32 else 'filesystem_error'
+        else:
+            category='state_format_error'
+        role='local_ledger' if path==ctx.local else 'mock_authority'
+        raise Unavailable('Synthetic recovery service unavailable ['+role+':'+category+']') from None
 
 
 def read_records(db, key):

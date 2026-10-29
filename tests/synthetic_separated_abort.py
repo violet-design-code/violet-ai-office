@@ -19,7 +19,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
 from violet_office.synthetic_recovery import Denied, Unavailable, canonical, digest, verify, timestamp, project
-from violet_office.synthetic_abort import VerifiedAuthority, VerifiedLedger, OwnedOutputSupervisor, OwnedJob, _worker, FACTS
+from violet_office.synthetic_abort import VerifiedAuthority, VerifiedLedger, OwnedOutputSupervisor, OwnedJob, _worker, FACTS, wait_for_owned_reply
 
 MODEL = 'separated-ed25519-synthetic-v1'
 PROTOCOL = 'violet-synthetic-abort-signature-v1'
@@ -94,19 +94,26 @@ class MockAuthenticatedPeer:
 
 
 class IsolatedIssuer:
-    def __init__(self, peer, timeout=2):
+    def __init__(self, peer, timeout=2, startup_timeout=15):
         if (peer.sid!='SUPERVISOR-SID' or not peer.authenticated or peer.remote
                 or peer.server!='SYNTHETIC-ISSUER'):
             raise Denied('Authenticated synthetic supervisor required')
         self._peer=peer; self._owner_pid=os.getpid(); self.timeout=timeout
+        self.startup_timeout=startup_timeout; self._usable=True
         self.boot=uuid4().hex; self._capability=secrets.token_hex(32); self._sequence=0
         ctx=multiprocessing.get_context('spawn'); self._channel,child=ctx.Pipe()
         self.process=ctx.Process(target=_issuer_process,args=(child,self._capability,self.boot))
-        self.process.start(); child.close()
-        self.registration=self._reply()
+        try:
+            self.process.start(); child.close()
+            self.registration=self._reply(timeout=self.startup_timeout)
+        except BaseException:
+            child.close()
+            self.close()
+            raise
 
-    def _reply(self):
-        if not self._channel.poll(self.timeout): raise Unavailable('Synthetic issuer unavailable')
+    def _reply(self, timeout=None):
+        budget=self.timeout if timeout is None else timeout
+        wait_for_owned_reply(self._channel,self.process,budget,'Synthetic issuer unavailable')
         result=_receive(self._channel)
         if 'error' in result: raise Denied('Synthetic issuer refused')
         return result
@@ -116,7 +123,7 @@ class IsolatedIssuer:
         # PID is only an extra fixture guard, NOT a claim of OS peer authentication.
         if peer is not self._peer or os.getpid()!=self._owner_pid:
             raise Denied('Bound synthetic IPC endpoint required')
-        if not self.process.is_alive(): raise Unavailable('Synthetic issuer unavailable')
+        if not self._usable or not self.process.is_alive(): raise Unavailable('Synthetic issuer unavailable')
         self._sequence+=1
         try:
             _send(self._channel,{'command':command,'capability':self._capability,
@@ -124,13 +131,21 @@ class IsolatedIssuer:
             result=self._reply()
             if command=='rotate': self.registration=result
             return result
+        except Unavailable:
+            # An unread late response must never become the next request's reply.
+            self.close()
+            raise
         except (BrokenPipeError,EOFError,OSError):
+            self.close()
             raise Unavailable('Synthetic issuer unavailable') from None
 
     def close(self):
+        self._usable=False
         self._channel.close()
-        self.process.join(0.1)
-        if self.process.is_alive(): self.process.terminate(); self.process.join(2)
+        if self.process.pid is not None:
+            self.process.join(0.1)
+            if self.process.is_alive(): self.process.terminate(); self.process.join(2)
+            if self.process.is_alive(): raise Unavailable('Synthetic issuer exit unconfirmed')
 
 
 class SeparatedAuthority(VerifiedAuthority):
@@ -262,12 +277,13 @@ class SeparatedLedger(VerifiedLedger):
 
 
 class SeparatedSupervisor(OwnedOutputSupervisor):
-    def __init__(self, client, representative, normal_authorize, timeout=2):
+    def __init__(self, client, representative, normal_authorize, timeout=2, startup_timeout=15):
         self.client=client; self.normal=normal_authorize; self.timeout=timeout
+        self.startup_timeout=startup_timeout
         self.identity=uuid4().hex; self.boot=uuid4().hex; self.jobs={}; self.available=True
         self.owner=self.identity+':'+self.boot
         self.peer=MockAuthenticatedPeer('SUPERVISOR-SID')
-        self.issuer=IsolatedIssuer(self.peer,timeout)
+        self.issuer=IsolatedIssuer(self.peer,timeout,startup_timeout=startup_timeout)
         self.unknown_resources=set()  # Trusted test supervisor's model inventory.
         try:
             client._change(representative,'register_separated_issuer',identity=self.identity,
@@ -296,7 +312,7 @@ class SeparatedSupervisor(OwnedOutputSupervisor):
         self.jobs[identifier]=job
         try:
             process.start(); child.close()
-            ready=self._receive(job,'ready')
+            ready=self._receive(job,'ready',timeout=self.startup_timeout)
             if ready['pid']!=process.pid or digest(ready['resources'])!=managed['inventory_hash']:
                 raise Denied('Owned synthetic job inventory mismatch')
             managed['worker_pid']=process.pid

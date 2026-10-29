@@ -11,6 +11,7 @@ import hmac
 import io
 import json
 import multiprocessing
+from multiprocessing.connection import wait
 import os
 from pathlib import Path
 import secrets
@@ -24,6 +25,16 @@ from .synthetic_recovery import (Denied, Unavailable, LocalLedger, MockAuthority
 MODEL = 'owned-synthetic-file-v1'
 FACTS = {'worker_exited','registered_job_empty','owned_resources_closed',
          'synchronous_io_settled','buffer_unreachable','post_fence_retry_blocked'}
+
+
+def wait_for_owned_reply(connection, process, timeout, message):
+    """Bounded readiness wait; process death is failure, never an abort proof."""
+    try:
+        ready=wait([connection,process.sentinel],timeout=timeout)
+        if connection not in ready:
+            raise Unavailable(message)
+    except (OSError,ValueError):
+        raise Unavailable(message) from None
 
 
 def key_path(ctx, identity):
@@ -354,8 +365,9 @@ class OwnedJob:
 
 class OwnedOutputSupervisor:
     """Owner of fixed synthetic jobs, not a Windows supervisor or security boundary."""
-    def __init__(self, client, representative, normal_authorize, timeout=2):
+    def __init__(self, client, representative, normal_authorize, timeout=2, startup_timeout=15):
         self.client=client; self.normal=normal_authorize; self.timeout=timeout
+        self.startup_timeout=startup_timeout
         self.identity=uuid4().hex; self.boot=uuid4().hex
         self._secret=secrets.token_hex(32); self.jobs={}; self.available=True
         self.owner=self.identity+':'+self.boot
@@ -372,8 +384,9 @@ class OwnedOutputSupervisor:
     def _normal(self, guards):
         DeliveryBroker(self.client,self.normal)._normal(guards)
 
-    def _receive(self, job, event=None):
-        if not job.connection.poll(self.timeout): raise Unavailable('Synthetic worker observation unavailable')
+    def _receive(self, job, event=None, timeout=None):
+        budget=self.timeout if timeout is None else timeout
+        wait_for_owned_reply(job.connection,job.process,budget,'Synthetic worker observation unavailable')
         try: body=_read_frame(job.connection,job.control_key)
         except (EOFError,OSError): raise Unavailable('Synthetic worker observation unavailable') from None
         if (any(body.get(k)!=job.managed[k] for k in ('job','worker_nonce','supervisor_boot'))
@@ -410,7 +423,7 @@ class OwnedOutputSupervisor:
         self.jobs[identifier]=job
         try:
             process.start(); child.close()
-            ready=self._receive(job,'ready')
+            ready=self._receive(job,'ready',timeout=self.startup_timeout)
             if ready['pid']!=process.pid or digest(ready['resources'])!=managed['inventory_hash']:
                 raise Denied('Owned synthetic job inventory mismatch')
             managed['worker_pid']=process.pid
@@ -461,8 +474,7 @@ class OwnedOutputSupervisor:
         issuer=ctx.Process(target=_proof_issuer,args=(sender,self._secret,body,crash_before_proof))
         try:
             issuer.start(); sender.close()
-            if not receiver.poll(self.timeout):
-                raise Unavailable('Synthetic supervisor evidence unavailable')
+            wait_for_owned_reply(receiver,issuer,self.startup_timeout,'Synthetic supervisor evidence unavailable')
             try:
                 issued_body=_read_frame(receiver,self._secret,limit=16384)
                 envelope=_frame(self._secret,issued_body)

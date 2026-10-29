@@ -44,16 +44,15 @@ def disable_review_process(context, representative, identity, ready, out):
 
 class SeparatedAbortTests(unittest.TestCase):
     def setUp(self):
-        self.realm=SyntheticRealm(); self.rep=self.realm.representative_token
+        self.realm=SyntheticRealm(); self.addCleanup(self.realm.close)
+        self.rep=self.realm.representative_token
         self.client=SeparatedLedger(self.realm.context)
         self.client.enroll(self.rep); self.client.open_after_review(self.rep,history_confirmed=True)
         self.scope=Scope('BIZ-A','AI27','TASK-A','detail',('amount_yen',),'2026-01-01','2026-02-01','PURPOSE')
         self.expires=(datetime.now(timezone.utc)+timedelta(days=1)).isoformat()
         self.client.propose(self.rep,'P1',self.scope,self.expires); self.client.approve(self.rep,'P1')
         self.supervisor=SeparatedSupervisor(self.client,self.rep,lambda p,s:True,timeout=1)
-
-    def tearDown(self):
-        self.supervisor.close(); self.realm.close()
+        self.addCleanup(self.supervisor.close)
 
     def job(self, mode='flush_fail'):
         return self.supervisor.start('P1',self.scope,lambda scope:[{'amount_yen':10}],mode=mode)

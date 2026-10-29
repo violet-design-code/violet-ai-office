@@ -232,7 +232,8 @@ class SeminarSupportTests(unittest.TestCase):
     def test_web_auth_csrf_xss_nonce_and_mobile_route(self):
         sid,p=self.setup_recipient(); h,csrf=self.headers(); app=OfficeApp(self.path,8765)
         self.store.db.execute("UPDATE seminars SET title='<img src=x onerror=alert(1)>' WHERE id=?",(sid,))
-        response=app.handle('GET','/seminar-office?business=BIZ-B',h); self.assertEqual(response[0],200); self.assertIn(b'&lt;img',response[2]); self.assertNotIn(b'<img src=x',response[2])
+        month=datetime.fromisoformat(self.o.seminars.get(sid)['start_at']).astimezone(JST).strftime('%Y-%m')
+        response=app.handle('GET','/seminar-office?business=BIZ-B&month='+month,h); self.assertEqual(response[0],200); self.assertIn(b'&lt;img',response[2]); self.assertNotIn(b'<img src=x',response[2])
         self.assertEqual(self.post(h,'bad','s14_state',{'business':self.b,'seminar':sid,'state':'closed'})[0],403)
         first=self.post(h,csrf,'s14_schedule',{'business':self.b,'enabled':'1'},'2'*32); self.assertEqual(first,self.post(h,csrf,'s14_schedule',{'business':self.b,'enabled':'1'},'2'*32))
         staff=self.operator(); sh,sc=self.headers('staff','business_operator'); self.assertEqual(app.handle('GET','/seminar-office?business=BIZ-A',sh)[0],403)
